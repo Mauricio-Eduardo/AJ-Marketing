@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* .light-mode {
+  --background-sidebar: rgb(243 244 246);
+  --text-color-sidebar: #6e6ade;
+  --border-color-sidebar: #6e6ade;
+}
+
+.dark-mode {
+  --background-sidebar: rgb(31 41 55);
+  --submenu-background-sidebar: rgb(55 65 81);
+  --text-color-sidebar: rgb(243 244 246);
+  --border-color-sidebar: rgb(55 65 81);
+  transition: background-color 0.3s ease;
+}
+
+.react-pro-sidebar {
+  background-color: var(--background-sidebar);
+  color: var(--text-color-sidebar);
+  height: 100vh; /* para ocupar toda a altura da tela 
+
+  border-style: solid;
+  border-width: 2px;
+  border-color: var(--border-color-sidebar);
+}
+
+.navbar {
+  background-color: var(--background-sidebar);
+  color: var(--text-color-sidebar);
+  height: 6vh;
+
+  border-style: none none solid none;
+  border-width: 2px;
+  border-color: var(--border-color-sidebar);
+  transition: background-color 0.3s ease;
+}
+
+.menu-separator {
+  border-style: none none solid none;
+  border-width: 2px;
+  border-color: var(--border-color-sidebar);
+}
+
+.components {
+  background-color: var(--background-sidebar);
+  color: var(--text-color-sidebar);
+  border-color: var(--border-color-sidebar);
+  transition: background-color 0.3s ease;
+}
+
+.submenu-itens {
+  background-color: var(--submenu-background-sidebar);
+  color: var(--text-color-sidebar);
+  border-color: var(--border-color-sidebar);
+  transition: background-color 0.3s ease;
+  font-size: 12px;
+} */
