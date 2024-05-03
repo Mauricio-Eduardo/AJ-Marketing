@@ -15,9 +15,6 @@ LOG ON
     FILEGROWTH = 5 MB);
 GO
 
-
-
-
 USE ajmarketing;
 
 CREATE TABLE paises (
@@ -25,6 +22,10 @@ CREATE TABLE paises (
 
   pais VARCHAR(56) NOT NULL,
   ddi VARCHAR(3),
+
+  ativo BIT NOT NULL,
+  data_cadastro DATETIME NOT NULL,
+  data_ult_alt DATETIME NOT NULL,
 )
 
 CREATE TABLE estados (
@@ -33,6 +34,10 @@ CREATE TABLE estados (
 
   estado VARCHAR(56) NOT NULL,
   uf VARCHAR(2) NOT NULL,
+
+  ativo BIT NOT NULL,
+  data_cadastro DATETIME NOT NULL,
+  data_ult_alt DATETIME NOT NULL,
 )
 
 ALTER TABLE estados
@@ -44,9 +49,11 @@ CREATE TABLE cidades (
 
   cidade VARCHAR(100) NOT NULL,
   ddd VARCHAR(2),
+
+  ativo BIT NOT NULL,
+  data_cadastro DATETIME NOT NULL,
+  data_ult_alt DATETIME NOT NULL,
 );
 
 ALTER TABLE cidades
 ADD FOREIGN KEY (estado_ID) REFERENCES estados(estado_ID);
-
-SELECT * FROM cidades;
