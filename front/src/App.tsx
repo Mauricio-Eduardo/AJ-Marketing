@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
-import { MySidebar } from "./components/menubar components/sidebar";
+import { MySidebar } from "./components/Menubar/sidebar";
 import { useState } from "react";
-import { Navbar } from "./components/menubar components/navbar";
+import { Navbar } from "./components/Menubar/navbar";
 import { MoonStars, Sun } from "@phosphor-icons/react";
 
 export function App() {
@@ -17,7 +17,7 @@ export function App() {
 
       <div className="flex h-screen">
         <MySidebar darkMode={darkMode} />
-        <div id="page-content" className=" flex-1 p-2 mr-2">
+        <div id="page-content" className="flex-1 p-2 mr-2">
           <Outlet />
         </div>
       </div>

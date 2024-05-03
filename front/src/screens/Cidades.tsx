@@ -1,7 +1,10 @@
+import { Flex } from "@radix-ui/themes";
+import { CidadesDataTable } from "../components/DataTable/CidadesDataTable";
+
 export const Cidades = () => {
   return (
-    <div>
-      <h1>CIDADES</h1>
-    </div>
+    <Flex justify={"center"} direction={"column"}>
+      <CidadesDataTable />
+    </Flex>
   );
 };

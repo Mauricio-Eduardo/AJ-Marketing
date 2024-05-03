@@ -21,7 +21,9 @@ import ContasPagar from "./screens/ContasPagar.tsx";
 import Cronograma from "./screens/Cronograma.tsx";
 import Config from "./screens/Config.tsx";
 import { Planejamento } from "./screens/Planejamento.tsx";
-import { DataTable } from "./components/DataTable/DataTable.tsx";
+import { Paises } from "./screens/Paises.tsx";
+import { Estados } from "./screens/Estados.tsx";
+import { Cidades } from "./screens/Cidades.tsx";
 
 const router = createBrowserRouter([
   {
@@ -79,15 +81,15 @@ const router = createBrowserRouter([
       },
       {
         path: "cidades",
-        element: <DataTable tableName="cidades" />,
+        element: <Cidades />,
       },
       {
         path: "estados",
-        element: <DataTable tableName="estados" />,
+        element: <Estados />,
       },
       {
         path: "paises",
-        element: <DataTable tableName="paises" />,
+        element: <Paises />,
       },
     ],
   },
