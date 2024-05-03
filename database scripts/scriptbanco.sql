@@ -30,7 +30,7 @@ CREATE TABLE paises (
 
 CREATE TABLE estados (
   estado_ID int NOT NULL PRIMARY KEY IDENTITY,
-  pais_ID int NOT NULL,
+  pais_ID int NOT NULL, -- Foreign Key
 
   estado VARCHAR(56) NOT NULL,
   uf VARCHAR(2) NOT NULL,
@@ -45,7 +45,7 @@ ADD FOREIGN KEY (pais_ID) REFERENCES paises(pais_ID);
 
 CREATE TABLE cidades (
   cidade_ID int NOT NULL PRIMARY KEY IDENTITY,
-  estado_ID int NOT NULL,
+  estado_ID int NOT NULL, -- Foreign Key
 
   cidade VARCHAR(100) NOT NULL,
   ddd VARCHAR(2),
