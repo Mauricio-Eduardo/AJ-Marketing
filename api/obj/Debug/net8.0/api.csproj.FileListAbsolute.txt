@@ -36,3 +36,4 @@ D:\Faculdade\Prática Profissional\Projeto\api\obj\Debug\net8.0\refint\api.dll
 D:\Faculdade\Prática Profissional\Projeto\api\obj\Debug\net8.0\api.pdb
 D:\Faculdade\Prática Profissional\Projeto\api\obj\Debug\net8.0\api.genruntimeconfig.cache
 D:\Faculdade\Prática Profissional\Projeto\api\obj\Debug\net8.0\ref\api.dll
+D:\Faculdade\Prática Profissional\Projeto\api\obj\Debug\net8.0\api.sourcelink.json

@@ -6,7 +6,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("corspolicy",
     policy =>
     {
-        policy.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod();
+        policy.WithOrigins("http://localhost:5173", "https://hoppscotch.io").AllowAnyHeader().AllowAnyMethod();
     });
 });
 

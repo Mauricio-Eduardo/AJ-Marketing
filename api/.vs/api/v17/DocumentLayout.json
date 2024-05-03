@@ -3,10 +3,6 @@
   "WorkspaceRootPath": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|d:\\faculdade\\pr\u00E1tica profissional\\projeto\\api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|d:\\faculdade\\pr\u00E1tica profissional\\projeto\\api\\controllers\\cidadescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|solutionrelative:controllers\\cidadescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -31,53 +27,40 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Program.cs",
-              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AQIAAAkAAAAAAAAAAAAAABwAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-13T05:20:02.474Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "PaisesController.cs",
-              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Controllers\\PaisesController.cs",
-              "RelativeDocumentMoniker": "Controllers\\PaisesController.cs",
-              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Controllers\\PaisesController.cs",
-              "RelativeToolTip": "Controllers\\PaisesController.cs",
-              "ViewState": "AQIAAAsAAAAAAAAAAAAAwGkAAABMAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-13T04:59:16.635Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "EstadosController.cs",
-              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Controllers\\EstadosController.cs",
-              "RelativeDocumentMoniker": "Controllers\\EstadosController.cs",
-              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Controllers\\EstadosController.cs",
-              "RelativeToolTip": "Controllers\\EstadosController.cs",
-              "ViewState": "AQIAAGgAAAAAAAAAAAAYwGoAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-13T02:47:33.079Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
               "Title": "CidadesController.cs",
               "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Controllers\\CidadesController.cs",
               "RelativeDocumentMoniker": "Controllers\\CidadesController.cs",
               "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Controllers\\CidadesController.cs",
               "RelativeToolTip": "Controllers\\CidadesController.cs",
-              "ViewState": "AQIAAKIAAAAAAAAAAAAkwKsAAAAAAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA0AAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-13T03:31:32.819Z",
+              "WhenOpened": "2024-04-27T06:22:26.339Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PaisesController.cs",
+              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Controllers\\PaisesController.cs",
+              "RelativeDocumentMoniker": "Controllers\\PaisesController.cs",
+              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Controllers\\PaisesController.cs",
+              "RelativeToolTip": "Controllers\\PaisesController.cs",
+              "ViewState": "AQIAACYBAAAAAAAAAAAIwDcBAAAcAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-18T05:34:57.593Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "EstadosController.cs",
+              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Controllers\\EstadosController.cs",
+              "RelativeDocumentMoniker": "Controllers\\EstadosController.cs",
+              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Controllers\\EstadosController.cs",
+              "RelativeToolTip": "Controllers\\EstadosController.cs",
+              "ViewState": "AQIAAIQAAAAAAAAAAAAAADEBAAAdAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-18T05:35:32.992Z",
               "EditorCaption": ""
             }
           ]
