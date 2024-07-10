@@ -2,7 +2,7 @@ import React, { HTMLProps } from "react";
 
 export function IndeterminateCheckbox({
   indeterminate,
-  className = "",
+  // className = "",
   ...rest
 }: { indeterminate?: boolean } & HTMLProps<HTMLInputElement>) {
   const ref = React.useRef<HTMLInputElement>(null!);
@@ -17,7 +17,7 @@ export function IndeterminateCheckbox({
     <input
       type="checkbox"
       ref={ref}
-      className={className + " cursor-pointer"}
+      className={" cursor-pointer rounded-lg"}
       {...rest}
     />
   );

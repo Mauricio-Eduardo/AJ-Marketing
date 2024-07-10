@@ -6,24 +6,19 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import "@radix-ui/themes/styles.css";
-import { Theme } from "@radix-ui/themes";
+import { Theme, ThemePanel } from "@radix-ui/themes";
 
-import Clientes from "./screens/Clientes.tsx";
 import Home from "./screens/Home.tsx";
+import { EstadosScreen } from "./screens/estados/index.tsx";
+import { PaisesScreen } from "./screens/paises/index.tsx";
+import { CidadesScreen } from "./screens/cidades/index.tsx";
+import { OrigensScreen } from "./screens/origens/index.tsx";
 import ErrorPage from "./screens/ErrorPage.tsx";
-import Propostas from "./screens/Propostas.tsx";
-import Contratos from "./screens/Contratos.tsx";
-import Servicos from "./screens/Servicos.tsx";
-import Administrador from "./screens/Administrador.tsx";
-import FluxoCaixa from "./screens/FluxoCaixa.tsx";
-import ContaReceber from "./screens/ContaReceber.tsx";
-import ContasPagar from "./screens/ContasPagar.tsx";
-import Cronograma from "./screens/Cronograma.tsx";
-import Config from "./screens/Config.tsx";
-import { Planejamento } from "./screens/Planejamento.tsx";
-import { Paises } from "./screens/Paises.tsx";
-import { Estados } from "./screens/Estados.tsx";
-import { Cidades } from "./screens/Cidades.tsx";
+import { UsuariosScreen } from "./screens/usuarios/index.tsx";
+import { ClientesScreen } from "./screens/clientes/index.tsx";
+import { FormasPagamentoScreen } from "./screens/formasPagamento/index.tsx";
+import { CondicoesPagamentoScreen } from "./screens/condicoesPagamento/index.tsx";
+import { ServicosScreen } from "./screens/servicos/index.tsx";
 
 const router = createBrowserRouter([
   {
@@ -36,60 +31,40 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "clientes",
-        element: <Clientes />,
-      },
-      {
-        path: "propostas",
-        element: <Propostas />,
-      },
-      {
-        path: "contratos",
-        element: <Contratos />,
-      },
-      {
         path: "servicos",
-        element: <Servicos />,
+        element: <ServicosScreen />,
       },
       {
-        path: "planejamento",
-        element: <Planejamento />,
+        path: "/origens",
+        element: <OrigensScreen />,
       },
       {
-        path: "cronograma",
-        element: <Cronograma />,
+        path: "clientes",
+        element: <ClientesScreen />,
       },
       {
-        path: "contasPagar",
-        element: <ContasPagar />,
+        path: "formasPagamento",
+        element: <FormasPagamentoScreen />,
       },
       {
-        path: "contasReceber",
-        element: <ContaReceber />,
-      },
-      {
-        path: "fluxoCaixa",
-        element: <FluxoCaixa />,
-      },
-      {
-        path: "administrador",
-        element: <Administrador />,
-      },
-      {
-        path: "config",
-        element: <Config />,
+        path: "condicoesPagamento",
+        element: <CondicoesPagamentoScreen />,
       },
       {
         path: "cidades",
-        element: <Cidades />,
+        element: <CidadesScreen />,
       },
       {
         path: "estados",
-        element: <Estados />,
+        element: <EstadosScreen />,
       },
       {
         path: "paises",
-        element: <Paises />,
+        element: <PaisesScreen />,
+      },
+      {
+        path: "usuarios",
+        element: <UsuariosScreen />,
       },
     ],
   },
@@ -97,6 +72,7 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <Theme accentColor="violet" grayColor="slate" scaling="95%">
+    <ThemePanel defaultOpen={false} />
     <React.StrictMode>
       <RouterProvider router={router} />
     </React.StrictMode>
