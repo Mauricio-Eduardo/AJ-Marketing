@@ -17,10 +17,21 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("/GetAllUsuarios")]
-        public ActionResult<IEnumerable<UsuarioModel>> GetAllUsuarios(int ativo)
+        [Route("/GetAllUsuariosAtivos")]
+        public ActionResult<IEnumerable<UsuarioModel>> GetAllUsuariosAtivos()
         {
-            IEnumerable<UsuarioModel> result = usuariosService.GetAllUsuarios(ativo);
+            IEnumerable<UsuarioModel> result = usuariosService.GetAllUsuariosAtivos();
+            if (result != null)
+                return Ok(result);
+            else
+                return BadRequest();
+        }
+
+        [HttpGet]
+        [Route("/GetAllUsuarios")]
+        public ActionResult<IEnumerable<UsuarioModel>> GetAllUsuarios()
+        {
+            IEnumerable<UsuarioModel> result = usuariosService.GetAllUsuarios();
             if (result != null)
                 return Ok(result);
             else
@@ -29,9 +40,9 @@ namespace api.Controllers
 
         [HttpGet]
         [Route("/GetUsuario")]
-        public IActionResult GetUsuario(int usuario_ID)
+        public IActionResult GetUsuario(int id)
         {
-            UsuarioModel result = usuariosService.GetUsuario(usuario_ID);
+            UsuarioModel result = usuariosService.GetUsuario(id);
             if (result != null)
                 return Ok(result);
             else
@@ -62,9 +73,9 @@ namespace api.Controllers
 
         [HttpDelete]
         [Route("/DeleteUsuario")]
-        public IActionResult DeleteUsuario(int usuario_ID)
+        public IActionResult DeleteUsuario(int id)
         {
-            string result = usuariosService.DeleteUsuario(usuario_ID);
+            string result = usuariosService.DeleteUsuario(id);
             if (result != null)
                 return Ok(result);
             else

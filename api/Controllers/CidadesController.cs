@@ -40,9 +40,9 @@ namespace api.Controllers
 
         [HttpGet]
         [Route("/GetCidade")]
-        public IActionResult GetCidade(int cidade_ID)
+        public IActionResult GetCidade(int id)
         {
-            CidadeModel result = cidadesService.GetCidade(cidade_ID);
+            CidadeModel result = cidadesService.GetCidade(id);
             if (result != null)
                 return Ok(result);
             else
@@ -73,9 +73,9 @@ namespace api.Controllers
 
         [HttpDelete]
         [Route("/DeleteCidade")]
-        public IActionResult DeleteCidade(int cidade_ID)
+        public IActionResult DeleteCidade(int id)
         {
-            string result = cidadesService.DeleteCidade(cidade_ID);
+            string result = cidadesService.DeleteCidade(id);
             if (result != null)
                 return Ok(result);
             else

@@ -3,16 +3,16 @@
     public class FormaPagamentoPutModel
     {
         // Variáveis privadas correspondentes aos campos no banco de dados
-        private int _formaPag_ID;
+        private int _id;
         private string _formaPagamento;
 
         private bool _ativo;
 
         // Propriedades públicas para acessar as variáveis
-        public int FormaPag_ID
+        public int Id
         {
-            get { return _formaPag_ID; }
-            set { _formaPag_ID = value; }
+            get { return _id; }
+            set { _id = value; }
         }
 
         public string FormaPagamento
@@ -31,9 +31,9 @@
         public FormaPagamentoPutModel() { }
 
         // Construtor com parâmetros
-        public FormaPagamentoPutModel(int formaPag_ID, string formaPagamento, bool ativo)
+        public FormaPagamentoPutModel(int id, string formaPagamento, bool ativo)
         {
-            _formaPag_ID = formaPag_ID;
+            _id = id;
             _formaPagamento = formaPagamento;
             _ativo = ativo;
         }

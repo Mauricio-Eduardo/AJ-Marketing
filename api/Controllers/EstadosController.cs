@@ -40,9 +40,9 @@ namespace api.Controllers
 
         [HttpGet]
         [Route("/GetEstado")]
-        public IActionResult GetEstado(int estado_ID)
+        public IActionResult GetEstado(int id)
         {
-            EstadoModel result = estadosService.GetEstado(estado_ID);
+            EstadoModel result = estadosService.GetEstado(id);
             if (result != null)
                 return Ok(result);
             else
@@ -73,9 +73,9 @@ namespace api.Controllers
 
         [HttpDelete]
         [Route("/DeleteEstado")]
-        public IActionResult DeleteEstado(int estado_ID)
+        public IActionResult DeleteEstado(int id)
         {
-            string result = estadosService.DeleteEstado(estado_ID);
+            string result = estadosService.DeleteEstado(id);
             if (result != null)
                 return Ok(result);
             else

@@ -6,8 +6,8 @@ namespace api.Models.CondicaoPagamento
     public class CondicaoPagamentoModel: Model
     {
         // Variáveis privadas correspondentes aos campos no banco de dados
-        private int _condPag_ID;
         private string _condicaoPagamento;
+        private int _quantidadeParcelas;
         private decimal _desconto;
         private decimal _juros;
         private decimal _multa;
@@ -15,16 +15,16 @@ namespace api.Models.CondicaoPagamento
         private List<ParcelasModel> _parcelas;     
 
         // Propriedades públicas para acessar as variáveis
-        public int CondPag_ID
-        {
-            get { return _condPag_ID; }
-            set { _condPag_ID = value; }
-        }
-
         public string CondicaoPagamento
         {
             get { return _condicaoPagamento; }
             set { _condicaoPagamento = value; }
+        }
+
+        public int QuantidadeParcelas
+        {
+            get { return _quantidadeParcelas;  }
+            set { _quantidadeParcelas = value; }
         }
 
         public decimal Desconto
@@ -55,11 +55,11 @@ namespace api.Models.CondicaoPagamento
         public CondicaoPagamentoModel() { }
 
         // Construtor com parâmetros
-        public CondicaoPagamentoModel(int condPag_ID, string condicaoPagamento, decimal desconto, decimal juros, decimal multa, 
+        public CondicaoPagamentoModel(string condicaoPagamento, int quantidadeParcelas, decimal desconto, decimal juros, decimal multa, 
             List<ParcelasModel> parcelas)
         {
-            _condPag_ID = condPag_ID;
             _condicaoPagamento = condicaoPagamento;
+            _quantidadeParcelas = quantidadeParcelas;
             _desconto = desconto;
             _juros = juros; 
             _multa = multa;

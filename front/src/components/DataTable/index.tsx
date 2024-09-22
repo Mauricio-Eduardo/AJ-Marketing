@@ -1,143 +1,133 @@
-import React, { useEffect, useState } from "react";
-import { Button, Flex, Switch } from "@radix-ui/themes";
+import { useEffect, useState } from "react";
+import { Button, Flex } from "@radix-ui/themes";
 import {
   ColumnDef,
+  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { api } from "../../config/api";
+import {
+  ContratoControllerMethods,
+  ControllerMethods,
+  PropostaControllerMethods,
+} from "../../controllers/model";
 
-type TableConfig = {
-  ChildModal: any;
+interface TableConfig {
+  type?: string;
   columns: ColumnDef<any>[];
-  action: string;
+  controller:
+    | ControllerMethods
+    | PropostaControllerMethods
+    | ContratoControllerMethods;
   onRowSelectionChange: (selectedRow: any) => void;
-  apiUrl: string;
-};
+  refreshKey: number;
+}
 
-export function DataTable({
-  ChildModal,
+export const DataTable = ({
+  type,
   columns,
-  action,
+  controller,
   onRowSelectionChange,
-  apiUrl,
-}: TableConfig) {
-  // Essas duas const controlam a linha selecionada e salva os dados dela para levar para a modal
-  const [rowSelection, setRowSelection] = React.useState({});
-  const [selectedRowData, setSelectedRowData] = useState<any>({});
-
-  const [data, setData] = useState([]);
+  refreshKey,
+}: TableConfig) => {
+  const [data, setData] = useState<any[]>([]);
   const [pagination, setPagination] = useState({
-    pageIndex: 0, // initial page index
-    pageSize: 10, // default page size
+    pageIndex: 0,
+    pageSize: 10,
   });
+
+  const getColumnFilters = (): ColumnFiltersState => {
+    switch (type) {
+      case "contratos":
+        return [
+          {
+            id: "situacao",
+            value: "Vigente",
+          },
+        ];
+      case "propostas":
+        return [
+          {
+            id: "situacao",
+            value: "Pendente",
+          },
+        ];
+      default:
+        return [
+          {
+            id: "ativo",
+            value: "true",
+          },
+        ];
+    }
+  };
+
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
+    getColumnFilters()
+  );
+
+  const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
+
   const table = useReactTable({
     data,
     columns,
     state: {
-      rowSelection,
       pagination,
+      columnFilters,
     },
-    enableRowSelection: true, // enable row selection for all rows
-    enableMultiRowSelection: false,
-    onRowSelectionChange: setRowSelection,
+    onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    onPaginationChange: setPagination, // update the pagination state when internal APIs mutate the pagination state
+    onPaginationChange: setPagination,
     debugTable: true,
   });
 
-  const [ativo, setAtivo] = useState<boolean>(true);
-
-  const handleFilter = () => {
-    setAtivo((prevAtivo) => !prevAtivo);
+  const refresh = () => {
+    getAll();
+    setSelectedRowId(null);
   };
 
-  // Executa quando a requisiçao for um sucesso
-  const handleSuccess = () => {
-    getAllData(); // Recarregar dados da tabela após operação bem-sucedida
-    setRowSelection({}); // Desmarcar o checkbox
-  };
+  useEffect(() => {
+    refresh();
+  }, [refreshKey]);
 
-  // Aqui define a função getAll para pegar todos os dados da API (conforme url que for passada nos parametros)
-  function getAllData() {
-    if (apiUrl) {
-      try {
-        api
-          .get(apiUrl, {
-            params: { ativo: ativo ? "1" : "0" },
-          })
-          .then((response) => {
-            setData(response.data);
-          })
-          .catch((error) => {
-            alert(`Erro na requisição: ${String(error)}`);
-          });
-      } catch (error) {
-        alert(`Erro na requisição: ${String(error)}`);
-      }
+  // Desmarcar a linha selecionada quando um filtro de coluna for aplicado
+  useEffect(() => {
+    setSelectedRowId(null);
+  }, [columnFilters]);
+
+  async function getAll() {
+    try {
+      const result = await controller.getAll();
+      setData(result);
+    } catch (error) {
+      console.error("Error fetching data", error);
     }
   }
 
-  // Faz o get na api.url passada como parâmetro e armazena na variável data
   useEffect(() => {
-    getAllData();
-  }, [apiUrl]);
-
-  // Esse useEffect armazena os valores da linha selecionada na variavel "selectedRow" para passar por parametro para a modal
-  useEffect(() => {
-    if (Object.keys(rowSelection).length > 0) {
-      const selectedRowId = Object.keys(rowSelection)[0];
+    if (selectedRowId) {
       const selectedRow = table.getRowModel().rowsById[selectedRowId].original;
       if (selectedRow) {
-        setSelectedRowData(selectedRow);
         onRowSelectionChange(selectedRow);
       }
     } else {
-      setSelectedRowData({});
       onRowSelectionChange({});
     }
-    // setOpen(false);
-  }, [rowSelection, table, onRowSelectionChange]);
-
-  // Executa toda vez que o ativo é alterado para dar um refresh na DataTable e desmarcar o que está selecionado
-  useEffect(() => {
-    if (ativo !== undefined) {
-      getAllData();
-      setRowSelection({});
-    }
-  }, [ativo]);
+  }, [selectedRowId, table, onRowSelectionChange]);
 
   // Render
   return (
     <Flex direction={"column"} gap={"1"}>
-      {/* Esse ChildModal vai ser qualquer Modal de Cadastro que for passada como parâmetro, é dinâmico */}
-
-      <ChildModal
-        data={selectedRowData}
-        action={action}
-        onSuccess={handleSuccess}
-      />
-
-      <div className="flex gap-3 items-center">
-        <input
-          className="w-72 text-sm border border-zinc-300 hover:border-violet-600 focus:outline-violet-700 shadow-sm rounded h-8 p-2"
-          placeholder="Pesquisar"
-        />
-
-        <div className="flex flex-col items-center">
-          <label>Ativos?</label>
-          <Switch checked={ativo} onCheckedChange={handleFilter} />
-        </div>
-      </div>
-
       <div className="p-2 border-2 border-gray-200 rounded-lg">
         {/* Table */}
-        <table className="w-full text-center rounded-lg overflow-hidden">
+        <table className="w-full rounded-lg text-left overflow-hidden">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="bg-gray-300">
@@ -151,14 +141,16 @@ export function DataTable({
                       }}
                       className="p-2"
                     >
-                      {header.isPlaceholder ? null : (
-                        <>
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                        </>
-                      )}
+                      <div className="flex gap-2">
+                        {header.isPlaceholder ? null : (
+                          <>
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                          </>
+                        )}
+                      </div>
                     </th>
                   );
                 })}
@@ -167,13 +159,18 @@ export function DataTable({
           </thead>
           <tbody>
             {table.getRowModel().rows.map((row, index) => {
-              // Defina a classe de acordo com o índice da linha para alternar as cores de fundo
-              const rowClass = index % 2 === 0 ? "bg-gray-100" : "bg-gray-200";
+              const rowClass =
+                row.id === selectedRowId
+                  ? "bg-violet-200"
+                  : index % 2 === 0
+                  ? "bg-gray-100"
+                  : "bg-gray-200";
 
               return (
                 <tr
                   key={row.id}
                   className={`${rowClass} hover:bg-gray-200 text-sm`}
+                  onClick={() => setSelectedRowId(row.id)}
                 >
                   {row.getVisibleCells().map((cell) => {
                     return (
@@ -261,8 +258,7 @@ export function DataTable({
         </Flex>
       </div>
 
-      {/* <pre>{JSON.stringify(selectedRowData, null, 2)}</pre> */}
       <div />
     </Flex>
   );
-}
+};

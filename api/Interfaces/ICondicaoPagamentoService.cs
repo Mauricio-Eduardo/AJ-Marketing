@@ -6,9 +6,9 @@ namespace api.Interfaces
     {
         IEnumerable<CondicaoPagamentoModel> GetAllCondicoesPagamentoAtivas();
         IEnumerable<CondicaoPagamentoModel> GetAllCondicoesPagamento();
-        CondicaoPagamentoModel GetCondicaoPagamento(int condPag_ID);
+        CondicaoPagamentoModel GetCondicaoPagamento(int id);
         string PostCondicaoPagamento(CondicaoPagamentoPostModel condicaoPagInserida);
         string PutCondicaoPagamento(CondicaoPagamentoPutModel condicaoPagAlterada);
-        string DeleteCondicaoPagamento(int condPag_ID);
+        string DeleteCondicaoPagamento(int id);
     }
 }

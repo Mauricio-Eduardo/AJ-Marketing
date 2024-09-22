@@ -65,54 +65,38 @@ VALUES
 ('Crédito Consignado'),
 ('Vale Alimentação');
 
-INSERT INTO condicoesPagamento (condicaoPagamento, desconto, juros, multa) 
+INSERT INTO condicoesPagamento (condicaoPagamento, quantidadeParcelas, desconto, juros, multa) 
 VALUES
-('00', 5.00, 0.00, 0.00),
-('15', 0.00, 1.00, 0.00),
-('30', 0.00, 1.50, 0.00),
-('15/30', 0.00, 2.00, 0.00),
-('15/30/45', 0.00, 2.50, 0.00),
-('30/60', 0.00, 3.00, 0.00),
-('30/60/90', 0.00, 3.50, 0.00),
-('30/60/90/120', 0.00, 4.00, 0.00),
-('30/60/90/120/150', 0.00, 4.50, 0.00),
-('30/60/90/120/150/180', 0.00, 5.00, 0.00);
+('00', 1, 5.00, 0.00, 0.00),
+('15/30', 2, 0.00, 1.00, 0.00),
+('30/60/90', 3, 0.00, 1.50, 0.00),
+('15/30/45/60', 4, 0.00, 2.00, 0.00),
+('15/30/45', 0, 0.00, 2.50, 0.00),
+('30/60', 0, 0.00, 3.00, 0.00),
+('30/60/90', 0, 0.00, 3.50, 0.00),
+('30/60/90/120', 0, 0.00, 4.00, 0.00),
+('30/60/90/120/150', 0, 0.00, 4.50, 0.00),
+('30/60/90/120/150/180', 0, 0.00, 5.00, 0.00);
 
 INSERT INTO parcelas (numeroParcela, dias, porcentagem, condPag_ID, formaPag_ID)
 VALUES
 (1, 30, 10.00, 1, 1),
 (2, 60, 20.00, 2, 2),
-(3, 90, 30.00, 3, 3),
-(4, 120, 40.00, 4, 4),
-(5, 150, 50.00, 5, 5),
-(6, 180, 60.00, 6, 6),
-(7, 210, 70.00, 7, 7),
-(8, 240, 80.00, 8, 8),
-(9, 270, 90.00, 9, 9),
-(10, 300, 100.00, 10, 10);
+(3, 90, 30.00, 2, 3),
+(4, 120, 40.00, 3, 4),
+(5, 150, 50.00, 3, 5),
+(6, 180, 60.00, 3, 6),
+(7, 210, 70.00, 4, 7),
+(8, 240, 80.00, 4, 8),
+(9, 270, 90.00, 4, 9),
+(10, 300, 100.00, 4, 10);
 
-INSERT INTO propostas (tipo_pessoa, cpf_cnpj, nome_razaoSocial, email, celular, prazo_final, inicio, termino, total)
+INSERT INTO peridiocidades (descricao, dias)
 VALUES 
-('Física', '12345678901', 'João Silva', 'joao.silva@example.com', '11987654321', GETDATE(), GETDATE(), GETDATE(), 1000.00),
-('Jurídica', '12345678000195', 'Empresa ABC', 'contato@empresaabc.com', '11987654322', GETDATE(), GETDATE(), GETDATE(), 1000.00),
-('Física', '12345678902', 'Maria Souza', 'maria.souza@example.com', '11987654323', GETDATE(), GETDATE(), GETDATE(), 1000.00),
-('Jurídica', '12345678000295', 'Empresa XYZ', 'contato@empresaxyz.com', '11987654324', GETDATE(), GETDATE(), GETDATE(), 1000.00),
-('Física', '12345678903', 'Carlos Lima', 'carlos.lima@example.com', '11987654325', GETDATE(), GETDATE(), GETDATE(), 1000.00),
-('Jurídica', '12345678000395', 'Empresa DEF', 'contato@empresadef.com', '11987654326', GETDATE(), GETDATE(), GETDATE(), 1000.00),
-('Física', '12345678904', 'Ana Pereira', 'ana.pereira@example.com', '11987654327', GETDATE(), GETDATE(), GETDATE(), 1000.00),
-('Jurídica', '12345678000495', 'Empresa GHI', 'contato@empresaghi.com', '11987654328', GETDATE(), GETDATE(), GETDATE(), 1000.00),
-('Física', '12345678905', 'Fernanda Oliveira', 'fernanda.oliveira@example.com', '11987654329', GETDATE(), GETDATE(), GETDATE(), 1000.00),
-('Jurídica', '12345678000595', 'Empresa JKL', 'contato@empresajkl.com', '11987654330', GETDATE(), GETDATE(), GETDATE(), 1000.00);
-
-
-DECLARE @PropostaID INT;
-SET @PropostaID = SCOPE_IDENTITY();
-
-INSERT INTO propostas_servicos(proposta_ID, servico_ID, quantidade, valor_unitario)
-VALUES
-	(@PropostaID, FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 1, 10.00),
-	(@PropostaID, FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 2, 20.00),
-	(@PropostaID, FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 3, 30.00);
+('Semanal', 7),
+('Quinzenal', 15), 
+('Mensal', 30),
+('Anual', 365);
 
 INSERT INTO usuarios (nome, email, senha)
 VALUES
@@ -166,8 +150,11 @@ VALUES
 ('Financeiro'),
 ('Imobiliário');
 
+-- Tabela temporária para armazenar os IDs das propostas inseridas
+DECLARE @Clientes TABLE (ClienteID INT);
+
+-- Inserindo ao clientes e capturando os IDs gerados
 INSERT INTO clientes (
-	proposta_ID,
     tipo_pessoa, 
     cpf_cnpj, 
     nome_razaoSocial, 
@@ -176,56 +163,142 @@ INSERT INTO clientes (
     genero,
     email, 
     celular, 
-    cidade_ID, 
+    cidade_id, 
     logradouro, 
     numero, 
     bairro, 
     complemento, 
     cep, 
-    origem_ID, 
-    interesse_ID,
-    ramo_ID
-) 
+    origem_id 
+)
+OUTPUT INSERTED.id INTO @Clientes(ClienteID)  -- Captura o ID das propostas inseridas
 VALUES 
-(FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 'Física', '12345678901', 'João Silva', 'João', 'MG1234567', 'Masculino', 'joao.silva@example.com', '11987654321', FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 'Rua A', '100', 'Centro', NULL, '12345678', FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID())))),
-(FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 'Jurídica', '12345678000195', 'Empresa ABC', 'ABC Ltda', 'SP12345678', NULL, 'contato@empresaabc.com', '11987654322', FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 'Rua B', '200', 'Centro', NULL, '12345679', FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID())))),
-(FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 'Física', '12345678902', 'Maria Souza', 'Maria', 'RJ1234567', 'Feminino', 'maria.souza@example.com', '11987654323', FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 'Rua C', '300', 'Bairro A', NULL, '12345680', FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID())))),
-(FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 'Jurídica', '12345678000295', 'Empresa XYZ', 'XYZ Ltda', 'SP12345679', NULL, 'contato@empresaxyz.com', '11987654324', FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 'Rua D', '400', 'Bairro B', NULL, '12345681', FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID())))),
-(FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 'Física', '12345678903', 'Carlos Lima', 'Carlos', 'MG1234568', 'Masculino', 'carlos.lima@example.com', '11987654325', FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 'Rua E', '500', 'Bairro C', NULL, '12345682', FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID())))),
-(FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 'Jurídica', '12345678000395', 'Empresa DEF', 'DEF Ltda', 'SP12345680', NULL, 'contato@empresadef.com', '11987654326', FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 'Rua F', '600', 'Bairro D', NULL, '12345683', FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID())))),
-(FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 'Física', '12345678904', 'Ana Pereira', 'Ana', 'RJ1234568', 'Feminino', 'ana.pereira@example.com', '11987654327', FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 'Rua G', '700', 'Bairro E', NULL, '12345684', FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID())))),
-(FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 'Jurídica', '12345678000495', 'Empresa GHI', 'GHI Ltda', 'SP12345681', NULL, 'contato@empresaghi.com', '11987654328', FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 'Rua H', '800', 'Bairro F', NULL, '12345685', FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID())))),
-(FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 'Física', '12345678905', 'Fernanda Oliveira', 'Fernanda', 'MG1234569', 'Feminino', 'fernanda.oliveira@example.com', '11987654329', FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 'Rua I', '900', 'Bairro G', NULL, '12345686', FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID())))),
-(FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 'Jurídica', '12345678000595', 'Empresa JKL', 'JKL Ltda', 'SP12345682', NULL, 'contato@empresajkl.com', '11987654330', FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), 'Rua J', '1000', 'Bairro H', NULL, '12345687', FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))), FLOOR(1 + (10 - 1 + 1) * RAND(CHECKSUM(NEWID()))));
+('Física', '12345678901', 'João Silva', 'João', 'MG1234567', 'Masculino', 'joao.silva@example.com', '11987654321', 1, 'Rua A', '100', 'Centro', '', '12345678', 1),
+('Jurídica', '12345678000195', 'Empresa ABC', 'ABC Ltda', 'SP12345678', '', 'contato@empresaabc.com', '11987654322', 2, 'Rua B', '200', 'Centro', '', '12345679', 2),
+('Física', '12345678902', 'Maria Souza', 'Maria', 'RJ1234567', 'Feminino', 'maria.souza@example.com', '11987654323', 3, 'Rua C', '300', 'Bairro A', '', '12345680', 3),
+('Jurídica', '12345678000295', 'Empresa XYZ', 'XYZ Ltda', 'SP12345679', '', 'contato@empresaxyz.com', '11987654324', 4, 'Rua D', '400', 'Bairro B', '', '12345681', 4),
+('Física', '12345678903', 'Carlos Lima', 'Carlos', 'MG1234568', 'Masculino', 'carlos.lima@example.com', '11987654325', 5, 'Rua E', '500', 'Bairro C', '', '12345682', 5),
+('Jurídica', '12345678000395', 'Empresa DEF', 'DEF Ltda', 'SP12345680', '', 'contato@empresadef.com', '11987654326', 6, 'Rua F', '600', 'Bairro D', '', '12345683', 6),
+('Física', '12345678904', 'Ana Pereira', 'Ana', 'RJ1234568', 'Feminino', 'ana.pereira@example.com', '11987654327', 7, 'Rua G', '700', 'Bairro E', '', '12345684', 7),
+('Jurídica', '12345678000495', 'Empresa GHI', 'GHI Ltda', 'SP12345681', '', 'contato@empresaghi.com', '11987654328', 8, 'Rua H', '800', 'Bairro F', '', '12345685', 8),
+('Física', '12345678905', 'Fernanda Oliveira', 'Fernanda', 'MG1234569', 'Feminino', 'fernanda.oliveira@example.com', '11987654329', 9, 'Rua I', '900', 'Bairro G', '', '12345686', 9),
+('Jurídica', '12345678000595', 'Empresa JKL', 'JKL Ltda', 'SP12345682', '', 'contato@empresajkl.com', '11987654330', 10, 'Rua J', '1000', 'Bairro H', '', '12345687', 10);
 
+-- Inserindo os usuarios para cada cliente inserido
+INSERT INTO clientes_usuarios(cliente_id, usuario_id)
+SELECT 
+    c.ClienteID, 
+    1
+FROM @Clientes c
+UNION ALL
+SELECT 
+    c.ClienteID, 
+    2
+FROM @Clientes c
+UNION ALL
+SELECT 
+    c.ClienteID, 
+    3
+FROM @Clientes c;
 
-DECLARE @ClienteID INT;
-SET @ClienteID = SCOPE_IDENTITY();
+-- Inserindo os usuarios para cada cliente inserido
+INSERT INTO clientes_interesses(cliente_id, interesse_id)
+SELECT 
+    c.ClienteID, 
+    1
+FROM @Clientes c
+UNION ALL
+SELECT 
+    c.ClienteID, 
+    2
+FROM @Clientes c
+UNION ALL
+SELECT 
+    c.ClienteID, 
+    3
+FROM @Clientes c
 
-INSERT INTO clientes_usuarios (cliente_ID, usuario_ID)
-VALUES
-	(@ClienteID, 1),
-	(@ClienteID, 2),
-	(@ClienteID, 3);
+-- Inserindo os usuarios para cada cliente inserido
+INSERT INTO clientes_ramosAtividade(cliente_id, ramo_id)
+SELECT 
+    c.ClienteID, 
+    1
+FROM @Clientes c
+UNION ALL
+SELECT 
+    c.ClienteID, 
+    2
+FROM @Clientes c
+UNION ALL
+SELECT 
+    c.ClienteID, 
+    3
+FROM @Clientes c;
 
+-- Tabela temporária para armazenar os IDs das propostas inseridas
+DECLARE @Propostas TABLE (PropostaID INT);
 
-INSERT INTO contratos (proposta_ID, cliente_ID, condPag_ID, total, situacao)
+-- Inserindo as propostas e capturando os IDs gerados
+INSERT INTO propostas (cliente_id, peridiocidade_id, data_proposta, prazo_final, data_inicio, total)
+OUTPUT INSERTED.id INTO @Propostas(PropostaID)  -- Captura o ID das propostas inseridas
 VALUES 
-(1, 1, 1, 1000.00, 'Vigente'),
-(2, 2, 2, 2000.00, 'Vigente'),
-(3, 3, 3, 1500.00, 'Vigente'),
-(4, 4, 4, 2500.00, 'A vencer'),
-(5, 5, 5, 3000.00, 'A vencer'),
-(6, 6, 6, 3500.00, 'A vencer'),
-(7, 7, 7, 4000.00, 'Vencido'),
-(8, 8, 8, 4500.00, 'Vencido'),
-(9, 9, 9, 5000.00, 'Vencido'),
-(10, 10, 10, 5500.00, 'Vencido');
+(1, 1, GETDATE(), GETDATE(), GETDATE(), 100.00),
+(2, 2, GETDATE(), GETDATE(), GETDATE(), 200.00),
+(3, 2, GETDATE(), GETDATE(), GETDATE(), 300.00),
+(4, 2, GETDATE(), GETDATE(), GETDATE(), 400.00),
+(5, 3, GETDATE(), GETDATE(), GETDATE(), 500.00),
+(6, 3, GETDATE(), GETDATE(), GETDATE(), 600.00),
+(7, 4, GETDATE(), GETDATE(), GETDATE(), 700.00),
+(8, 4, GETDATE(), GETDATE(), GETDATE(), 800.00),
+(9, 1, GETDATE(), GETDATE(), GETDATE(), 900.00),
+(10, 1, GETDATE(), GETDATE(), GETDATE(), 1000.00);
+
+-- Inserindo os serviços para cada proposta inserida
+INSERT INTO propostas_servicos(proposta_id, servico_id, quantidade, valor_unitario, desconto, valor_total)
+SELECT 
+    p.PropostaID, 
+    1,
+    1, -- Quantidade
+    10.00, -- Valor Unitário
+    0.00, -- Desconto
+    10.00  -- Valor Total
+FROM @Propostas p
+UNION ALL
+SELECT 
+    p.PropostaID, 
+    2,
+    2, 
+    20.00, 
+    5.00, 
+    30.00
+FROM @Propostas p
+UNION ALL
+SELECT 
+    p.PropostaID, 
+    3,
+    3, 
+    30.00, 
+    10.00, 
+    60.00
+FROM @Propostas p;
+
+INSERT INTO contratos (proposta_id, cliente_id, condPag_id, data_contrato, data_vencimento, situacao)
+VALUES 
+(1, 1, 1, GETDATE(), GETDATE(), 'Vigente'),
+(2, 2, 2, GETDATE(), GETDATE(), 'Vigente'),
+(3, 3, 3, GETDATE(), GETDATE(), 'Vigente'),
+(4, 4, 4, GETDATE(), GETDATE(), 'Cancelado'),
+(5, 5, 5, GETDATE(), GETDATE(), 'Cancelado'),
+(6, 6, 6, GETDATE(), GETDATE(), 'Cancelado'),
+(7, 7, 7, GETDATE(), GETDATE(), 'Cancelado'),
+(8, 8, 8, GETDATE(), GETDATE(), 'Vigente'),
+(9, 9, 9, GETDATE(), GETDATE(), 'Vigente'),
+(10, 10, 10, GETDATE(), GETDATE(), 'Vigente');
 
 INSERT INTO contasReceber (cliente_ID, contrato_ID, data_vencimento, valor, situacao)
 VALUES 
 (1, 1, '2024-02-01', 1000.00, 'Pendente'),
-(2, 2, '2024-02-02', 2000.00, 'Pendente'),
+(2, 2, '2024-02-02', 2000.00, 'Pendente'),	
 (3, 3, '2024-02-03', 1500.00, 'Pendente'),
 (4, 4, '2024-02-04', 2500.00, 'Pendente'),
 (5, 5, '2024-02-05', 3000.00, 'Pendente'),

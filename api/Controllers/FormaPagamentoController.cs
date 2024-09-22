@@ -16,10 +16,21 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("/GetAllFormasPagamento")]
-        public ActionResult<IEnumerable<FormaPagamentoModel>> GetAllFormasPagamento(int ativo)
+        [Route("/GetAllFormasPagamentoAtivas")]
+        public ActionResult<IEnumerable<FormaPagamentoModel>> GetAllFormasPagamentoAtivas()
         {
-            IEnumerable<FormaPagamentoModel> result = formaPagamentoService.GetAllFormasPagamento(ativo);
+            IEnumerable<FormaPagamentoModel> result = formaPagamentoService.GetAllFormasPagamentoAtivas();
+            if (result != null)
+                return Ok(result);
+            else
+                return BadRequest();
+        }
+
+        [HttpGet]
+        [Route("/GetAllFormasPagamento")]
+        public ActionResult<IEnumerable<FormaPagamentoModel>> GetAllFormasPagamento()
+        {
+            IEnumerable<FormaPagamentoModel> result = formaPagamentoService.GetAllFormasPagamento();
             if (result != null)
                 return Ok(result);
             else
@@ -28,9 +39,9 @@ namespace api.Controllers
 
         [HttpGet]
         [Route("/GetFormaPagamento")]
-        public IActionResult GetFormasPagamento(int formaPag_ID)
+        public IActionResult GetFormasPagamento(int id)
         {
-            FormaPagamentoModel result = formaPagamentoService.GetFormaPagamento(formaPag_ID);
+            FormaPagamentoModel result = formaPagamentoService.GetFormaPagamento(id);
             if (result != null)
                 return Ok(result);
             else
@@ -61,9 +72,9 @@ namespace api.Controllers
 
         [HttpDelete]
         [Route("/DeleteFormaPagamento")]
-        public IActionResult DeleteFormaPagamento(int formaPag_ID)
+        public IActionResult DeleteFormaPagamento(int id)
         {
-            string result = formaPagamentoService.DeleteFormaPagamento(formaPag_ID);
+            string result = formaPagamentoService.DeleteFormaPagamento(id);
             if (result != null)
                 return Ok(result);
             else

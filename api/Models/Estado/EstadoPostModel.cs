@@ -6,7 +6,7 @@
         private string _estado;
         private string _uf;
 
-        private int _pais_ID;
+        private int _pais_id;
 
         // Propriedades públicas para acessar as variáveis
         public string Estado
@@ -21,21 +21,21 @@
             set { _uf = value; }
         }
 
-        public int Pais_ID
+        public int Pais_id
         {
-            get { return _pais_ID; }
-            set { _pais_ID = value; }
+            get { return _pais_id; }
+            set { _pais_id = value; }
         }
 
         // Construtor sem parâmetros
         public EstadoPostModel() { }
 
         // Construtor com parâmetros
-        public EstadoPostModel(string estado, string uf, int pais_ID, bool ativo)
+        public EstadoPostModel(string estado, string uf, int pais_id)
         {
             _estado = estado;
             _uf = uf;
-            _pais_ID = pais_ID;
+            _pais_id = pais_id;
         }
     }
 }

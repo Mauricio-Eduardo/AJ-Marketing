@@ -5,6 +5,7 @@ namespace api.Models.CondicaoPagamento
     public class CondicaoPagamentoPostModel
     {
         private string _condicaoPagamento;
+        private int _quantidadeParcelas;
         private decimal _desconto;
         private decimal _juros;
         private decimal _multa;
@@ -16,6 +17,12 @@ namespace api.Models.CondicaoPagamento
         {
             get { return _condicaoPagamento; }
             set { _condicaoPagamento = value; }
+        }
+
+        public int QuantidadeParcelas
+        {
+            get { return _quantidadeParcelas; }
+            set { _quantidadeParcelas = value; }
         }
 
         public decimal Desconto
@@ -46,9 +53,10 @@ namespace api.Models.CondicaoPagamento
         public CondicaoPagamentoPostModel() { }
 
         // Construtor com parâmetros
-        public CondicaoPagamentoPostModel(string condicaoPagamento, decimal desconto, decimal juros, decimal multa, List<ParcelasPostModel> parcelas)
+        public CondicaoPagamentoPostModel(string condicaoPagamento, int quantidadeParcelas, decimal desconto, decimal juros, decimal multa, List<ParcelasPostModel> parcelas)
         {
             _condicaoPagamento = condicaoPagamento;
+            _quantidadeParcelas = quantidadeParcelas;
             _desconto = desconto;
             _juros = juros; 
             _multa = multa;

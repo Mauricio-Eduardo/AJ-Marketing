@@ -17,10 +17,21 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("/GetAllServicos")]
-        public ActionResult<IEnumerable<ServicoModel>> GetAllServicos(int ativo)
+        [Route("/GetAllServicosAtivos")]
+        public ActionResult<IEnumerable<ServicoModel>> GetAllServicosAtivos()
         {
-            IEnumerable<ServicoModel> result = servicosService.GetAllServicos(ativo);
+            IEnumerable<ServicoModel> result = servicosService.GetAllServicosAtivos();
+            if (result != null)
+                return Ok(result);
+            else
+                return BadRequest();
+        }
+
+        [HttpGet]
+        [Route("/GetAllServicos")]
+        public ActionResult<IEnumerable<ServicoModel>> GetAllServicos()
+        {
+            IEnumerable<ServicoModel> result = servicosService.GetAllServicos();
             if (result != null)
                 return Ok(result);
             else
@@ -29,9 +40,9 @@ namespace api.Controllers
 
         [HttpGet]
         [Route("/GetServico")]
-        public IActionResult GetServico(int servico_ID)
+        public IActionResult GetServico(int id)
         {
-            ServicoModel result = servicosService.GetServico(servico_ID);
+            ServicoModel result = servicosService.GetServico(id);
             if (result != null)
                 return Ok(result);
             else
@@ -62,9 +73,9 @@ namespace api.Controllers
 
         [HttpDelete]
         [Route("/DeleteServico")]
-        public IActionResult DeleteServico(int servico_ID)
+        public IActionResult DeleteServico(int id)
         {
-            string result = servicosService.DeleteServico(servico_ID);
+            string result = servicosService.DeleteServico(id);
             if (result != null)
                 return Ok(result);
             else

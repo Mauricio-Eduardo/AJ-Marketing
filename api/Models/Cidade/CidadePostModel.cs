@@ -6,7 +6,7 @@
         private string _cidade;
         private string _ddd;
 
-        private int _estado_ID;
+        private int _estado_id;
 
         // Propriedades públicas para acessar as variáveis
         public string Cidade
@@ -20,21 +20,21 @@
             get { return _ddd; }
             set { _ddd = value; }
         }
-        public int Estado_ID
+        public int Estado_id
         {
-            get { return _estado_ID; }
-            set { _estado_ID = value; }
+            get { return _estado_id; }
+            set { _estado_id = value; }
         }
 
         // Construtor sem parâmetros
         public CidadePostModel() { }
 
         // Construtor com parâmetros
-        public CidadePostModel(string cidade, string ddd, int estado_ID)
+        public CidadePostModel(string cidade, string ddd, int estado_id)
         {
             _cidade = cidade;
             _ddd = ddd;
-            _estado_ID = estado_ID;
+            _estado_id = estado_id;
         }
     }
 }

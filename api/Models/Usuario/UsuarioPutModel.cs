@@ -4,8 +4,7 @@
     {
 
         // Variáveis que podem ser editáveis em um registro
-        private int _usuario_ID; // o ID não é editável porém é necessário para a requisição do PUT
-        private string _cpf;
+        private int _id; // o ID não é editável porém é necessário para a requisição do PUT
         private string _nome;  
         private string _email;
         private string _senha;
@@ -13,16 +12,10 @@
         private bool _ativo;
 
         // Propriedades públicas para acessar as variáveis
-        public int Usuario_ID
+        public int Id
         {
-            get { return _usuario_ID; }
-            set { _usuario_ID = value; }
-        }
-
-        public string Cpf
-        {
-            get { return _cpf; }
-            set { _cpf = value; }
+            get { return _id; }
+            set { _id = value; }
         }
 
         public string Nome
@@ -53,14 +46,13 @@
         public UsuarioPutModel() { }
 
         // Construtor com parâmetros
-        public UsuarioPutModel(int Usuario_ID, string Cpf, string Nome, string Email, string Senha, bool Ativo)
+        public UsuarioPutModel(int id, string nome, string email, string senha, bool ativo)
         {
-            _usuario_ID = Usuario_ID;
-            _cpf = Cpf;
-            _nome = Nome;
-            _email = Email;
-            _senha = Senha;
-            _ativo = Ativo;
+            _id = id;
+            _nome = nome;
+            _email = email;
+            _senha = senha;
+            _ativo = ativo;
         }
     }
 }

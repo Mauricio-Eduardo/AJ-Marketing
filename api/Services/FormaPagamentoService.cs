@@ -15,7 +15,7 @@ namespace api.Services
             this.Connection = pSqlConnection;
         }
 
-        public IEnumerable<FormaPagamentoModel> GetAllFormasPagamento(int ativo) 
+        public IEnumerable<FormaPagamentoModel> GetAllFormasPagamentoAtivas() 
         {
             List<FormaPagamentoModel> listaFormaPagamentos = new List<FormaPagamentoModel>();
 
@@ -29,7 +29,7 @@ namespace api.Services
                         "SELECT * FROM formasPagamento WHERE ativo = @ativo"), Connection);
 
                     getAllCmd.Parameters.Clear();
-                    getAllCmd.Parameters.Add("@ativo", SqlDbType.Bit).Value = ativo;
+                    getAllCmd.Parameters.Add("@ativo", SqlDbType.Bit).Value = 1;
 
 
                     SqlDataReader reader = getAllCmd.ExecuteReader();
@@ -40,11 +40,13 @@ namespace api.Services
                         listaFormaPagamentos.Add(
                             new FormaPagamentoModel
                             {
-                                FormaPag_ID = reader.GetInt32("formaPag_ID"),
+                                Id = reader.GetInt32("id"),
                                 FormaPagamento = reader.GetString("formaPagamento"),
                                 Ativo = reader.GetBoolean("ativo"),
                                 Data_cadastro = reader.GetDateTime("data_cadastro"),
-                                Data_ult_alt = reader.GetDateTime("data_ult_alt")
+                                Data_ult_alt = reader.IsDBNull(reader.GetOrdinal("data_ult_alt"))
+                                    ? (DateTime?)null
+                                    : reader.GetDateTime(reader.GetOrdinal("data_ult_alt"))
                             }
                         );
                     }
@@ -63,7 +65,53 @@ namespace api.Services
             }
         }
 
-        public FormaPagamentoModel GetFormaPagamento(int formaPag_ID)
+        public IEnumerable<FormaPagamentoModel> GetAllFormasPagamento()
+        {
+            List<FormaPagamentoModel> listaFormaPagamentos = new List<FormaPagamentoModel>();
+
+            using (Connection)
+            {
+                try
+                {
+                    Connection.Open();
+
+                    SqlCommand getAllCmd = new SqlCommand(String.Format(
+                        "SELECT * FROM formasPagamento"), Connection);
+
+                    SqlDataReader reader = getAllCmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        // Para cada registro encontrado, cria um objeto e adiciona à lista
+                        listaFormaPagamentos.Add(
+                            new FormaPagamentoModel
+                            {
+                                Id = reader.GetInt32("id"),
+                                FormaPagamento = reader.GetString("formaPagamento"),
+                                Ativo = reader.GetBoolean("ativo"),
+                                Data_cadastro = reader.GetDateTime("data_cadastro"),
+                                Data_ult_alt = reader.IsDBNull(reader.GetOrdinal("data_ult_alt"))
+                                    ? (DateTime?)null
+                                    : reader.GetDateTime(reader.GetOrdinal("data_ult_alt"))
+                            }
+                        );
+                    }
+                    return listaFormaPagamentos;
+
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception(ex.Message);
+                }
+                finally
+                {
+                    Connection.Close();
+                }
+
+            }
+        }
+
+        public FormaPagamentoModel GetFormaPagamento(int id)
         {
             using (Connection)
             {
@@ -72,10 +120,10 @@ namespace api.Services
                     Connection.Open();
 
                     SqlCommand getCmd = new SqlCommand(String.Format(
-                    "SELECT * FROM formasPagamento WHERE formaPag_ID = @id"), Connection);
+                    "SELECT * FROM formasPagamento WHERE id = @id"), Connection);
 
                     getCmd.Parameters.Clear();
-                    getCmd.Parameters.Add("@id", SqlDbType.Int).Value = formaPag_ID;
+                    getCmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
 
                     SqlDataReader reader = getCmd.ExecuteReader();
                     if (reader.HasRows)
@@ -83,11 +131,13 @@ namespace api.Services
                         reader.Read();
                         return new FormaPagamentoModel
                         {
-                            FormaPag_ID = reader.GetInt32("formaPag_ID"),
+                            Id = reader.GetInt32("id"),
                             FormaPagamento = reader.GetString("formaPagamento"),
                             Ativo = reader.GetBoolean("ativo"),
                             Data_cadastro = reader.GetDateTime("data_cadastro"),
-                            Data_ult_alt = reader.GetDateTime("data_ult_alt")
+                            Data_ult_alt = reader.IsDBNull(reader.GetOrdinal("data_ult_alt"))
+                                    ? (DateTime?)null
+                                    : reader.GetDateTime(reader.GetOrdinal("data_ult_alt"))
                         };
                     }
                     else
@@ -114,14 +164,11 @@ namespace api.Services
                     Connection.Open();
 
                     SqlCommand postCmd = new SqlCommand(String.Format(
-                    "INSERT INTO formasPagamento (formaPagamento, ativo, data_cadastro, data_ult_alt) " +
-                    "VALUES (@formaPagamento, @ativo, @data_cadastro, @data_ult_alt)"), Connection);
+                    "INSERT INTO formasPagamento (formaPagamento) " +
+                    "VALUES (@formaPagamento)"), Connection);
 
                     postCmd.Parameters.Clear();
                     postCmd.Parameters.Add("@formaPagamento", SqlDbType.VarChar).Value = formaPagInserida.FormaPagamento;
-                    postCmd.Parameters.Add("@ativo", SqlDbType.Bit).Value = formaPagInserida.Ativo;
-                    postCmd.Parameters.Add("@data_cadastro", SqlDbType.DateTime).Value = new SqlDateTime(DateTime.Now).ToString();
-                    postCmd.Parameters.Add("@data_ult_alt", SqlDbType.DateTime).Value = new SqlDateTime(DateTime.Now).ToString();
 
                     postCmd.ExecuteNonQuery();
                     return "Inserido com Sucesso!";
@@ -148,10 +195,10 @@ namespace api.Services
 
                     SqlCommand putCmd = new SqlCommand(String.Format(
                     "UPDATE formasPagamento SET formaPagamento = @formaPagamento, ativo = @ativo, data_ult_alt = @data_ult_alt " +
-                    "WHERE formaPag_ID = @id"), Connection);
+                    "WHERE id = @id"), Connection);
 
                     putCmd.Parameters.Clear();
-                    putCmd.Parameters.Add("@id", SqlDbType.Int).Value = formaPagAlterada.FormaPag_ID;
+                    putCmd.Parameters.Add("@id", SqlDbType.Int).Value = formaPagAlterada.Id;
                     putCmd.Parameters.Add("@formaPagamento", SqlDbType.VarChar).Value = formaPagAlterada.FormaPagamento;
                     putCmd.Parameters.Add("@ativo", SqlDbType.Bit).Value = formaPagAlterada.Ativo;
                     putCmd.Parameters.Add("@data_ult_alt", SqlDbType.DateTime).Value = new SqlDateTime(DateTime.Now).ToString();
@@ -180,7 +227,7 @@ namespace api.Services
                     Connection.Open();
 
                     SqlCommand deleteCmd = new SqlCommand(String.Format(
-                    "DELETE FROM formasPagamento WHERE formaPag_ID = @id"), Connection);
+                    "DELETE FROM formasPagamento WHERE id = @id"), Connection);
 
                     deleteCmd.Parameters.Clear();
                     deleteCmd.Parameters.Add("@id", SqlDbType.Int).Value = origem_ID;
@@ -199,6 +246,5 @@ namespace api.Services
                 }
             }
         }
-
     }
 }

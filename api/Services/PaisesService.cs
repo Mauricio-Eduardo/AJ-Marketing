@@ -15,7 +15,7 @@ namespace api.Services
             this.Connection = pSqlConnection;
         }
 
-        public IEnumerable<PaisModel> GetAllPaises(int ativo) 
+        public IEnumerable<PaisModel> GetAllPaisesAtivos()
         {
             List<PaisModel> listaPaises = new List<PaisModel>();
 
@@ -29,7 +29,7 @@ namespace api.Services
                         "SELECT * FROM paises WHERE ativo = @ativo"), Connection);
 
                     getAllCmd.Parameters.Clear();
-                    getAllCmd.Parameters.Add("@ativo", SqlDbType.Bit).Value = ativo;
+                    getAllCmd.Parameters.Add("@ativo", SqlDbType.Bit).Value = 1;
 
 
                     SqlDataReader reader = getAllCmd.ExecuteReader();
@@ -40,13 +40,15 @@ namespace api.Services
                         listaPaises.Add(
                             new PaisModel
                             {
-                                Pais_ID = reader.GetInt32("pais_ID"),
+                                Id = reader.GetInt32("id"),
                                 Pais = reader.GetString("pais"),
                                 Sigla = reader.GetString("sigla"),
                                 Ddi = reader.GetString("ddi"),
                                 Ativo = reader.GetBoolean("ativo"),
                                 Data_cadastro = reader.GetDateTime("data_cadastro"),
-                                Data_ult_alt = reader.GetDateTime("data_ult_alt")
+                                Data_ult_alt = reader.IsDBNull(reader.GetOrdinal("data_ult_alt"))
+                                    ? (DateTime?)null
+                                    : reader.GetDateTime(reader.GetOrdinal("data_ult_alt"))
                             }
                         );
                     }
@@ -65,7 +67,55 @@ namespace api.Services
             }
         }
 
-        public PaisModel GetPais(int pais_ID)
+        public IEnumerable<PaisModel> GetAllPaises() 
+        {
+            List<PaisModel> listaPaises = new List<PaisModel>();
+
+            using (Connection)
+            {
+                try
+                {
+                    Connection.Open();
+
+                    SqlCommand getAllCmd = new SqlCommand(String.Format(
+                        "SELECT * FROM paises"), Connection);
+
+                    SqlDataReader reader = getAllCmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        // Para cada registro encontrado, cria um objeto e adiciona à lista
+                        listaPaises.Add(
+                            new PaisModel
+                            {
+                                Id = reader.GetInt32("id"),
+                                Pais = reader.GetString("pais"),
+                                Sigla = reader.GetString("sigla"),
+                                Ddi = reader.GetString("ddi"),
+                                Ativo = reader.GetBoolean("ativo"),
+                                Data_cadastro = reader.GetDateTime("data_cadastro"),
+                                Data_ult_alt = reader.IsDBNull(reader.GetOrdinal("data_ult_alt"))
+                                    ? (DateTime?)null
+                                    : reader.GetDateTime(reader.GetOrdinal("data_ult_alt"))
+                            }
+                        );
+                    }
+                    return listaPaises;
+
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception(ex.Message);
+                }
+                finally
+                {
+                    Connection.Close();
+                }
+
+            }
+        }
+
+        public PaisModel GetPais(int id)
         {
             using (Connection)
             {
@@ -74,10 +124,10 @@ namespace api.Services
                     Connection.Open();
 
                     SqlCommand getCmd = new SqlCommand(String.Format(
-                    "SELECT * FROM paises WHERE pais_ID = @id"), Connection);
+                    "SELECT * FROM paises WHERE id = @id"), Connection);
 
                     getCmd.Parameters.Clear();
-                    getCmd.Parameters.Add("@id", SqlDbType.Int).Value = pais_ID;
+                    getCmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
 
                     SqlDataReader reader = getCmd.ExecuteReader();
                     if (reader.HasRows)
@@ -85,13 +135,15 @@ namespace api.Services
                         reader.Read();
                         return new PaisModel
                         {
-                            Pais_ID = reader.GetInt32("pais_ID"),
+                            Id = reader.GetInt32("id"),
                             Pais = reader.GetString("pais"),
                             Sigla = reader.GetString("sigla"),
                             Ddi = reader.GetString("ddi"),
                             Ativo = reader.GetBoolean("ativo"),
                             Data_cadastro = reader.GetDateTime("data_cadastro"),
-                            Data_ult_alt = reader.GetDateTime("data_ult_alt")
+                            Data_ult_alt = reader.IsDBNull(reader.GetOrdinal("data_ult_alt"))
+                                    ? (DateTime?)null
+                                    : reader.GetDateTime(reader.GetOrdinal("data_ult_alt"))
                         };
                     }
                     else
@@ -118,16 +170,13 @@ namespace api.Services
                     Connection.Open();
 
                     SqlCommand postCmd = new SqlCommand(String.Format(
-                    "INSERT INTO paises (pais, sigla, ddi, ativo, data_cadastro, data_ult_alt) " +
-                    "VALUES (@pais, @sigla, @ddi, @ativo, @data_cadastro, @data_ult_alt)"), Connection);
+                    "INSERT INTO paises (pais, sigla, ddi) " +
+                    "VALUES (@pais, @sigla, @ddi)"), Connection);
 
                     postCmd.Parameters.Clear();
                     postCmd.Parameters.Add("@pais", SqlDbType.VarChar).Value = paisInserido.Pais;
                     postCmd.Parameters.Add("@sigla", SqlDbType.VarChar).Value = paisInserido.Sigla;
                     postCmd.Parameters.Add("@ddi", SqlDbType.VarChar).Value = paisInserido.Ddi;
-                    postCmd.Parameters.Add("@ativo", SqlDbType.Bit).Value = paisInserido.Ativo;
-                    postCmd.Parameters.Add("@data_cadastro", SqlDbType.DateTime).Value = new SqlDateTime(DateTime.Now).ToString();
-                    postCmd.Parameters.Add("@data_ult_alt", SqlDbType.DateTime).Value = new SqlDateTime(DateTime.Now).ToString();
 
                     postCmd.ExecuteNonQuery();
                     return "Inserido com Sucesso!";
@@ -154,10 +203,10 @@ namespace api.Services
 
                     SqlCommand putCmd = new SqlCommand(String.Format(
                     "UPDATE paises SET pais = @pais, sigla = @sigla, ddi = @ddi, ativo = @ativo, data_ult_alt = @data_ult_alt " +
-                    "WHERE pais_ID = @id"), Connection);
+                    "WHERE id = @id"), Connection);
 
                     putCmd.Parameters.Clear();
-                    putCmd.Parameters.Add("@id", SqlDbType.Int).Value = paisAlterado.Pais_ID;
+                    putCmd.Parameters.Add("@id", SqlDbType.Int).Value = paisAlterado.Id;
                     putCmd.Parameters.Add("@pais", SqlDbType.VarChar).Value = paisAlterado.Pais;
                     putCmd.Parameters.Add("@sigla", SqlDbType.VarChar).Value = paisAlterado.Sigla;
                     putCmd.Parameters.Add("@ddi", SqlDbType.VarChar).Value = paisAlterado.Ddi;
@@ -179,7 +228,7 @@ namespace api.Services
             }
         }
 
-        public string DeletePais(int pais_ID)
+        public string DeletePais(int id)
         {
             using (Connection)
             {
@@ -188,10 +237,10 @@ namespace api.Services
                     Connection.Open();
 
                     SqlCommand deleteCmd = new SqlCommand(String.Format(
-                    "DELETE FROM paises WHERE pais_ID = @id"), Connection);
+                    "DELETE FROM paises WHERE id = @id"), Connection);
 
                     deleteCmd.Parameters.Clear();
-                    deleteCmd.Parameters.Add("@id", SqlDbType.Int).Value = pais_ID;
+                    deleteCmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
 
                     deleteCmd.ExecuteNonQuery();
                     return "Deletado com Sucesso!";
@@ -207,6 +256,5 @@ namespace api.Services
                 }
             }
         }
-
     }
 }

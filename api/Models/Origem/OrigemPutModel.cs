@@ -3,15 +3,15 @@
     public class OrigemPutModel
     {
         // Variáveis que podem ser editáveis em um registro
-        private int _origem_ID; // o ID não é editável porém é necessário para a requisição do PUT
+        private int _id; // o ID não é editável porém é necessário para a requisição do PUT
         private string _origem;
         private bool _ativo;
 
         // Propriedades públicas para acessar as variáveis privadas
-        public int Origem_ID
+        public int Id
         {
-            get { return _origem_ID; }
-            set { _origem_ID = value; }
+            get { return _id; }
+            set { _id = value; }
         }
 
         public string Origem
@@ -30,9 +30,9 @@
         public OrigemPutModel() { }
 
         // Construtor com parâmetros
-        public OrigemPutModel(int origem_ID, string origem, bool ativo)
+        public OrigemPutModel(int id, string origem, bool ativo)
         {
-            _origem_ID = origem_ID;
+            _id = id;
             _origem = origem;
             _ativo = ativo;
         }

@@ -1,4 +1,6 @@
 ﻿
+using api.Models.Interesse;
+using api.Models.RamosAtividade;
 using api.Models.Usuario;
 
 namespace api.Models.Cliente
@@ -11,22 +13,20 @@ namespace api.Models.Cliente
         private string _nome_razaoSocial;
         private string _apelido_nomeFantasia;
         private string _rg_inscricaoEstadual;
-        private DateTime _dataNascimento_dataAbertura;
         private string _genero;
         private string _email;
         private string _celular;
-        private string _ramo_atividade;
-        private int _cidade_ID;
+        private int _cidade_id;
         private string _logradouro;
         private string _numero;
         private string _bairro;
         private string _complemento;
         private string _cep;
-        private int _origem_ID;
-        private string _interesses;
-        private List<UsuarioPutModel> _usuarios;
+        private int _origem_id;
 
-        private bool _ativo;
+        private List<UsuarioPutModel> _usuarios;
+        private List<InteressePutModel> _interesses;
+        private List<RamoAtividadePutModel> _ramos;
 
         // Propriedades públicas para acessar as variáveis
         public string Tipo_pessoa
@@ -59,12 +59,6 @@ namespace api.Models.Cliente
             set { _rg_inscricaoEstadual = value; }
         }
 
-        public DateTime DataNascimento_dataAbertura
-        {
-            get { return _dataNascimento_dataAbertura; }
-            set { _dataNascimento_dataAbertura = value; }
-        }
-
         public string Genero
         {
             get { return _genero; }
@@ -83,16 +77,10 @@ namespace api.Models.Cliente
             set { _celular = value; }
         }
 
-        public string Ramo_atividade
+        public int Cidade_id
         {
-            get { return _ramo_atividade; }
-            set { _ramo_atividade = value; }
-        }
-
-        public int Cidade_ID
-        {
-            get { return _cidade_ID; }
-            set { _cidade_ID = value; }
+            get { return _cidade_id; }
+            set { _cidade_id = value; }
         }
 
         public string Logradouro
@@ -125,16 +113,10 @@ namespace api.Models.Cliente
             set { _cep = value; }
         }
 
-        public int Origem_ID
+        public int Origem_id
         {
-            get { return _origem_ID; }
-            set { _origem_ID = value; }
-        }
-
-        public string Interesses
-        {
-            get { return _interesses; }
-            set { _interesses = value; }
+            get { return _origem_id; }
+            set { _origem_id = value; }
         }
 
         // Aqui é o 'PutModel' porque vou precisar do ID para inserir na associativa, e o putModel tem exatamente o
@@ -145,10 +127,16 @@ namespace api.Models.Cliente
             set { _usuarios = value; }
         }
 
-        public bool Ativo
+        public List<InteressePutModel> Interesses
         {
-            get { return _ativo; }
-            set { _ativo = value; }
+            get { return _interesses; }
+            set { _interesses = value; }
+        }
+
+        public List<RamoAtividadePutModel> Ramos
+        {
+            get { return _ramos; }
+            set { _ramos = value; }
         }
 
         // Construtor sem parâmetros
@@ -161,11 +149,9 @@ namespace api.Models.Cliente
             string nome_razaoSocial,
             string apelido_nomeFantasia,
             string rg_inscricaoEstadual,
-            DateTime dataNascimento_dataAbertura,
             string genero,
             string email,
             string celular,
-            string ramo_atividade,
             int cidade_ID,
             string logradouro,
             string numero,
@@ -173,30 +159,30 @@ namespace api.Models.Cliente
             string complemento,
             string cep,
             int origem_ID,
-            string interesses,
+
             List<UsuarioPutModel> usuarios,
-            bool ativo)
+            List<InteressePutModel> interesses,
+            List<RamoAtividadePutModel> ramos)
         {
             _tipo_pessoa = tipo_pessoa;
             _cpf_cnpj = cpf_cnpj;
             _nome_razaoSocial = nome_razaoSocial;
             _apelido_nomeFantasia = apelido_nomeFantasia;
             _rg_inscricaoEstadual = rg_inscricaoEstadual;
-            _dataNascimento_dataAbertura = dataNascimento_dataAbertura;
             _genero = genero;
             _email = email;
             _celular = celular;
-            _ramo_atividade = ramo_atividade;
-            _cidade_ID = cidade_ID;
+            _cidade_id = cidade_ID;
             _logradouro = logradouro;
             _numero = numero;
             _bairro = bairro;
             _complemento = complemento;
             _cep = cep;
-            _origem_ID = origem_ID;
+            _origem_id = origem_ID;
             _interesses = interesses;
             _usuarios = usuarios;
-            _ativo = ativo;
+            _interesses = interesses;
+            _ramos = ramos;
         }
     }
 }

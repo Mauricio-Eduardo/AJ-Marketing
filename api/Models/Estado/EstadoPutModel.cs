@@ -3,19 +3,19 @@
     public class EstadoPutModel
     {
         // Variáveis que podem ser editáveis em um registro
-        private int _estado_ID; // o ID não é editável porém é necessário para a requisição do PUT
+        private int _id; // o ID não é editável porém é necessário para a requisição do PUT
         private string _estado;
         private string _uf;
 
-        private int _pais_ID;
+        private int _pais_id;
 
         private bool _ativo;
 
         // Propriedades públicas para acessar as variáveis
-        public int Estado_ID
+        public int Id
         {
-            get { return _estado_ID; }
-            set { _estado_ID = value; }
+            get { return _id; }
+            set { _id = value; }
         }
 
         public string Estado
@@ -30,10 +30,10 @@
             set { _uf = value; }
         }
 
-        public int Pais_ID
+        public int Pais_id
         {
-            get { return _pais_ID; }
-            set { _pais_ID = value; }
+            get { return _pais_id; }
+            set { _pais_id = value; }
         }
 
         public bool Ativo
@@ -46,12 +46,12 @@
         public EstadoPutModel() { }
 
         // Construtor com parâmetros
-        public EstadoPutModel(int estado_ID, string estado, string uf, int pais_ID, bool ativo)
+        public EstadoPutModel(int id, string estado, string uf, int pais_id, bool ativo)
         {
-            _estado_ID = estado_ID;
+            _id = id;
             _estado = estado;
             _uf = uf;
-            _pais_ID = pais_ID;
+            _pais_id = pais_id;
             _ativo = ativo;
         }
     }

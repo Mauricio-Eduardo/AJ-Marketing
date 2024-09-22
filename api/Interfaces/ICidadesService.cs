@@ -6,9 +6,9 @@ namespace api.Interfaces
     {
         IEnumerable<CidadeModel> GetAllCidadesAtivas();
         IEnumerable<CidadeModel> GetAllCidades();
-        CidadeModel GetCidade(int cidade_ID);
+        CidadeModel GetCidade(int id);
         string PostCidade(CidadePostModel cidadeInserida);
         string PutCidade(CidadePutModel cidadeAlterada);
-        string DeleteCidade(int cidade_ID);
+        string DeleteCidade(int id);
     }
 }

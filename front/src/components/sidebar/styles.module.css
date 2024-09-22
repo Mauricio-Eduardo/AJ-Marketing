@@ -15,7 +15,6 @@
 .sidebar {
   background-color: var(--background-sidebar);
   color: var(--text-color-sidebar);
-  height: 100vh; /* para ocupar toda a altura da tela */
   font-size: 14px;
 
   border-style: solid;

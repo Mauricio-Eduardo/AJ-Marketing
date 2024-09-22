@@ -7,8 +7,6 @@
         private decimal _valor;
         private string _descricao;
 
-        private bool _ativo;
-
         // Propriedades públicas para acessar as variáveis
          public string Servico
         {
@@ -28,22 +26,15 @@
             set { _descricao = value; }
         }
 
-        public bool Ativo
-        {
-            get { return _ativo; }
-            set { _ativo = value; }
-        }
-
         // Construtor sem parâmetros
         public ServicoPostModel() { }
 
         // Construtor com parâmetros
-        public ServicoPostModel(string servico, decimal valor, string descricao, bool ativo)
+        public ServicoPostModel(string servico, decimal valor, string descricao)
         {
             _servico = servico;
             _valor = valor;
             _descricao = descricao;
-            _ativo = ativo;
         }
     }
 }

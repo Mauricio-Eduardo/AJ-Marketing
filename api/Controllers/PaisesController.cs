@@ -17,10 +17,21 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("/GetAllPaises")]
-        public ActionResult<IEnumerable<PaisModel>> GetAllUsuarios(int ativo)
+        [Route("/GetAllPaisesAtivos")]
+        public ActionResult<IEnumerable<PaisModel>> GetAllPaisesAtivos()
         {
-            IEnumerable<PaisModel> result = paisesService.GetAllPaises(ativo);
+            IEnumerable<PaisModel> result = paisesService.GetAllPaisesAtivos();
+            if (result != null)
+                return Ok(result);
+            else
+                return BadRequest();
+        }
+
+        [HttpGet]
+        [Route("/GetAllPaises")]
+        public ActionResult<IEnumerable<PaisModel>> GetAllPaises()
+        {
+            IEnumerable<PaisModel> result = paisesService.GetAllPaises();
             if (result != null)
                 return Ok(result);
             else
@@ -29,9 +40,9 @@ namespace api.Controllers
 
         [HttpGet]
         [Route("/GetPais")]
-        public IActionResult GetPais(int pais_ID)
+        public IActionResult GetPais(int id)
         {
-            PaisModel result = paisesService.GetPais(pais_ID);
+            PaisModel result = paisesService.GetPais(id);
             if (result != null)
                 return Ok(result);
             else
@@ -62,9 +73,9 @@ namespace api.Controllers
 
         [HttpDelete]
         [Route("/DeletePais")]
-        public IActionResult DeletePais(int pais_ID)
+        public IActionResult DeletePais(int id)
         {
-            string result = paisesService.DeletePais(pais_ID);
+            string result = paisesService.DeletePais(id);
             if (result != null)
                 return Ok(result);
             else

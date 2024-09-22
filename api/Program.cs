@@ -35,6 +35,11 @@ builder.Services.AddTransient<IClientesService, ClientesService>();
 builder.Services.AddTransient<IServicosService, ServicosService>();
 builder.Services.AddTransient<IFormaPagamentoService, FormaPagamentoService>();
 builder.Services.AddTransient<ICondicaoPagamentoService, CondicaoPagamentoService>();
+builder.Services.AddTransient<IPropostasService, PropostaService>();
+builder.Services.AddTransient<IInteressesService, InteresseService>();
+builder.Services.AddTransient<IRamosAtividadeService, RamosAtividadeService>();
+builder.Services.AddTransient<IPeridiocidadesService, PeridiocidadesService>();
+builder.Services.AddTransient<IContratosService, ContratosService>();
 
 var app = builder.Build();
 

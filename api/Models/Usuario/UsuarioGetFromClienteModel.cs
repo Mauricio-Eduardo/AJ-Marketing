@@ -3,21 +3,14 @@
     public class UsuarioGetFromClienteModel
     {
 
-        private int _usuario_ID; 
-        private string _cpf;
+        private int _id; 
         private string _nome;  
 
         // Propriedades públicas para acessar as variáveis
-        public int Usuario_ID
+        public int Id
         {
-            get { return _usuario_ID; }
-            set { _usuario_ID = value; }
-        }
-
-        public string Cpf
-        {
-            get { return _cpf; }
-            set { _cpf = value; }
+            get { return _id; }
+            set { _id = value; }
         }
 
         public string Nome
@@ -30,10 +23,9 @@
         public UsuarioGetFromClienteModel() { }
 
         // Construtor com parâmetros
-        public UsuarioGetFromClienteModel(int Usuario_ID, string Cpf, string Nome)
+        public UsuarioGetFromClienteModel(int id, string Nome)
         {
-            _usuario_ID = Usuario_ID;
-            _cpf = Cpf;
+            _id = id;
             _nome = Nome;
         }
     }

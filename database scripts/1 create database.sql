@@ -1,5 +1,5 @@
-USE master;
 GO
+USE master;
 
 CREATE DATABASE ajmarketing ON
 (NAME = ajmarketing_dat,

@@ -40,9 +40,9 @@ namespace api.Controllers
 
         [HttpGet]
         [Route("/GetCondicaoPagamento")]
-        public IActionResult GetCondicaoPagamento(int condPag_ID)
+        public IActionResult GetCondicaoPagamento(int id)
         {
-            CondicaoPagamentoModel result = condicaoPagamentoService.GetCondicaoPagamento(condPag_ID);
+            CondicaoPagamentoModel result = condicaoPagamentoService.GetCondicaoPagamento(id);
             if (result != null)
                 return Ok(result);
             else
@@ -73,9 +73,9 @@ namespace api.Controllers
 
         [HttpDelete]
         [Route("/DeleteCondicaoPagamento")]
-        public IActionResult DeleteCondicaoPagamento(int condPag_ID)
+        public IActionResult DeleteCondicaoPagamento(int id)
         {
-            string result = condicaoPagamentoService.DeleteCondicaoPagamento(condPag_ID);
+            string result = condicaoPagamentoService.DeleteCondicaoPagamento(id);
             if (result != null)
                 return Ok(result);
             else

@@ -4,6 +4,9 @@ import { useState } from "react";
 import { Navbar } from "./components/sidebar/navbar";
 import { MoonStars, Sun } from "@phosphor-icons/react";
 
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
+
 export function App() {
   const [darkMode, setDarkMode] = useState(true);
 

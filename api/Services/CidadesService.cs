@@ -26,10 +26,10 @@ namespace api.Services
                     Connection.Open();
 
                     SqlCommand getAllCmd = new SqlCommand(String.Format(
-                    "SELECT c.cidade_ID, c.cidade, c.ddd, c.estado_ID, e.estado, p.pais, c.ativo, c.data_cadastro, c.data_ult_alt " +
+                    "SELECT c.id, c.cidade, c.ddd, c.estado_id, e.estado, p.pais, c.ativo, c.data_cadastro, c.data_ult_alt " +
                     "FROM cidades c " +
-                    "INNER JOIN estados e ON c.estado_ID = e.estado_ID " +
-                    "INNER JOIN paises p ON e.pais_ID = p.pais_ID " +
+                    "INNER JOIN estados e ON c.estado_id = e.id " +
+                    "INNER JOIN paises p ON e.pais_id = p.id " +
                     "WHERE c.ativo = @ativo"), Connection);
 
                     getAllCmd.Parameters.Clear();
@@ -44,15 +44,17 @@ namespace api.Services
                         listaCidades.Add(
                             new CidadeModel
                             {
-                                Cidade_ID = reader.GetInt32("cidade_ID"),
+                                Id = reader.GetInt32("id"),
                                 Cidade = reader.GetString("cidade"),
                                 Ddd = reader.GetString("ddd"),
-                                Estado_ID = reader.GetInt32("estado_ID"),
+                                Estado_id = reader.GetInt32("estado_id"),
                                 Estado = reader.GetString("estado"),
                                 Pais = reader.GetString("pais"),
                                 Ativo = reader.GetBoolean("ativo"),
                                 Data_cadastro = reader.GetDateTime("data_cadastro"),
-                                Data_ult_alt = reader.GetDateTime("data_ult_alt")
+                                Data_ult_alt = reader.IsDBNull(reader.GetOrdinal("data_ult_alt"))
+                                    ? (DateTime?)null
+                                    : reader.GetDateTime(reader.GetOrdinal("data_ult_alt"))
                             }
                         );
                     }
@@ -82,10 +84,10 @@ namespace api.Services
                     Connection.Open();
 
                     SqlCommand getAllCmd = new SqlCommand(String.Format(
-                    "SELECT c.cidade_ID, c.cidade, c.ddd, c.estado_ID, e.estado, p.pais, c.ativo, c.data_cadastro, c.data_ult_alt " +
+                    "SELECT c.id, c.cidade, c.ddd, c.estado_id, e.estado, p.pais, c.ativo, c.data_cadastro, c.data_ult_alt " +
                     "FROM cidades c " +
-                    "INNER JOIN estados e ON c.estado_ID = e.estado_ID " +
-                    "INNER JOIN paises p ON e.pais_ID = p.pais_ID"), Connection);
+                    "INNER JOIN estados e ON c.estado_id = e.id " +
+                    "INNER JOIN paises p ON e.pais_id = p.id"), Connection);
 
                     SqlDataReader reader = getAllCmd.ExecuteReader();
 
@@ -95,15 +97,17 @@ namespace api.Services
                         listaCidades.Add(
                             new CidadeModel
                             {
-                                Cidade_ID = reader.GetInt32("cidade_ID"),
+                                Id = reader.GetInt32("id"),
                                 Cidade = reader.GetString("cidade"),
                                 Ddd = reader.GetString("ddd"),
-                                Estado_ID = reader.GetInt32("estado_ID"),
+                                Estado_id = reader.GetInt32("estado_id"),
                                 Estado = reader.GetString("estado"),
                                 Pais = reader.GetString("pais"),
                                 Ativo = reader.GetBoolean("ativo"),
                                 Data_cadastro = reader.GetDateTime("data_cadastro"),
-                                Data_ult_alt = reader.GetDateTime("data_ult_alt")
+                                Data_ult_alt = reader.IsDBNull(reader.GetOrdinal("data_ult_alt"))
+                                    ? (DateTime?)null
+                                    : reader.GetDateTime(reader.GetOrdinal("data_ult_alt"))
                             }
                         );
                     }
@@ -122,7 +126,7 @@ namespace api.Services
             }
         }
 
-        public CidadeModel GetCidade(int cidade_ID)
+        public CidadeModel GetCidade(int id)
         {
             using (Connection)
             {
@@ -131,14 +135,14 @@ namespace api.Services
                     Connection.Open();
 
                     SqlCommand getCmd = new SqlCommand(String.Format(
-                    "SELECT c.cidade_ID, c.cidade, c.ddd, c.estado_ID, e.estado, p.pais, c.ativo, c.data_cadastro, c.data_ult_alt " +
+                    "SELECT c.id, c.cidade, c.ddd, c.estado_id, e.estado, p.pais, c.ativo, c.data_cadastro, c.data_ult_alt " +
                     "FROM cidades c " +
-                    "INNER JOIN estados e ON c.estado_ID = e.estado_ID " +
-                    "INNER JOIN paises p ON e.pais_ID = p.pais_ID " +
-                    "WHERE c.cidade_ID = @id"), Connection);
+                    "INNER JOIN estados e ON c.estado_id = e.id " +
+                    "INNER JOIN paises p ON e.pais_id = p.id " +
+                    "WHERE c.id = @id"), Connection);
 
                     getCmd.Parameters.Clear();
-                    getCmd.Parameters.Add("@id", SqlDbType.Int).Value = cidade_ID;
+                    getCmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
 
                     SqlDataReader reader = getCmd.ExecuteReader();
                     if (reader.HasRows)
@@ -146,15 +150,17 @@ namespace api.Services
                         reader.Read();
                         return new CidadeModel
                         {
-                            Cidade_ID = reader.GetInt32("cidade_ID"),
+                            Id = reader.GetInt32("id"),
                             Cidade = reader.GetString("cidade"),
                             Ddd = reader.GetString("ddd"),
-                            Estado_ID = reader.GetInt32("estado_ID"),
+                            Estado_id = reader.GetInt32("estado_id"),
                             Estado = reader.GetString("estado"),
                             Pais = reader.GetString("pais"),
                             Ativo = reader.GetBoolean("ativo"),
                             Data_cadastro = reader.GetDateTime("data_cadastro"),
-                            Data_ult_alt = reader.GetDateTime("data_ult_alt")
+                            Data_ult_alt = reader.IsDBNull(reader.GetOrdinal("data_ult_alt"))
+                                    ? (DateTime?)null
+                                    : reader.GetDateTime(reader.GetOrdinal("data_ult_alt"))
                         };
                     }
                     else
@@ -181,13 +187,13 @@ namespace api.Services
                     Connection.Open();
 
                     SqlCommand postCmd = new SqlCommand(
-                    "INSERT INTO cidades (cidade, ddd, estado_ID) " +
-                    "VALUES (@cidade, @ddd, @estado_ID)", Connection);
+                    "INSERT INTO cidades (cidade, ddd, estado_id) " +
+                    "VALUES (@cidade, @ddd, @estado_id)", Connection);
 
                     postCmd.Parameters.Clear();
                     postCmd.Parameters.Add("@cidade", SqlDbType.VarChar).Value = cidadeInserida.Cidade;
                     postCmd.Parameters.Add("@ddd", SqlDbType.VarChar).Value = cidadeInserida.Ddd;
-                    postCmd.Parameters.Add("@estado_ID", SqlDbType.Int).Value = cidadeInserida.Estado_ID;
+                    postCmd.Parameters.Add("@estado_id", SqlDbType.Int).Value = cidadeInserida.Estado_id;
 
                     postCmd.ExecuteNonQuery();
                     return "Inserido com Sucesso!";
@@ -213,15 +219,15 @@ namespace api.Services
                     Connection.Open();
 
                     SqlCommand putCmd = new SqlCommand(
-                    "UPDATE cidades SET cidade = @cidade, ddd = @ddd, estado_ID = @estado_ID, " +
+                    "UPDATE cidades SET cidade = @cidade, ddd = @ddd, estado_id = @estado_id, " +
                     "ativo = @ativo, data_ult_alt = @data_ult_alt " +
-                    "WHERE cidade_ID = @id;", Connection);
+                    "WHERE id = @id;", Connection);
 
                     putCmd.Parameters.Clear();
-                    putCmd.Parameters.Add("@id", SqlDbType.Int).Value = cidadeAlterada.Cidade_ID;
+                    putCmd.Parameters.Add("@id", SqlDbType.Int).Value = cidadeAlterada.Id;
                     putCmd.Parameters.Add("@cidade", SqlDbType.VarChar).Value = cidadeAlterada.Cidade;
                     putCmd.Parameters.Add("@ddd", SqlDbType.VarChar).Value = cidadeAlterada.Ddd;
-                    putCmd.Parameters.Add("@estado_ID", SqlDbType.Int).Value = cidadeAlterada.Estado_ID;
+                    putCmd.Parameters.Add("@estado_id", SqlDbType.Int).Value = cidadeAlterada.Estado_id;
                     putCmd.Parameters.Add("@ativo", SqlDbType.Bit).Value = cidadeAlterada.Ativo;
                     putCmd.Parameters.Add("@data_ult_alt", SqlDbType.DateTime).Value = new SqlDateTime(DateTime.Now).ToString();
 
@@ -240,7 +246,7 @@ namespace api.Services
             }
         }
 
-        public string DeleteCidade(int cidade_ID)
+        public string DeleteCidade(int id)
         {
             using (Connection)
             {
@@ -249,10 +255,10 @@ namespace api.Services
                     Connection.Open();
 
                     SqlCommand deleteCmd = new SqlCommand(String.Format(
-                    "DELETE FROM cidades WHERE cidade_ID = @id"), Connection);
+                    "DELETE FROM cidades WHERE id = @id"), Connection);
 
                     deleteCmd.Parameters.Clear();
-                    deleteCmd.Parameters.Add("@id", SqlDbType.Int).Value = cidade_ID;
+                    deleteCmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
 
                     deleteCmd.ExecuteNonQuery();
                     return "Deletado com Sucesso!";

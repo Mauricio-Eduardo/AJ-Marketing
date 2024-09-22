@@ -4,10 +4,11 @@ namespace api.Interfaces
 {
     public interface IUsuariosService
     {
-        IEnumerable<UsuarioModel> GetAllUsuarios(int ativo);
-        UsuarioModel GetUsuario(int usuario_ID);
+        IEnumerable<UsuarioModel> GetAllUsuariosAtivos();
+        IEnumerable<UsuarioModel> GetAllUsuarios();
+        UsuarioModel GetUsuario(int id);
         string PostUsuario(UsuarioPostModel usuarioInserido);
         string PutUsuario(UsuarioPutModel usuarioAlterado);
-        string DeleteUsuario(int usuario_ID);
+        string DeleteUsuario(int id);
     }
 }

@@ -8,6 +8,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   max?: number;
   disabled?: boolean;
   maskType?: MaskTypes;
+  textColor?: string;
 }
 
 export function Input({
@@ -16,6 +17,7 @@ export function Input({
   max,
   disabled,
   maskType,
+  textColor,
   onChange,
   ...rest
 }: InputProps) {
@@ -23,6 +25,7 @@ export function Input({
 
   const style = {
     width: width ? `${width}px` : undefined,
+    textColor: textColor ? textColor : "text-zinc-800",
   };
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -57,8 +60,10 @@ export function Input({
       id={name}
       maxLength={max}
       className={`${
-        disabled ? "bg-gray-200 text-gray-500 cursor-not-allowed" : ""
-      } h-8 pl-2 pr-2 rounded border border-zinc-300 hover:border-violet-600 focus:ring-2 focus:outline-violet-700 shadow-sm text-zinc-800`}
+        disabled
+          ? `bg-gray-200 text-gray-500 cursor-not-allowed ${textColor}`
+          : ""
+      } h-8 pl-2 pr-2 rounded border border-zinc-300 hover:border-violet-600 focus:ring-2 focus:outline-violet-700 shadow-sm ${textColor}`}
       style={style}
       disabled={disabled}
       {...register(name)}

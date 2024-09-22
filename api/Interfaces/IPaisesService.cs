@@ -4,10 +4,11 @@ namespace api.Interfaces
 {
     public interface IPaisesService
     {
-        IEnumerable<PaisModel> GetAllPaises(int ativo);
-        PaisModel GetPais(int pais_ID);
+        IEnumerable<PaisModel> GetAllPaisesAtivos();
+        IEnumerable<PaisModel> GetAllPaises();
+        PaisModel GetPais(int id);
         string PostPais(PaisPostModel paisInserido);
         string PutPais(PaisPutModel paisAlterado);
-        string DeletePais(int pais_ID);
+        string DeletePais(int id);
     }
 }

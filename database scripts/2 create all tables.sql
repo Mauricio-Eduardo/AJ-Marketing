@@ -1,7 +1,7 @@
 use ajmarketing
 
 CREATE TABLE paises (
-  pais_ID int NOT NULL PRIMARY KEY IDENTITY,
+  id int NOT NULL PRIMARY KEY IDENTITY,
 
   pais VARCHAR(56) NOT NULL,
   sigla VARCHAR(2) NOT NULL,
@@ -9,119 +9,86 @@ CREATE TABLE paises (
 
   ativo BIT NOT NULL DEFAULT 1,
   data_cadastro DATETIME NOT NULL DEFAULT GETDATE(),
-  data_ult_alt DATETIME NOT NULL DEFAULT GETDATE(),
+  data_ult_alt DATETIME DEFAULT NULL
 )
 
 CREATE TABLE estados (
-  estado_ID int NOT NULL PRIMARY KEY IDENTITY,
+  id int NOT NULL PRIMARY KEY IDENTITY,
  
   estado VARCHAR(56) NOT NULL,
   uf VARCHAR(2) NOT NULL,
 
-  pais_ID int NOT NULL, -- Foreign Key
-  FOREIGN KEY (pais_ID) REFERENCES paises(pais_ID),
+  pais_id int NOT NULL, -- Foreign Key
+  FOREIGN KEY (pais_id) REFERENCES paises(id),
 
   ativo BIT NOT NULL DEFAULT 1,
   data_cadastro DATETIME NOT NULL DEFAULT GETDATE(),
-  data_ult_alt DATETIME NOT NULL DEFAULT GETDATE(),
+  data_ult_alt DATETIME DEFAULT NULL
 )
 
 CREATE TABLE cidades (
-  cidade_ID int NOT NULL PRIMARY KEY IDENTITY,
+  id int NOT NULL PRIMARY KEY IDENTITY,
   
   cidade VARCHAR(100) NOT NULL,
   ddd VARCHAR(2),
 
-  estado_ID int NOT NULL, -- Foreign Key
-  FOREIGN KEY (estado_ID) REFERENCES estados(estado_ID),
+  estado_id int NOT NULL, -- Foreign Key
+  FOREIGN KEY (estado_id) REFERENCES estados(id),
 
   ativo BIT NOT NULL DEFAULT 1,
   data_cadastro DATETIME NOT NULL DEFAULT GETDATE(),
-  data_ult_alt DATETIME NOT NULL DEFAULT GETDATE(),
+  data_ult_alt DATETIME DEFAULT NULL
 );
 
 CREATE TABLE servicos (
-	servico_ID INT NOT NULL PRIMARY KEY IDENTITY,
+	id INT NOT NULL PRIMARY KEY IDENTITY,
 	servico VARCHAR(30) NOT NULL,
-	valor DECIMAL(7,2) NOT NULL,
+	valor DECIMAL(8,2) NOT NULL,
 	descricao VARCHAR(255),
 
 	ativo BIT NOT NULL DEFAULT 1,
 	data_cadastro DATETIME NOT NULL DEFAULT GETDATE(),
-	data_ult_alt DATETIME NOT NULL DEFAULT GETDATE(),
+	data_ult_alt DATETIME DEFAULT NULL
 )
 
 CREATE TABLE formasPagamento (
-    formaPag_ID INT NOT NULL PRIMARY KEY IDENTITY,
+    id INT NOT NULL PRIMARY KEY IDENTITY,
     formaPagamento VARCHAR(50) NOT NULL,
 
     ativo BIT NOT NULL DEFAULT 1,
 	data_cadastro DATETIME NOT NULL DEFAULT GETDATE(),
-	data_ult_alt DATETIME NOT NULL DEFAULT GETDATE(),
+	data_ult_alt DATETIME DEFAULT NULL
 );
 
 CREATE TABLE condicoesPagamento (
-    condPag_ID INT NOT NULL PRIMARY KEY IDENTITY,
+    id INT NOT NULL PRIMARY KEY IDENTITY,
     condicaoPagamento VARCHAR(50) NOT NULL,
-    desconto DECIMAL(10, 2),
-    juros DECIMAL(10, 2),
-    multa DECIMAL(10, 2),
+    quantidadeParcelas INT DEFAULT 0,
+	desconto DECIMAL(5, 2),
+    juros DECIMAL(5, 2),
+    multa DECIMAL(5, 2),
 
     ativo BIT NOT NULL DEFAULT 1,
 	data_cadastro DATETIME NOT NULL DEFAULT GETDATE(),
-	data_ult_alt DATETIME NOT NULL DEFAULT GETDATE(),
+	data_ult_alt DATETIME DEFAULT NULL
 );
+
 
 CREATE TABLE parcelas (
-    parcela_ID INT NOT NULL PRIMARY KEY IDENTITY,
+    id INT NOT NULL PRIMARY KEY IDENTITY,
     numeroParcela INT NOT NULL,
     dias INT NOT NULL,
-    porcentagem DECIMAL(10, 2) NOT NULL,
+    porcentagem DECIMAL(8, 2) NOT NULL,
 
-    condPag_ID INT NOT NULL, -- Foreign Key
-    formaPag_ID INT NOT NULL, -- Foreign Key
+    condPag_id INT NOT NULL, -- Foreign Key
+    formaPag_id INT NOT NULL, -- Foreign Key
 
-	FOREIGN KEY (condPag_ID) REFERENCES condicoesPagamento(condPag_ID),
-	FOREIGN KEY (formaPag_ID) REFERENCES formasPagamento(formaPag_ID),
+	FOREIGN KEY (condPag_id) REFERENCES condicoesPagamento(id),
+	FOREIGN KEY (formaPag_id) REFERENCES formasPagamento(id),
 );
 
-CREATE TABLE propostas (
-	proposta_ID INT NOT NULL PRIMARY KEY IDENTITY,
-
-	-- Flag: Física ou Jurídica
-	tipo_pessoa VARCHAR(8) NOT NULL, 
-	
-		cpf_cnpj VARCHAR(14),
-		nome_razaoSocial VARCHAR(50) NOT NULL,
-	
-	email VARCHAR(50) NOT NULL,
-	celular VARCHAR(11) NOT NULL,
-
-	data_proposta DATE NOT NULL DEFAULT GETDATE(),
-	prazo_final DATE NOT NULL,
-	inicio DATE NOT NULL,
-	termino DATE NOT NULL,
-	total DECIMAL NOT NULL,
-	situacao VARCHAR(30) NOT NULL DEFAULT 'Pendente',
-
-	data_ult_alt DATETIME NOT NULL DEFAULT GETDATE(),
-)
-
-CREATE TABLE propostas_servicos (
-	proposta_ID INT NOT NULL,
-	servico_ID INT NOT NULL,
-
-	PRIMARY KEY (proposta_ID, servico_ID), -- Chave Composta
-	FOREIGN KEY (proposta_ID) REFERENCES propostas(proposta_ID),
-    FOREIGN KEY (servico_ID) REFERENCES servicos(servico_ID),
-
-	quantidade INT NOT NULL,
-	desconto DECIMAL,
-	valor_unitario DECIMAL NOT NULL,
-)
-
 CREATE TABLE usuarios (
-	usuario_ID INT NOT NULL PRIMARY KEY IDENTITY,
+	id INT NOT NULL PRIMARY KEY IDENTITY,
 
 	nome VARCHAR(50) NOT NULL,
 	email VARCHAR(50) NOT NULL,
@@ -129,58 +96,65 @@ CREATE TABLE usuarios (
 
 	ativo BIT NOT NULL DEFAULT 1,
 	data_cadastro DATETIME NOT NULL DEFAULT GETDATE(),
-	data_ult_alt DATETIME NOT NULL DEFAULT GETDATE(),
+	data_ult_alt DATETIME DEFAULT NULL
 )
 
 CREATE TABLE origens (
-	origem_ID INT NOT NULL PRIMARY KEY IDENTITY,
+	id INT NOT NULL PRIMARY KEY IDENTITY,
 
 	origem VARCHAR(30) NOT NULL,
 
 	ativo BIT NOT NULL DEFAULT 1,
 	data_cadastro DATETIME NOT NULL DEFAULT GETDATE(),
-	data_ult_alt DATETIME NOT NULL DEFAULT GETDATE(),
+	data_ult_alt DATETIME DEFAULT NULL
 )
 
 CREATE TABLE interesses (
-	interesse_ID INT NOT NULL PRIMARY KEY IDENTITY,
+	id INT NOT NULL PRIMARY KEY IDENTITY,
 	interesse VARCHAR(60) NOT NULL,
 
 	ativo BIT NOT NULL DEFAULT 1,
 	data_cadastro DATETIME NOT NULL DEFAULT GETDATE(),
-	data_ult_alt DATETIME NOT NULL DEFAULT GETDATE(),
+	data_ult_alt DATETIME DEFAULT NULL
 )
 
 CREATE TABLE ramosAtividade (
-	ramo_ID INT NOT NULL PRIMARY KEY IDENTITY,
+	id INT NOT NULL PRIMARY KEY IDENTITY,
 	ramo VARCHAR(60) NOT NULL,
 
 	ativo BIT NOT NULL DEFAULT 1,
 	data_cadastro DATETIME NOT NULL DEFAULT GETDATE(),
-	data_ult_alt DATETIME NOT NULL DEFAULT GETDATE(),
+	data_ult_alt DATETIME DEFAULT NULL
+)
+
+CREATE TABLE peridiocidades (
+	id INT NOT NULL PRIMARY KEY IDENTITY,
+	
+	descricao VARCHAR(20) NOT NULL,
+	dias INT NOT NULL,
+
+	ativo BIT NOT NULL DEFAULT 1,
+	data_cadastro DATETIME NOT NULL DEFAULT GETDATE(),
+	data_ult_alt DATETIME DEFAULT NULL
 )
 
 CREATE TABLE clientes (
-	cliente_ID INT NOT NULL PRIMARY KEY IDENTITY,
-
-	proposta_ID INT NOT NULL, -- Foreign Key
-	FOREIGN KEY (proposta_ID) REFERENCES propostas(proposta_ID),
+	id INT NOT NULL PRIMARY KEY IDENTITY,
 
 	-- Flag: Física ou Jurídica
 	tipo_pessoa VARCHAR(8) NOT NULL, 
-	
-		cpf_cnpj VARCHAR(14),
-		nome_razaoSocial VARCHAR(50) NOT NULL,
-		apelido_nomeFantasia VARCHAR(50), 
-		rg_inscricaoEstadual VARCHAR(14), -- 9 rg 14 ie
-		genero VARCHAR(10),
+	cpf_cnpj VARCHAR(14),
+	nome_razaoSocial VARCHAR(50) NOT NULL,
+	apelido_nomeFantasia VARCHAR(50), 
+	rg_inscricaoEstadual VARCHAR(14), -- 9 rg 14 ie
+	genero VARCHAR(10),
 
 	email VARCHAR(50) NOT NULL,
 	celular VARCHAR(11) NOT NULL,
 
 	-- Endereço
-	cidade_ID INT NOT NULL, -- Foreign Key
-	FOREIGN KEY (cidade_ID) REFERENCES cidades(cidade_ID),
+	cidade_id INT NOT NULL, -- Foreign Key
+	FOREIGN KEY (cidade_id) REFERENCES cidades(id),
 
 	logradouro VARCHAR(80) NOT NULL,
 	numero VARCHAR(6) NOT NULL,
@@ -188,74 +162,107 @@ CREATE TABLE clientes (
 	complemento VARCHAR(80),
 	cep VARCHAR(8) NOT NULL,
 
-	origem_ID INT NOT NULL, -- Foreign Key
-	FOREIGN KEY (origem_ID) REFERENCES origens(origem_ID),
+	origem_id INT NOT NULL, -- Foreign Key
+	FOREIGN KEY (origem_id) REFERENCES origens(id),	
 
-	interesse_ID INT NOT NULL, -- Foreign Key
-	FOREIGN KEY (interesse_ID) REFERENCES interesses(interesse_ID),
+	--situacao VARCHAR(20) NOT NULL DEFAULT 'Sem Proposta', -- Sem Proposta, Aguardando Resposta, Contrato Vigente, Contrato Vencido, Contrato Cancelado
 
-	ramo_ID INT NOT NULL, -- Foreign Key
-	FOREIGN KEY (ramo_ID) REFERENCES ramosAtividade(ramo_ID),	
-
-	ativo BIT NOT NULL DEFAULT 1,
+	ativo BIT NOT NULL DEFAULT 1, -- Quando for 0, deve-ser como 'Contrato Vencido' ou 'Contrato Cancelado'
 	data_cadastro DATETIME NOT NULL DEFAULT GETDATE(),
-	data_ult_alt DATETIME NOT NULL DEFAULT GETDATE(),
+	data_ult_alt DATETIME DEFAULT NULL
 );
 
-CREATE TABLE clientes_usuarios (
-	cliente_ID INT NOT NULL,
-	usuario_ID INT NOT NULL,
-	PRIMARY KEY (cliente_ID, usuario_ID), -- Chave Composta
+CREATE TABLE propostas (
+	id INT NOT NULL PRIMARY KEY IDENTITY,
 
-	FOREIGN KEY (cliente_ID) REFERENCES clientes(cliente_ID),
-    FOREIGN KEY (usuario_ID) REFERENCES usuarios(usuario_ID),
+	situacao VARCHAR(30) NOT NULL DEFAULT 'Pendente', -- Pendente, Aprovada, Recusada, Vencida, Cancelada
+	
+	peridiocidade_id INT NOT NULL, -- Foreign Key
+	FOREIGN KEY (peridiocidade_id) REFERENCES peridiocidades(id),	
+
+	cliente_id INT NOT NULL, -- Foreign Key
+	FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+	
+	data_proposta DATE NOT NULL DEFAULT GETDATE(),
+	prazo_final DATE NOT NULL,
+	data_inicio DATE NOT NULL,
+
+	total DECIMAL(10,2) NOT NULL,
+
+	data_cadastro DATETIME NOT NULL DEFAULT GETDATE(),
+	data_ult_alt DATETIME DEFAULT NULL
 )
 
-CREATE TABLE clientes_interesses (
-	cliente_ID INT NOT NULL,
-	interesse_ID INT NOT NULL,
-	PRIMARY KEY (cliente_ID, interesse_ID), -- Chave Composta
+CREATE TABLE propostas_servicos (
+	id INT NOT NULL PRIMARY KEY IDENTITY,
+	proposta_id INT NOT NULL,
+	servico_id INT NOT NULL,
 
-	FOREIGN KEY (cliente_ID) REFERENCES clientes(cliente_ID),
-    FOREIGN KEY (interesse_ID) REFERENCES interesses(interesse_ID),
-)
+	--PRIMARY KEY (id, proposta_ID, servico_ID), -- Chave Composta
+	FOREIGN KEY (proposta_id) REFERENCES propostas(id),
+    FOREIGN KEY (servico_id) REFERENCES servicos(id),
 
-CREATE TABLE clientes_ramosAtividade (
-	cliente_ID INT NOT NULL,
-	ramo_ID INT NOT NULL,
-	PRIMARY KEY (cliente_ID, ramo_ID), -- Chave Composta
-
-	FOREIGN KEY (cliente_ID) REFERENCES clientes(cliente_ID),
-    FOREIGN KEY (ramo_ID) REFERENCES ramosAtividade(ramo_ID),
+	quantidade INT NOT NULL,
+	desconto DECIMAL(7,2),
+	valor_unitario DECIMAL(7,2) NOT NULL,
+	valor_total DECIMAL(9, 2) NOT NULL,
 )
 
 CREATE TABLE contratos (
-	contrato_ID INT NOT NULL PRIMARY KEY IDENTITY,
+	id INT NOT NULL PRIMARY KEY IDENTITY,
 
-	proposta_ID INT NOT NULL, -- Foreign Key
-	FOREIGN KEY (proposta_ID) REFERENCES propostas(proposta_ID),
+	cliente_id INT NOT NULL, -- Foreign Key
+	FOREIGN KEY (cliente_id) REFERENCES clientes(id),
 
-	cliente_ID INT NOT NULL, -- Foreign Key
-	FOREIGN KEY (cliente_ID) REFERENCES clientes(cliente_ID),
+	proposta_id INT NOT NULL, -- Foreign Key
+	FOREIGN KEY (proposta_id) REFERENCES propostas(id),
 
-	condPag_ID INT NOT NULL, -- Foreign Key
-	FOREIGN KEY (condPag_ID) REFERENCES condicoesPagamento(condPag_ID),
+	condPag_id INT NOT NULL, -- Foreign Key
+	FOREIGN KEY (condPag_ID) REFERENCES condicoesPagamento(id),
 
 	data_contrato DATE NOT NULL DEFAULT GETDATE(),
-	total DECIMAL(10, 2) NOT NULL,
-	situacao VARCHAR(30) NOT NULL DEFAULT 'Vigente',
+	data_vencimento DATE NOT NULL,
+
+	situacao VARCHAR(30) NOT NULL DEFAULT 'Vigente', -- Vigente, Cancelado, Vencido
+)
+
+CREATE TABLE clientes_usuarios (
+	cliente_id INT NOT NULL,
+	usuario_id INT NOT NULL,
+	PRIMARY KEY (cliente_ID, usuario_ID), -- Chave Composta
+
+	FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+)
+
+CREATE TABLE clientes_interesses (
+	cliente_id INT NOT NULL,
+	interesse_id INT NOT NULL,
+	PRIMARY KEY (cliente_id, interesse_id), -- Chave Composta
+
+	FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+    FOREIGN KEY (interesse_id) REFERENCES interesses(id),
+)
+
+CREATE TABLE clientes_ramosAtividade (
+	cliente_id INT NOT NULL,
+	ramo_id INT NOT NULL,
+	PRIMARY KEY (cliente_id, ramo_id), -- Chave Composta
+
+	FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+    FOREIGN KEY (ramo_id) REFERENCES ramosAtividade(id),
 )
 
 CREATE TABLE contasReceber (
-	contaReceber_ID INT NOT NULL PRIMARY KEY IDENTITY,
+	id INT NOT NULL PRIMARY KEY IDENTITY,
 
-	cliente_ID INT NOT NULL, -- Foreign Key
-	FOREIGN KEY (cliente_ID) REFERENCES clientes(cliente_ID),
+	cliente_id INT NOT NULL, -- Foreign Key
+	FOREIGN KEY (cliente_id) REFERENCES clientes(id),
 
-	contrato_ID INT NOT NULL, -- Foreign Key
-	FOREIGN KEY (contrato_ID) REFERENCES contratos(contrato_ID),
+	contrato_id INT NOT NULL, -- Foreign Key
+	FOREIGN KEY (contrato_id) REFERENCES contratos(id),
 
     data_vencimento DATE NOT NULL,
-    valor DECIMAL(10, 2) NOT NULL,
+    valor DECIMAL(8, 2) NOT NULL,
     situacao VARCHAR(30) NOT NULL DEFAULT 'Pendente',	
 )

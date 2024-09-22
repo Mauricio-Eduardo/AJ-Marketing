@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|d:\\faculdade\\pr\u00E1tica profissional\\projeto\\api\\models\\formapagamento\\formapagamentomodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|solutionrelative:models\\formapagamento\\formapagamentomodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|d:\\faculdade\\pr\u00E1tica profissional\\projeto\\api\\services\\clientesservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|solutionrelative:services\\clientesservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|d:\\faculdade\\pr\u00E1tica profissional\\projeto\\api\\models\\formapagamento\\formapagamentopostmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|solutionrelative:models\\formapagamento\\formapagamentopostmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|d:\\faculdade\\pr\u00E1tica profissional\\projeto\\api\\services\\propostasservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|solutionrelative:services\\propostasservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -23,27 +23,27 @@
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "FormaPagamentoPostModel.cs",
-              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Models\\FormaPagamento\\FormaPagamentoPostModel.cs",
-              "RelativeDocumentMoniker": "Models\\FormaPagamento\\FormaPagamentoPostModel.cs",
-              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Models\\FormaPagamento\\FormaPagamentoPostModel.cs",
-              "RelativeToolTip": "Models\\FormaPagamento\\FormaPagamentoPostModel.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABQAAAAtAAAA",
+              "Title": "PropostasService.cs",
+              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Services\\PropostasService.cs",
+              "RelativeDocumentMoniker": "Services\\PropostasService.cs",
+              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Services\\PropostasService.cs",
+              "RelativeToolTip": "Services\\PropostasService.cs",
+              "ViewState": "AQIAACIBAAAAAAAAAIAwwAIBAABUAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-09T01:03:08.176Z",
+              "WhenOpened": "2024-09-22T18:37:37.489Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "FormaPagamentoModel.cs",
-              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Models\\FormaPagamento\\FormaPagamentoModel.cs",
-              "RelativeDocumentMoniker": "Models\\FormaPagamento\\FormaPagamentoModel.cs",
-              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Models\\FormaPagamento\\FormaPagamentoModel.cs",
-              "RelativeToolTip": "Models\\FormaPagamento\\FormaPagamentoModel.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAwAAAAJAAAA",
+              "Title": "ClientesService.cs",
+              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Services\\ClientesService.cs",
+              "RelativeDocumentMoniker": "Services\\ClientesService.cs",
+              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Services\\ClientesService.cs",
+              "RelativeToolTip": "Services\\ClientesService.cs",
+              "ViewState": "AQIAAC8AAAAAAAAAAAAAADkAAABFAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-09T01:03:07.485Z",
+              "WhenOpened": "2024-09-22T18:30:06.237Z",
               "EditorCaption": ""
             }
           ]

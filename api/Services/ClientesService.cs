@@ -1,10 +1,13 @@
 ﻿using api.Interfaces;
 using api.Models.Cliente;
+using api.Models.Interesse;
 using api.Models.Parcelas;
+using api.Models.RamosAtividade;
 using api.Models.Usuario;
 using System.Data;
 using System.Data.SqlClient;
 using System.Data.SqlTypes;
+using System.Reflection.PortableExecutable;
 
 namespace api.Services
 {
@@ -17,7 +20,7 @@ namespace api.Services
             this.Connection = pSqlConnection;
         }
 
-        public IEnumerable<ClienteModel> GetAllClientes(int ativo) 
+        public IEnumerable<ClienteModel> GetAllClientes() 
         {
             List<ClienteModel> listaClientes = new List<ClienteModel>();
 
@@ -30,25 +33,15 @@ namespace api.Services
                     SqlCommand getAllCmd = new SqlCommand(String.Format(
                     "SELECT " +
 
-                    "cl.cliente_ID, cl.tipo_pessoa, cl.cpf_cnpj, cl.nome_razaoSocial, cl.apelido_nomeFantasia, cl.rg_inscricaoEstadual, " +
-                    "cl.dataNascimento_dataAbertura, cl.genero, cl.email, cl.celular, cl.ramo_atividade, " +
-                    "cl.cidade_ID, c.cidade, e.estado, p.pais, cl.logradouro, cl.numero, cl.bairro, cl.complemento, cl.cep, " +
-                    "cl.origem_ID, o.origem, cl.interesses, " +
-                    "cl.ativo, cl.data_cadastro, cl.data_ult_alt " +
+                    "cl.id, cl.tipo_pessoa, cl.cpf_cnpj, cl.nome_razaoSocial, cl.apelido_nomeFantasia, cl.rg_inscricaoEstadual, " +
+                    "cl.genero, cl.email, cl.celular, cl.cidade_id, c.cidade, e.estado, p.pais, cl.logradouro, cl.numero, cl.bairro, " +
+                    "cl.complemento, cl.cep, cl.origem_id, o.origem, cl.ativo, cl.data_cadastro, cl.data_ult_alt " +
 
                     "FROM clientes cl " +
-                    "INNER JOIN cidades c ON cl.cidade_ID = c.cidade_ID " +
-                    "INNER JOIN estados e ON c.estado_ID = e.estado_ID " +
-                    "INNER JOIN paises p ON e.pais_ID = p.pais_ID " +
-                    "INNER JOIN origens o ON cl.origem_ID = o.origem_ID " +
-
-                    "WHERE cl.ativo = @ativo"), Connection);
-
-                    getAllCmd.Parameters.AddWithValue("@ativo", ativo);
-
-                    getAllCmd.Parameters.Clear();
-                    getAllCmd.Parameters.Add("@ativo", SqlDbType.Bit).Value = ativo;
-
+                    "INNER JOIN cidades c ON cl.cidade_ID = c.id " +
+                    "INNER JOIN estados e ON c.estado_ID = e.id " +
+                    "INNER JOIN paises p ON e.pais_ID = p.id " +
+                    "INNER JOIN origens o ON cl.origem_ID = o.id"), Connection);
 
                     using (SqlDataReader reader = getAllCmd.ExecuteReader())
                     {
@@ -58,18 +51,16 @@ namespace api.Services
                             listaClientes.Add(
                             new ClienteModel
                             {
-                                Cliente_ID = reader.GetInt32("cliente_ID"),
+                                Id = reader.GetInt32("id"),
                                 Tipo_pessoa = reader.GetString("tipo_pessoa"),
                                 Cpf_cnpj = reader.GetString("cpf_cnpj"),
                                 Nome_razaoSocial = reader.GetString("nome_razaoSocial"),
                                 Apelido_nomeFantasia = reader.GetString("apelido_nomeFantasia"),
                                 Rg_inscricaoEstadual = reader.GetString("rg_inscricaoEstadual"),
-                                DataNascimento_dataAbertura = reader.GetDateTime("dataNascimento_dataAbertura"),
                                 Genero = reader.GetString("genero"),
                                 Email = reader.GetString("email"),
                                 Celular = reader.GetString("celular"),
-                                Ramo_atividade = reader.GetString("ramo_atividade"),
-                                Cidade_ID = reader.GetInt32("cidade_ID"),
+                                Cidade_id = reader.GetInt32("cidade_id"),
                                 Cidade = reader.GetString("cidade"),
                                 Estado = reader.GetString("estado"),
                                 Pais = reader.GetString("pais"),
@@ -78,24 +69,25 @@ namespace api.Services
                                 Bairro = reader.GetString("bairro"),
                                 Complemento = reader.GetString("complemento"),
                                 Cep = reader.GetString("cep"),
-                                Origem_ID = reader.GetInt32("origem_ID"),
+                                Origem_id = reader.GetInt32("origem_id"),
                                 Origem = reader.GetString("origem"),
-                                Interesses = reader.GetString("interesses"),
                                 Ativo = reader.GetBoolean("ativo"),
                                 Data_cadastro = reader.GetDateTime("data_cadastro"),
-                                Data_ult_alt = reader.GetDateTime("data_ult_alt")
-                            }
-                        ) ;
-                            }
+                                Data_ult_alt = reader.IsDBNull(reader.GetOrdinal("data_ult_alt"))
+                                    ? (DateTime?)null
+                                    : reader.GetDateTime(reader.GetOrdinal("data_ult_alt"))
+                            });
+                        }
                     }
 
                     foreach (var cliente in listaClientes)
                     {
-                        cliente.Usuarios = GetUsuariosFromCliente(Connection, cliente.Cliente_ID);
+                        cliente.Usuarios = GetUsuariosFromCliente(Connection, cliente.Id);
+                        cliente.Interesses = GetInteressesFromCliente(Connection, cliente.Id);
+                        cliente.Ramos = GetRamosFromCliente(Connection, cliente.Id);
                     }
 
                     return listaClientes;
-
                 }
                 catch (SqlException ex)
                 {
@@ -109,7 +101,7 @@ namespace api.Services
             }
         }
 
-        public ClienteModel GetCliente(int cliente_ID)
+        public ClienteModel GetCliente(int id)
         {
             using (Connection)
             {
@@ -120,24 +112,24 @@ namespace api.Services
                     SqlCommand getCmd = new SqlCommand(String.Format(
                     "SELECT " +
 
-                    "cl.cliente_ID, cl.tipo_pessoa, cl.cpf_cnpj, cl.nome_razaoSocial, cl.apelido_nomeFantasia, cl.rg_inscricaoEstadual, " +
-                    "cl.dataNascimento_dataAbertura, cl.genero, cl.email, cl.celular, cl.ramo_atividade, " +
-                    "cl.cidade_ID, c.cidade, e.estado, p.pais, cl.logradouro, cl.numero, cl.bairro, cl.complemento, cl.cep, " +
-                    "cl.origem_ID, o.origem, cl.interesses, " +
-                    "cl.ativo, cl.data_cadastro, cl.data_ult_alt " +
+                    "cl.id, cl.tipo_pessoa, cl.cpf_cnpj, cl.nome_razaoSocial, cl.apelido_nomeFantasia, cl.rg_inscricaoEstadual, " +
+                    "cl.genero, cl.email, cl.celular, cl.cidade_id, c.cidade, e.estado, p.pais, cl.logradouro, cl.numero, cl.bairro, " +
+                    "cl.complemento, cl.cep, cl.origem_id, o.origem, cl.ativo, cl.data_cadastro, cl.data_ult_alt " +
 
                     "FROM clientes cl " +
-                    "INNER JOIN cidades c ON cl.cidade_ID = c.cidade_ID " +
-                    "INNER JOIN estados e ON c.estado_ID = e.estado_ID " +
-                    "INNER JOIN paises p ON e.pais_ID = p.pais_ID " +
-                    "INNER JOIN origens o ON cl.origem_ID = o.origem_ID " +
+                    "INNER JOIN cidades c ON cl.cidade_id = c.id " +
+                    "INNER JOIN estados e ON c.estado_id = e.id " +
+                    "INNER JOIN paises p ON e.pais_id = p.id " +
+                    "INNER JOIN origens o ON cl.origem_id = o.id " +
 
-                    "WHERE cl.cliente_ID = @id"), Connection);
+                    "WHERE cl.id = @id"), Connection);
 
                     getCmd.Parameters.Clear();
-                    getCmd.Parameters.Add("@id", SqlDbType.Int).Value = cliente_ID;
+                    getCmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
 
-                    List<UsuarioModel> usuarios = GetUsuariosFromCliente(Connection, cliente_ID);
+                    List<UsuarioModel> usuarios = GetUsuariosFromCliente(Connection, id);
+                    List<InteresseModel> interesses = GetInteressesFromCliente(Connection, id);
+                    List<RamoAtividadeModel> ramos = GetRamosFromCliente(Connection, id);
 
                     SqlDataReader reader = getCmd.ExecuteReader();
                     if (reader.HasRows)
@@ -145,18 +137,16 @@ namespace api.Services
                         reader.Read();
                         return new ClienteModel
                         {
-                            Cliente_ID = reader.GetInt32("cliente_ID"),
+                            Id = reader.GetInt32("id"),
                             Tipo_pessoa = reader.GetString("tipo_pessoa"),
                             Cpf_cnpj = reader.GetString("cpf_cnpj"),
                             Nome_razaoSocial = reader.GetString("nome_razaoSocial"),
                             Apelido_nomeFantasia = reader.GetString("apelido_nomeFantasia"),
                             Rg_inscricaoEstadual = reader.GetString("rg_inscricaoEstadual"),
-                            DataNascimento_dataAbertura = reader.GetDateTime("dataNascimento_dataAbertura"),
                             Genero = reader.GetString("genero"),
                             Email = reader.GetString("email"),
                             Celular = reader.GetString("celular"),
-                            Ramo_atividade = reader.GetString("ramo_atividade"),
-                            Cidade_ID = reader.GetInt32("cidade_ID"),
+                            Cidade_id = reader.GetInt32("cidade_id"),
                             Cidade = reader.GetString("cidade"),
                             Estado = reader.GetString("estado"),
                             Pais = reader.GetString("pais"),
@@ -165,13 +155,16 @@ namespace api.Services
                             Bairro = reader.GetString("bairro"),
                             Complemento = reader.GetString("complemento"),
                             Cep = reader.GetString("cep"),
-                            Origem_ID = reader.GetInt32("origem_ID"),
+                            Origem_id = reader.GetInt32("origem_id"),
                             Origem = reader.GetString("origem"),
-                            Interesses = reader.GetString("interesses"),
                             Ativo = reader.GetBoolean("ativo"),
                             Data_cadastro = reader.GetDateTime("data_cadastro"),
-                            Data_ult_alt = reader.GetDateTime("data_ult_alt"),
+                            Data_ult_alt = reader.IsDBNull(reader.GetOrdinal("data_ult_alt"))
+                                    ? (DateTime?)null
+                                    : reader.GetDateTime(reader.GetOrdinal("data_ult_alt")),
                             Usuarios = usuarios,
+                            Interesses = interesses,
+                            Ramos = ramos,
                         };
                     }
                     else
@@ -189,88 +182,117 @@ namespace api.Services
             }
         }
 
-        private List<UsuarioModel> GetUsuariosFromCliente(SqlConnection connection, int cliente_ID)
+        private List<UsuarioModel> GetUsuariosFromCliente(SqlConnection connection, int id)
         {
-            List<UsuarioModel> listaParcelas = new List<UsuarioModel>();
+            List<UsuarioModel> listaUsuarios = new List<UsuarioModel>();
 
-            string queryParcelas = @"
-            SELECT u.usuario_ID, u.cpf, u.nome, u.email, u.senha, u.ativo, u.data_cadastro, u.data_ult_alt
+            string query = @"
+            SELECT u.id, u.nome, u.email, u.senha, u.ativo, u.data_cadastro, u.data_ult_alt
             FROM clientes_usuarios cu
-            INNER JOIN usuarios u ON cu.usuario_ID = u.usuario_ID
-            INNER JOIN clientes c ON cu.cliente_ID = c.cliente_ID
-            WHERE cu.cliente_ID = @cliente_ID";
+            INNER JOIN usuarios u ON cu.usuario_id = u.id
+            INNER JOIN clientes c ON cu.cliente_id = c.id
+            WHERE cu.cliente_id = @id";
 
-            using (SqlCommand getAllUsuarios = new SqlCommand(queryParcelas, connection))
+            using (SqlCommand getAllUsuarios = new SqlCommand(query, connection))
             {
-                getAllUsuarios.Parameters.Add("@cliente_ID", SqlDbType.Int).Value = cliente_ID;
+                getAllUsuarios.Parameters.Add("@id", SqlDbType.Int).Value = id;
 
-                using (SqlDataReader UsuarioReader = getAllUsuarios.ExecuteReader())
+                using (SqlDataReader UsuariosReader = getAllUsuarios.ExecuteReader())
                 {
-                    while (UsuarioReader.Read())
+                    while (UsuariosReader.Read())
                     {
-                        listaParcelas.Add(
+                        listaUsuarios.Add(
                             new UsuarioModel
                             {
-                                Usuario_ID = UsuarioReader.GetInt32(UsuarioReader.GetOrdinal("usuario_ID")),
-                                Cpf = UsuarioReader.GetString(UsuarioReader.GetOrdinal("cpf")),
-                                Nome = UsuarioReader.GetString(UsuarioReader.GetOrdinal("nome")),
-                                Email = UsuarioReader.GetString(UsuarioReader.GetOrdinal("email")),
-                                Senha = UsuarioReader.GetString(UsuarioReader.GetOrdinal("senha")),
-                                Ativo = UsuarioReader.GetBoolean(UsuarioReader.GetOrdinal("ativo")),
-                                Data_cadastro = UsuarioReader.GetDateTime(UsuarioReader.GetOrdinal("data_cadastro")),
-                                Data_ult_alt = UsuarioReader.GetDateTime(UsuarioReader.GetOrdinal("data_ult_alt")),
+                                Id = UsuariosReader.GetInt32(UsuariosReader.GetOrdinal("id")),
+                                Nome = UsuariosReader.GetString(UsuariosReader.GetOrdinal("nome")),
+                                Email = UsuariosReader.GetString(UsuariosReader.GetOrdinal("email")),
+                                Senha = UsuariosReader.GetString(UsuariosReader.GetOrdinal("senha")),
+                                Ativo = UsuariosReader.GetBoolean(UsuariosReader.GetOrdinal("ativo")),
+                                Data_cadastro = UsuariosReader.GetDateTime(UsuariosReader.GetOrdinal("data_cadastro")),
+                                Data_ult_alt = UsuariosReader.IsDBNull(UsuariosReader.GetOrdinal("data_ult_alt"))
+                                ? (DateTime?)null
+                                    : UsuariosReader.GetDateTime(UsuariosReader.GetOrdinal("data_ult_alt"))
                             });
                     }
                 }
             }
 
-            return listaParcelas;
+            return listaUsuarios;
         }
 
-        public IEnumerable<UsuarioGetFromClienteModel> GetAllUsuariosFromCliente(int cliente_ID)
+        private List<InteresseModel> GetInteressesFromCliente(SqlConnection connection, int id)
         {
-            List<UsuarioGetFromClienteModel> listaUsuarios = new List<UsuarioGetFromClienteModel>();
+            List<InteresseModel> listaInteresses = new List<InteresseModel>();
 
-            using (Connection)
+            string query = @"
+            SELECT i.id, i.interesse, i.ativo, i.data_cadastro, i.data_ult_alt
+            FROM clientes_interesses ci
+            INNER JOIN interesses i ON ci.interesse_id = i.id
+            INNER JOIN clientes c ON ci.cliente_id = c.id
+            WHERE ci.cliente_id = @id";
+
+            using (SqlCommand getAll = new SqlCommand(query, connection))
             {
-                try
+                getAll.Parameters.Add("@id", SqlDbType.Int).Value = id;
+
+                using (SqlDataReader InteressesReader = getAll.ExecuteReader())
                 {
-                    Connection.Open();
-
-                    SqlCommand getCmd = new SqlCommand(String.Format(
-                    "SELECT cu.usuario_ID, u.nome, u.cpf " +
-                    "FROM usuarios u, clientes c, clientes_usuarios cu " +
-                    "WHERE cu.usuario_ID = u.usuario_ID " +
-                    "AND cu.cliente_ID = c.cliente_ID " +
-                    "AND cu.cliente_ID = @id"), Connection);
-
-                    getCmd.Parameters.Clear();
-                    getCmd.Parameters.Add("@id", SqlDbType.Int).Value = cliente_ID;
-
-                    SqlDataReader reader = getCmd.ExecuteReader();
-                    while (reader.Read())
+                    while (InteressesReader.Read())
                     {
-                        // Para cada registro encontrado, cria um objeto e adiciona à lista
-                        listaUsuarios.Add(
-                            new UsuarioGetFromClienteModel
+                        listaInteresses.Add(
+                            new InteresseModel
                             {
-                                Usuario_ID = reader.GetInt32("usuario_ID"),
-                                Cpf = reader.GetString("cpf"),
-                                Nome = reader.GetString("nome"),
-                            }
-                        );
+                                Id = InteressesReader.GetInt32(InteressesReader.GetOrdinal("id")),
+                                Interesse = InteressesReader.GetString(InteressesReader.GetOrdinal("interesse")),
+                                Ativo = InteressesReader.GetBoolean(InteressesReader.GetOrdinal("ativo")),
+                                Data_cadastro = InteressesReader.GetDateTime(InteressesReader.GetOrdinal("data_cadastro")),
+                                Data_ult_alt = InteressesReader.IsDBNull(InteressesReader.GetOrdinal("data_ult_alt"))
+                                ? (DateTime?)null
+                                    : InteressesReader.GetDateTime(InteressesReader.GetOrdinal("data_ult_alt"))
+                            });
                     }
-                    return listaUsuarios;
-                }
-                catch (SqlException ex)
-                {
-                    throw new Exception(ex.Message);
-                }
-                finally
-                {
-                    Connection.Close();
                 }
             }
+
+            return listaInteresses;
+        }
+
+        private List<RamoAtividadeModel> GetRamosFromCliente(SqlConnection connection, int id)
+        {
+            List<RamoAtividadeModel> listaRamos = new List<RamoAtividadeModel>();
+
+            string query = @"
+            SELECT r.id, r.ramo, r.ativo, r.data_cadastro, r.data_ult_alt
+            FROM clientes_ramosAtividade cr
+            INNER JOIN ramosAtividade r ON cr.ramo_id = r.id
+            INNER JOIN clientes c ON cr.cliente_id = c.id
+            WHERE cr.cliente_id = @id";
+
+            using (SqlCommand getAll = new SqlCommand(query, connection))
+            {
+                getAll.Parameters.Add("@id", SqlDbType.Int).Value = id;
+
+                using (SqlDataReader ramosReader = getAll.ExecuteReader())
+                {
+                    while (ramosReader.Read())
+                    {
+                        listaRamos.Add(
+                            new RamoAtividadeModel
+                            {
+                                Id = ramosReader.GetInt32(ramosReader.GetOrdinal("id")),
+                                Ramo = ramosReader.GetString(ramosReader.GetOrdinal("ramo")),
+                                Ativo = ramosReader.GetBoolean(ramosReader.GetOrdinal("ativo")),
+                                Data_cadastro = ramosReader.GetDateTime(ramosReader.GetOrdinal("data_cadastro")),
+                                Data_ult_alt = ramosReader.IsDBNull(ramosReader.GetOrdinal("data_ult_alt"))
+                                ? (DateTime?)null
+                                    : ramosReader.GetDateTime(ramosReader.GetOrdinal("data_ult_alt"))
+                            });
+                    }
+                }
+            }
+
+            return listaRamos;
         }
 
         public string PostCliente(ClientePostModel clienteInserido)
@@ -288,14 +310,10 @@ namespace api.Services
                     string postQuery = @"
                         INSERT INTO clientes
                         (tipo_pessoa, cpf_cnpj, nome_razaoSocial, apelido_nomeFantasia, rg_inscricaoEstadual,
-                        dataNascimento_dataAbertura, genero, email, celular, ramo_atividade,
-                        cidade_ID, logradouro, numero, bairro, complemento, cep, origem_ID, interesses,
-                        ativo, data_cadastro, data_ult_alt)
+                        genero, email, celular, cidade_id, logradouro, numero, bairro, complemento, cep, origem_id)
                         VALUES
                         (@tipo_pessoa, @cpf_cnpj, @nome_razaoSocial, @apelido_nomeFantasia, @rg_inscricaoEstadual,
-                        @dataNascimento_dataAbertura, @genero, @email, @celular, @ramo_atividade,
-                        @cidade_ID, @logradouro, @numero, @bairro, @complemento, @cep, @origem_ID, @interesses,
-                        @ativo, @data_cadastro, @data_ult_alt);
+                        @genero, @email, @celular, @cidade_id, @logradouro, @numero, @bairro, @complemento, @cep, @origem_id);
                         SELECT SCOPE_IDENTITY();";
 
                     SqlCommand postCmd = new SqlCommand(postQuery, Connection, transaction);
@@ -306,38 +324,59 @@ namespace api.Services
                     postCmd.Parameters.Add("@nome_razaoSocial", SqlDbType.VarChar).Value = clienteInserido.Nome_razaoSocial;
                     postCmd.Parameters.Add("@apelido_nomeFantasia", SqlDbType.VarChar).Value = clienteInserido.Apelido_nomeFantasia;
                     postCmd.Parameters.Add("@rg_inscricaoEstadual", SqlDbType.VarChar).Value = clienteInserido.Rg_inscricaoEstadual;
-                    postCmd.Parameters.Add("@dataNascimento_dataAbertura", SqlDbType.Date).Value = clienteInserido.DataNascimento_dataAbertura;
                     postCmd.Parameters.Add("@genero", SqlDbType.VarChar).Value = clienteInserido.Genero;
                     postCmd.Parameters.Add("@email", SqlDbType.VarChar).Value = clienteInserido.Email;
                     postCmd.Parameters.Add("@celular", SqlDbType.VarChar).Value = clienteInserido.Celular;
-                    postCmd.Parameters.Add("@ramo_atividade", SqlDbType.VarChar).Value = clienteInserido.Ramo_atividade;
-                    postCmd.Parameters.Add("@cidade_ID", SqlDbType.VarChar).Value = clienteInserido.Cidade_ID;
+                    postCmd.Parameters.Add("@cidade_id", SqlDbType.VarChar).Value = clienteInserido.Cidade_id;
                     postCmd.Parameters.Add("@logradouro", SqlDbType.VarChar).Value = clienteInserido.Logradouro;
                     postCmd.Parameters.Add("@numero", SqlDbType.VarChar).Value = clienteInserido.Numero;
                     postCmd.Parameters.Add("@bairro", SqlDbType.VarChar).Value = clienteInserido.Bairro;
                     postCmd.Parameters.Add("@complemento", SqlDbType.VarChar).Value = clienteInserido.Complemento;
                     postCmd.Parameters.Add("@cep", SqlDbType.VarChar).Value = clienteInserido.Cep;
-                    postCmd.Parameters.Add("@origem_ID", SqlDbType.VarChar).Value = clienteInserido.Origem_ID;
-                    postCmd.Parameters.Add("@interesses", SqlDbType.VarChar).Value = clienteInserido.Interesses;
-
-                    postCmd.Parameters.Add("@ativo", SqlDbType.Bit).Value = clienteInserido.Ativo;
-                    postCmd.Parameters.Add("@data_cadastro", SqlDbType.DateTime).Value = new SqlDateTime(DateTime.Now).ToString();
-                    postCmd.Parameters.Add("@data_ult_alt", SqlDbType.DateTime).Value = new SqlDateTime(DateTime.Now).ToString();
+                    postCmd.Parameters.Add("@origem_id", SqlDbType.VarChar).Value = clienteInserido.Origem_id;
 
                     int clienteID = Convert.ToInt32(postCmd.ExecuteScalar());
 
-                    // Inserir os IDs na associativa
+                    // Inserir os IDs na associativa de usuarios
                     foreach (var usuario in clienteInserido.Usuarios)
                     {
-                        string postUsuarioQuery = @"
-                        INSERT INTO clientes_usuarios (cliente_ID, usuario_ID)
-                        VALUES (@cliente_ID, @usuario_ID);";
+                        string query = @"
+                        INSERT INTO clientes_usuarios (cliente_id, usuario_id)
+                        VALUES (@cliente_id, @usuario_id);";
 
-                        SqlCommand insertUsuarioCmd = new SqlCommand(postUsuarioQuery, Connection, transaction);
-                        insertUsuarioCmd.Parameters.AddWithValue("@cliente_ID", clienteID);
-                        insertUsuarioCmd.Parameters.AddWithValue("@usuario_ID", usuario.Usuario_ID);
+                        SqlCommand cmd = new SqlCommand(query, Connection, transaction);
+                        cmd.Parameters.AddWithValue("@cliente_id", clienteID);
+                        cmd.Parameters.AddWithValue("@usuario_id", usuario.Id);
 
-                        insertUsuarioCmd.ExecuteNonQuery();
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    // Inserir os IDs na associativa de interesses
+                    foreach (var interesse in clienteInserido.Interesses)
+                    {
+                        string query = @"
+                        INSERT INTO clientes_interesses (cliente_id, interesse_id)
+                        VALUES (@cliente_id, @interesse_id);";
+
+                        SqlCommand cmd = new SqlCommand(query, Connection, transaction);
+                        cmd.Parameters.AddWithValue("@cliente_id", clienteID);
+                        cmd.Parameters.AddWithValue("@interesse_id", interesse.Id);
+
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    // Inserir os IDs na associativa de ramos
+                    foreach (var ramo in clienteInserido.Ramos)
+                    {
+                        string query = @"
+                        INSERT INTO clientes_ramosAtividade (cliente_id, ramo_id)
+                        VALUES (@cliente_id, @ramo_id);";
+
+                        SqlCommand cmd = new SqlCommand(query, Connection, transaction);
+                        cmd.Parameters.AddWithValue("@cliente_id", clienteID);
+                        cmd.Parameters.AddWithValue("@ramo_id", ramo.Id);
+
+                        cmd.ExecuteNonQuery();
                     }
 
                     transaction.Commit();
@@ -376,57 +415,93 @@ namespace api.Services
                     string putQuery = @"
                     UPDATE clientes SET
                     nome_razaoSocial = @nome_razaoSocial, apelido_nomeFantasia = @apelido_nomeFantasia,
-                    rg_inscricaoEstadual = @rg_inscricaoEstadual, dataNascimento_dataAbertura = @dataNascimento_dataAbertura,
-                    genero = @genero, email = @email, celular = @celular, ramo_atividade = @ramo_atividade,
-                    cidade_ID = @cidade_ID, logradouro = @logradouro, numero = @numero, bairro = @bairro,
-                    complemento = @complemento, cep = @cep, origem_ID = @origem_ID, interesses = @interesses,
-                    ativo = @ativo, data_ult_alt = @data_ult_alt
-                    WHERE cliente_ID = @id";
+                    rg_inscricaoEstadual = @rg_inscricaoEstadual, genero = @genero, email = @email, celular = @celular,
+                    cidade_id = @cidade_id, logradouro = @logradouro, numero = @numero, bairro = @bairro,
+                    complemento = @complemento, cep = @cep, origem_id = @origem_id, ativo = @ativo, data_ult_alt = @data_ult_alt
+                    WHERE id = @id";
 
                     SqlCommand putCmd = new SqlCommand(putQuery, Connection, transaction);
 
-                    putCmd.Parameters.Add("@id", SqlDbType.VarChar).Value = clienteAlterado.Cliente_ID;
+                    putCmd.Parameters.Add("@id", SqlDbType.VarChar).Value = clienteAlterado.Id;
                     putCmd.Parameters.Add("@nome_razaoSocial", SqlDbType.VarChar).Value = clienteAlterado.Nome_razaoSocial;
                     putCmd.Parameters.Add("@apelido_nomeFantasia", SqlDbType.VarChar).Value = clienteAlterado.Apelido_nomeFantasia;
                     putCmd.Parameters.Add("@rg_inscricaoEstadual", SqlDbType.VarChar).Value = clienteAlterado.Rg_inscricaoEstadual;
-                    putCmd.Parameters.Add("@dataNascimento_dataAbertura", SqlDbType.Date).Value = clienteAlterado.DataNascimento_dataAbertura;
                     putCmd.Parameters.Add("@genero", SqlDbType.VarChar).Value = clienteAlterado.Genero;
                     putCmd.Parameters.Add("@email", SqlDbType.VarChar).Value = clienteAlterado.Email;
                     putCmd.Parameters.Add("@celular", SqlDbType.VarChar).Value = clienteAlterado.Celular;
-                    putCmd.Parameters.Add("@ramo_atividade", SqlDbType.VarChar).Value = clienteAlterado.Ramo_atividade;
-                    putCmd.Parameters.Add("@cidade_ID", SqlDbType.VarChar).Value = clienteAlterado.Cidade_ID;
+                    putCmd.Parameters.Add("@cidade_id", SqlDbType.VarChar).Value = clienteAlterado.Cidade_id;
                     putCmd.Parameters.Add("@logradouro", SqlDbType.VarChar).Value = clienteAlterado.Logradouro;
                     putCmd.Parameters.Add("@numero", SqlDbType.VarChar).Value = clienteAlterado.Numero;
                     putCmd.Parameters.Add("@bairro", SqlDbType.VarChar).Value = clienteAlterado.Bairro;
                     putCmd.Parameters.Add("@complemento", SqlDbType.VarChar).Value = clienteAlterado.Complemento;
                     putCmd.Parameters.Add("@cep", SqlDbType.VarChar).Value = clienteAlterado.Cep;
-                    putCmd.Parameters.Add("@origem_ID", SqlDbType.VarChar).Value = clienteAlterado.Origem_ID;
-                    putCmd.Parameters.Add("@interesses", SqlDbType.VarChar).Value = clienteAlterado.Interesses;
-
+                    putCmd.Parameters.Add("@origem_id", SqlDbType.VarChar).Value = clienteAlterado.Origem_id;
                     putCmd.Parameters.Add("@ativo", SqlDbType.Bit).Value = clienteAlterado.Ativo;
                     putCmd.Parameters.Add("@data_ult_alt", SqlDbType.DateTime).Value = new SqlDateTime(DateTime.Now).ToString();
 
                     putCmd.ExecuteNonQuery();
 
-                    // Deletar as ligações da associativa
-                    string deleteAssociativaQuery = "DELETE FROM clientes_usuarios WHERE cliente_ID = @id";
-                    SqlCommand deleteUsuariosCmd = new SqlCommand(deleteAssociativaQuery, Connection, transaction);
-                    deleteUsuariosCmd.Parameters.AddWithValue("@id", clienteAlterado.Cliente_ID);
+                    // Deletar as ligações da associativa de usuarios
+                    string delete = "DELETE FROM clientes_usuarios WHERE cliente_id = @id";
+                    SqlCommand deleteCmd = new SqlCommand(delete, Connection, transaction);
+                    deleteCmd.Parameters.AddWithValue("@id", clienteAlterado.Id);
 
-                    deleteUsuariosCmd.ExecuteNonQuery();
+                    deleteCmd.ExecuteNonQuery();
 
-                    // Inserir na associativa
+                    // Deletar as ligações da associativa de interesses
+                    delete = "DELETE FROM clientes_interesses WHERE cliente_id = @id";
+                    deleteCmd = new SqlCommand(delete, Connection, transaction);
+                    deleteCmd.Parameters.AddWithValue("@id", clienteAlterado.Id);
+
+                    deleteCmd.ExecuteNonQuery();
+
+                    // Deletar as ligações da associativa de ramos
+                    delete = "DELETE FROM clientes_ramosAtividade WHERE cliente_id = @id";
+                    deleteCmd = new SqlCommand(delete, Connection, transaction);
+                    deleteCmd.Parameters.AddWithValue("@id", clienteAlterado.Id);
+
+                    deleteCmd.ExecuteNonQuery();
+
+                    // Inserir os IDs na associativa de usuarios
                     foreach (var usuario in clienteAlterado.Usuarios)
                     {
-                        string insertAssociativaQuery = @"
-                        INSERT INTO clientes_usuarios (cliente_ID, usuario_ID)
-                        VALUES (@cliente_ID, @usuario_ID);";
+                        string query = @"
+                        INSERT INTO clientes_usuarios (cliente_id, usuario_id)
+                        VALUES (@cliente_id, @usuario_id);";
 
-                        SqlCommand insertAssociativaCmd = new SqlCommand(insertAssociativaQuery, Connection, transaction);
-                        insertAssociativaCmd.Parameters.AddWithValue("@cliente_ID", clienteAlterado.Cliente_ID);
-                        insertAssociativaCmd.Parameters.AddWithValue("@usuario_ID", usuario.Usuario_ID);
+                        SqlCommand cmd = new SqlCommand(query, Connection, transaction);
+                        cmd.Parameters.AddWithValue("@cliente_id", clienteAlterado.Id);
+                        cmd.Parameters.AddWithValue("@usuario_id", usuario.Id);
 
-                        insertAssociativaCmd.ExecuteNonQuery();
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    // Inserir os IDs na associativa de interesses
+                    foreach (var interesse in clienteAlterado.Interesses)
+                    {
+                        string query = @"
+                        INSERT INTO clientes_interesses (cliente_id, interesse_id)
+                        VALUES (@cliente_id, @interesse_id);";
+
+                        SqlCommand cmd = new SqlCommand(query, Connection, transaction);
+                        cmd.Parameters.AddWithValue("@cliente_id", clienteAlterado.Id);
+                        cmd.Parameters.AddWithValue("@interesse_id", interesse.Id);
+
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    // Inserir os IDs na associativa de ramos
+                    foreach (var ramo in clienteAlterado.Ramos)
+                    {
+                        string query = @"
+                        INSERT INTO clientes_ramosAtividade (cliente_id, ramo_id)
+                        VALUES (@cliente_id, @ramo_id);";
+
+                        SqlCommand cmd = new SqlCommand(query, Connection, transaction);
+                        cmd.Parameters.AddWithValue("@cliente_id", clienteAlterado.Id);
+                        cmd.Parameters.AddWithValue("@ramo_id", ramo.Id);
+
+                        cmd.ExecuteNonQuery();
                     }
 
                     transaction.Commit();
@@ -448,7 +523,7 @@ namespace api.Services
             }
         }
 
-        public string DeleteCliente(int cliente_ID)
+        public string DeleteCliente(int id)
         {
             using (Connection)
             {
@@ -460,25 +535,40 @@ namespace api.Services
                     Connection.Open();
                     transaction = Connection.BeginTransaction();
 
-                    // Deletar da associativa
-                    string deleteAssociativaQuery = "DELETE FROM clientes_usuarios WHERE cliente_ID = @id";
-                    SqlCommand deleteAssociativaCmd = new SqlCommand(deleteAssociativaQuery, Connection, transaction);
-                    deleteAssociativaCmd.Parameters.AddWithValue("@id", cliente_ID);
+                    // Deletar as ligações da associativa de usuarios
+                    string delete = "DELETE FROM clientes_usuarios WHERE cliente_id = @id";
+                    SqlCommand deleteCmd = new SqlCommand(delete, Connection, transaction);
+                    deleteCmd.Parameters.AddWithValue("@id", id);
+                    deleteCmd.ExecuteNonQuery();
 
-                    deleteAssociativaCmd.ExecuteNonQuery();
+                    // Deletar as ligações da associativa de interesses
+                    delete = "DELETE FROM clientes_interesses WHERE cliente_id = @id";
+                    deleteCmd = new SqlCommand(delete, Connection, transaction);
+                    deleteCmd.Parameters.AddWithValue("@id", id);
+                    deleteCmd.ExecuteNonQuery();
+
+                    // Deletar as ligações da associativa de ramos
+                    delete = "DELETE FROM clientes_ramosAtividade WHERE cliente_id = @id";
+                    deleteCmd = new SqlCommand(delete, Connection, transaction);
+                    deleteCmd.Parameters.AddWithValue("@id", id);
+                    deleteCmd.ExecuteNonQuery();
+
+                    // Deletar as ligações da tabela de propostas
+                    delete = "DELETE FROM propostas WHERE cliente_id = @id";
+                    deleteCmd = new SqlCommand(delete, Connection, transaction);
+                    deleteCmd.Parameters.AddWithValue("@id", id);
+                    deleteCmd.ExecuteNonQuery();
 
                     // Deletar o cliente
-                    string deleteCmdQuery = "DELETE FROM clientes WHERE cliente_ID = @id";
-                    SqlCommand deleteCmd = new SqlCommand(deleteCmdQuery, Connection, transaction);
-
+                    delete = "DELETE FROM clientes WHERE id = @id";
+                    deleteCmd = new SqlCommand(delete, Connection, transaction);
                     deleteCmd.Parameters.Clear();
-                    deleteCmd.Parameters.Add("@id", SqlDbType.Int).Value = cliente_ID;
+                    deleteCmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
 
                     deleteCmd.ExecuteNonQuery();
 
                     transaction.Commit();
-                    return "Deletado com Sucesso!";
-
+                    return "Excluído com Sucesso!";   
                 }
                 catch (SqlException ex)
                 {
@@ -494,6 +584,5 @@ namespace api.Services
                 }
             }
         }
-
     }
 }

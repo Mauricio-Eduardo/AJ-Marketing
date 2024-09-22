@@ -1,22 +1,17 @@
 import { useState } from "react";
-import { Sidebar, Menu, MenuItem, SubMenu, SubMenuFR } from "react-pro-sidebar";
+import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Link } from "react-router-dom";
 import {
-  TrendUp,
   HandArrowUp,
   Wrench,
   House,
   CaretLeft,
   CaretRight,
   Heart,
-  CalendarDots,
   GearFine,
   Power,
   Scroll,
-  Strategy,
   IconContext,
-  TrendDown,
-  ChartLine,
   City,
   Flag,
   GlobeHemisphereEast,
@@ -48,6 +43,7 @@ export const MySidebar: React.FC<ThemeSwitcherProps> = ({ darkMode }) => {
             borderTop: "none",
             borderLeft: "none",
             borderBottom: "none",
+            overflow: "!hidden",
           }}
           collapsed={!isExpanded}
           collapsedWidth="5vw"
@@ -62,7 +58,7 @@ export const MySidebar: React.FC<ThemeSwitcherProps> = ({ darkMode }) => {
               weight: "light",
             }}
           >
-            <Flex // id='sidebar-top-icons
+            <Flex
               id="sidebar-top-icons"
               justify={"center"}
               className={style.menuseparator}
@@ -128,6 +124,12 @@ export const MySidebar: React.FC<ThemeSwitcherProps> = ({ darkMode }) => {
                 <MenuItem icon={<Globe />} component={<Link to="origens" />}>
                   Origens
                 </MenuItem>
+                <MenuItem component={<Link to="interesses" />}>
+                  Interesses
+                </MenuItem>
+                <MenuItem component={<Link to="ramosAtividade" />}>
+                  Ramos de Atividade
+                </MenuItem>
                 <MenuItem
                   icon={<HandArrowUp />}
                   component={<Link to="propostas" />}
@@ -141,20 +143,6 @@ export const MySidebar: React.FC<ThemeSwitcherProps> = ({ darkMode }) => {
                 >
                   Contratos{" "}
                 </MenuItem>
-
-                {/* <MenuItem
-                  icon={<Strategy />}
-                  component={<Link to="planejamento" />}
-                >
-                  Planejamento
-                </MenuItem>
-                <MenuItem
-                  icon={<CalendarDots />}
-                  component={<Link to="cronograma" />}
-                  className={style.menuseparator}
-                >
-                  Cronograma
-                </MenuItem> */}
 
                 <MenuItem
                   icon={<CreditCard />}

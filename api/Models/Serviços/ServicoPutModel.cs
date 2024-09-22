@@ -3,7 +3,7 @@
     public class ServicoPutModel
     {
         // Variáveis privadas correspondentes aos campos no banco de dados
-        private int _servico_ID; // o ID não é editável porém é necessário para a requisição do PUT
+        private int _id; // o ID não é editável porém é necessário para a requisição do PUT
         private string _servico;
         private decimal _valor;
         private string _descricao;
@@ -11,10 +11,10 @@
         private bool _ativo;
 
         // Propriedades públicas para acessar as variáveis
-        public int Servico_ID
+        public int Id
         {
-            get { return _servico_ID; }
-            set { _servico_ID = value; }
+            get { return _id; }
+            set { _id = value; }
         }
 
         public string Servico
@@ -45,9 +45,9 @@
         public ServicoPutModel() { }
 
         // Construtor com parâmetros
-        public ServicoPutModel(int servico_ID, string servico, decimal valor, string descricao, bool ativo)
+        public ServicoPutModel(int id, string servico, decimal valor, string descricao, bool ativo)
         {
-            _servico_ID = servico_ID;
+            _id = id;
             _servico = servico;
             _valor = valor;
             _descricao = descricao;

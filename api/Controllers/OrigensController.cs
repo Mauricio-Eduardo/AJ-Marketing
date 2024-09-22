@@ -17,10 +17,21 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("/GetAllOrigens")]
-        public ActionResult<IEnumerable<OrigemModel>> GetAllOrigens(int ativo)
+        [Route("/GetAllOrigensAtivas")]
+        public ActionResult<IEnumerable<OrigemModel>> GetAllOrigensAtivas()
         {
-            IEnumerable<OrigemModel> result = origensService.GetAllOrigens(ativo);
+            IEnumerable<OrigemModel> result = origensService.GetAllOrigensAtivas();
+            if (result != null)
+                return Ok(result);
+            else
+                return BadRequest();
+        }
+
+        [HttpGet]
+        [Route("/GetAllOrigens")]
+        public ActionResult<IEnumerable<OrigemModel>> GetAllOrigens()
+        {
+            IEnumerable<OrigemModel> result = origensService.GetAllOrigens();
             if (result != null)
                 return Ok(result);
             else
@@ -29,9 +40,9 @@ namespace api.Controllers
 
         [HttpGet]
         [Route("/GetOrigem")]
-        public IActionResult GetOrigem(int origem_ID)
+        public IActionResult GetOrigem(int id)
         {
-            OrigemModel result = origensService.GetOrigem(origem_ID);
+            OrigemModel result = origensService.GetOrigem(id);
             if (result != null)
                 return Ok(result);
             else
@@ -62,9 +73,9 @@ namespace api.Controllers
 
         [HttpDelete]
         [Route("/DeleteOrigem")]
-        public IActionResult DeleteOrigem(int origem_ID)
+        public IActionResult DeleteOrigem(int id)
         {
-            string result = origensService.DeleteOrigem(origem_ID);
+            string result = origensService.DeleteOrigem(id);
             if (result != null)
                 return Ok(result);
             else

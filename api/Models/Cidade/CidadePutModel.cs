@@ -3,19 +3,19 @@
     public class CidadePutModel
     {
         // Variáveis que podem ser editáveis em um registro
-        private int _cidade_ID; // o ID não é editável porém é necessário para a requisição do PUT
+        private int _id; // o ID não é editável porém é necessário para a requisição do PUT
         private string _cidade;
         private string _ddd;
 
-        private int _estado_ID;
+        private int _estado_id;
 
         private bool _ativo;
 
         // Propriedades públicas para acessar as variáveis
-        public int Cidade_ID
+        public int Id
         {
-            get { return _cidade_ID; }
-            set { _cidade_ID = value; }
+            get { return _id; }
+            set { _id = value; }
         }
 
         public string Cidade
@@ -29,10 +29,10 @@
             get { return _ddd; }
             set { _ddd = value; }
         }
-        public int Estado_ID
+        public int Estado_id
         {
-            get { return _estado_ID; }
-            set { _estado_ID = value; }
+            get { return _estado_id; }
+            set { _estado_id = value; }
         }
 
         public bool Ativo
@@ -45,12 +45,12 @@
         public CidadePutModel() { }
 
         // Construtor com parâmetros
-        public CidadePutModel(int cidade_ID, string cidade, string ddd, int estado_ID, bool ativo)
+        public CidadePutModel(int id, string cidade, string ddd, int estado_id, bool ativo)
         {
-            _cidade_ID = cidade_ID;
+            _id = id;
             _cidade = cidade;
             _ddd = ddd;
-            _estado_ID = estado_ID;
+            _estado_id = estado_id;
             _ativo = ativo;
         }
     }

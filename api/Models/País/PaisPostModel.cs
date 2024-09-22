@@ -7,8 +7,6 @@
         private string _sigla;
         private string _ddi;
 
-        private bool _ativo;
-
         // Propriedades públicas para acessar as variáveis
         public string Pais
         {
@@ -28,12 +26,6 @@
             set { _ddi = value; }
         }
 
-        public bool Ativo
-        {
-            get { return _ativo; }
-            set { _ativo = value; }
-        }
-
         // Construtor sem parâmetros
         public PaisPostModel() { }
 
@@ -43,7 +35,6 @@
             _pais = pais;
             _sigla = sigla;
             _ddi = ddi;
-            _ativo = ativo;
         }
     }
 }

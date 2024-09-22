@@ -6,9 +6,9 @@ namespace api.Interfaces
     {
         IEnumerable<EstadoModel> GetAllEstadosAtivos();
         IEnumerable<EstadoModel> GetAllEstados();
-        EstadoModel GetEstado(int estado_ID);
+        EstadoModel GetEstado(int id);
         string PostEstado(EstadoPostModel estadoInserido);
         string PutEstado(EstadoPutModel estadoAlterado);
-        string DeleteEstado(int estado_ID);
+        string DeleteEstado(int id);
     }
 }

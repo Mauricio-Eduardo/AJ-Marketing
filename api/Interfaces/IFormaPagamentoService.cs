@@ -4,10 +4,11 @@ namespace api.Interfaces
 {
     public interface IFormaPagamentoService
     {
-        IEnumerable<FormaPagamentoModel> GetAllFormasPagamento(int ativo);
-        FormaPagamentoModel GetFormaPagamento(int formaPag_ID);
+        IEnumerable<FormaPagamentoModel> GetAllFormasPagamentoAtivas();
+        IEnumerable<FormaPagamentoModel> GetAllFormasPagamento();
+        FormaPagamentoModel GetFormaPagamento(int id);
         string PostFormaPagamento(FormaPagamentoPostModel formaPagInserida);
         string PutFormaPagamento(FormaPagamentoPutModel formaPagAlterada);
-        string DeleteFormaPagamento(int formaPag_ID);
+        string DeleteFormaPagamento(int id);
     }
 }

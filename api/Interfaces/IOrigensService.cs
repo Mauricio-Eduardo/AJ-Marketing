@@ -4,10 +4,11 @@ namespace api.Interfaces
 {
     public interface IOrigensService
     {
-        IEnumerable<OrigemModel> GetAllOrigens(int ativo);
-        OrigemModel GetOrigem(int origem_ID);
+        IEnumerable<OrigemModel> GetAllOrigensAtivas();
+        IEnumerable<OrigemModel> GetAllOrigens();
+        OrigemModel GetOrigem(int id);
         string PostOrigem(OrigemPostModel origemInserido);
         string PutOrigem(OrigemPutModel origemAlterado);
-        string DeleteOrigem(int origem_ID);
+        string DeleteOrigem(int id);
     }
 }

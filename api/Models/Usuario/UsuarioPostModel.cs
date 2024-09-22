@@ -4,20 +4,11 @@
     {
 
         // Variáveis que são necessárias para criar um novo registro
-        private string _cpf;
         private string _nome;  
         private string _email;
         private string _senha;
 
-        private bool _ativo;
-
         // Propriedades públicas para acessar as variáveis
-        public string Cpf
-        {
-            get { return _cpf; }
-            set { _cpf = value; }
-        }
-
         public string Nome
         {
             get { return _nome; }
@@ -36,24 +27,15 @@
             set { _senha = value; }
         }
 
-        public bool Ativo
-        {
-            get { return _ativo; }
-            set { _ativo = value; }
-        }
-
-
         // Construtor sem parâmetros
         public UsuarioPostModel() { }
 
         // Construtor com parâmetros
-        public UsuarioPostModel(string Cpf, string Nome, string Email, string Senha, bool Ativo)
+        public UsuarioPostModel(string nome, string email, string senha)
         {
-            _cpf = Cpf;
-            _nome = Nome;
-            _email = Email;
-            _senha = Senha;
-            _ativo = Ativo;
+            _nome = nome;
+            _email = email;
+            _senha = senha;
         }
     }
 }

@@ -7,7 +7,7 @@
         private int _dias;
         private decimal _porcentagem;
 
-        private int _formaPag_ID;
+        private int _formaPag_id;
 
         // Propriedades públicas para acessar as variáveis
         public int NumeroParcela
@@ -28,22 +28,22 @@
             set { _porcentagem = value; }
         }
 
-        public int FormaPag_ID
+        public int FormaPag_id
         {
-            get { return _formaPag_ID; }
-            set { _formaPag_ID = value; }
+            get { return _formaPag_id; }
+            set { _formaPag_id = value; }
         }
 
         // Construtor sem parâmetros
         public ParcelasPutModel() { }
 
         // Construtor com parâmetros
-        public ParcelasPutModel(int numeroParcela, int dias, decimal porcentagem, int formaPag_ID)
+        public ParcelasPutModel(int numeroParcela, int dias, decimal porcentagem, int formaPag_id)
         {
             _numeroParcela = numeroParcela;
             _dias = dias;
             _porcentagem = porcentagem;
-            _formaPag_ID = formaPag_ID;
+            _formaPag_id = formaPag_id;
         }
     }
 }
