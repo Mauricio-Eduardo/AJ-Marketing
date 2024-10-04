@@ -3,7 +3,7 @@ import { z } from "zod";
 export const createPropostasSchema = z.object({
   id: z.coerce.number().readonly(),
 
-  cliente_id: z.coerce.number().min(1, "Obrigatóro"),
+  cliente_id: z.coerce.number().nullable(),
   tipo_pessoa: z.string().min(1, "Obrigatóro").readonly(),
   cpf_cnpj: z.string().min(1, "Obrigatóro").readonly(),
   nome_razaoSocial: z.string().min(1, "Obrigatóro").readonly(),

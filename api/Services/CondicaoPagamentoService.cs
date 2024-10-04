@@ -182,39 +182,46 @@ namespace api.Services
 
         private List<ParcelasModel> GetParcelasFromCondicaoPagamento(SqlConnection connection, int id)
         {
-            List<ParcelasModel> listaParcelas = new List<ParcelasModel>();
-
-            string queryParcelas = @"
-            SELECT p.id, p.numeroParcela, p.dias, p.porcentagem, 
-                   p.condPag_id, p.formaPag_id, f.formaPagamento
-            FROM parcelas p
-            INNER JOIN formasPagamento f ON p.formaPag_id = f.id
-            WHERE p.condPag_id = @condPag_id";
-
-            using (SqlCommand getAllParcelas = new SqlCommand(queryParcelas, connection))
+            try
             {
-                getAllParcelas.Parameters.Add("@condPag_id", SqlDbType.Int).Value = id;
+                List<ParcelasModel> listaParcelas = new List<ParcelasModel>();
 
-                using (SqlDataReader ParcelaReader = getAllParcelas.ExecuteReader())
+                string queryParcelas = @"
+                SELECT p.id, p.numeroParcela, p.dias, p.porcentagem, 
+                        p.condPag_id, p.formaPag_id, f.formaPagamento
+                FROM parcelas p
+                INNER JOIN formasPagamento f ON p.formaPag_id = f.id
+                WHERE p.condPag_id = @condPag_id";
+
+                using (SqlCommand getAllParcelas = new SqlCommand(queryParcelas, connection))
                 {
-                    while (ParcelaReader.Read())
+                    getAllParcelas.Parameters.Add("@condPag_id", SqlDbType.Int).Value = id;
+
+                    using (SqlDataReader ParcelaReader = getAllParcelas.ExecuteReader())
                     {
-                        listaParcelas.Add(
-                            new ParcelasModel
-                            {
-                                Id = ParcelaReader.GetInt32(ParcelaReader.GetOrdinal("id")),
-                                NumeroParcela = ParcelaReader.GetInt32(ParcelaReader.GetOrdinal("numeroParcela")),
-                                Dias = ParcelaReader.GetInt32(ParcelaReader.GetOrdinal("dias")),
-                                Porcentagem = ParcelaReader.GetDecimal(ParcelaReader.GetOrdinal("porcentagem")),
-                                CondPag_id = ParcelaReader.GetInt32(ParcelaReader.GetOrdinal("condPag_id")),
-                                FormaPag_id = ParcelaReader.GetInt32(ParcelaReader.GetOrdinal("formaPag_id")),
-                                FormaPagamento = ParcelaReader.GetString(ParcelaReader.GetOrdinal("formaPagamento")),
-                            });
+                        while (ParcelaReader.Read())
+                        {
+                            listaParcelas.Add(
+                                new ParcelasModel
+                                {
+                                    Id = ParcelaReader.GetInt32(ParcelaReader.GetOrdinal("id")),
+                                    NumeroParcela = ParcelaReader.GetInt32(ParcelaReader.GetOrdinal("numeroParcela")),
+                                    Dias = ParcelaReader.GetInt32(ParcelaReader.GetOrdinal("dias")),
+                                    Porcentagem = ParcelaReader.GetDecimal(ParcelaReader.GetOrdinal("porcentagem")),
+                                    CondPag_id = ParcelaReader.GetInt32(ParcelaReader.GetOrdinal("condPag_id")),
+                                    FormaPag_id = ParcelaReader.GetInt32(ParcelaReader.GetOrdinal("formaPag_id")),
+                                    FormaPagamento = ParcelaReader.GetString(ParcelaReader.GetOrdinal("formaPagamento")),
+                                });
+                        }
                     }
+
+                    return listaParcelas;
                 }
             }
-
-            return listaParcelas;
+            catch (SqlException ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         public string PostCondicaoPagamento(CondicaoPagamentoPostModel condicaoPagInserida)

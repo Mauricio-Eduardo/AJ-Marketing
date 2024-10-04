@@ -19,7 +19,6 @@ export interface UpdateClienteDto {
   complemento: string;
   cep: string;
   origem_id: number;
-  situacao: string;
 
   usuarios: Usuario[];
   interesses: Interesse[];
@@ -44,7 +43,6 @@ export function transformarParaPutCliente(data: Cliente): UpdateClienteDto {
     complemento: data.complemento,
     cep: data.cep,
     origem_id: data.origem_id,
-    situacao: data.situacao,
     usuarios: data.usuarios,
     interesses: data.interesses,
     ramos: data.ramos,

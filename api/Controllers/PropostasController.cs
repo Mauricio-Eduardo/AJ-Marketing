@@ -1,6 +1,7 @@
 ﻿using api.Interfaces;
 using api.Models.Proposta;
 using Microsoft.AspNetCore.Mvc;
+using System.Data.SqlClient;
 
 
 namespace api.Controllers

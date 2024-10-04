@@ -8,6 +8,11 @@ export class PropostasService {
     return response.data;
   }
 
+  async getAllFiltered() {
+    const response = await api.get("GetAllPropostasAprovadas");
+    return response.data;
+  }
+
   async getOne(pId: number) {
     const response = await api.get("GetProposta", {
       params: { id: pId },
@@ -25,10 +30,10 @@ export class PropostasService {
     return String(response.data);
   }
 
-  async aprovar(id: number) {
-    const response = await api.put("AprovarProposta", {
-      params: { id: id },
-    });
+  async atualizarSituacao(id: number, situacao: string) {
+    const response = await api.put(
+      `/AtualizarSituacaoProposta?id=${id}&situacao=${situacao}`
+    );
     return String(response.data);
   }
 }

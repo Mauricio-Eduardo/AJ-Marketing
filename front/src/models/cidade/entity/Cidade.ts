@@ -5,6 +5,7 @@ export class Cidade extends ModelPai {
   ddd: string;
   estado_id: number;
   estado: string;
+  pais: string;
 
   constructor(
     pId: number,
@@ -14,12 +15,14 @@ export class Cidade extends ModelPai {
     pCidade: string,
     pDdd: string,
     pEstado_id: number,
-    pEstado: string
+    pEstado: string,
+    pPais: string
   ) {
     super(pId, pAtivo, pDataCadastro, pDataUltAlt);
     this.cidade = pCidade;
     this.ddd = pDdd;
     this.estado_id = pEstado_id;
     this.estado = pEstado;
+    this.pais = pPais;
   }
 }

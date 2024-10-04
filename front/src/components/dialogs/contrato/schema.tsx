@@ -4,6 +4,7 @@ export const createContratosSchema = z.object({
   id: z.coerce.number().readonly(),
 
   cliente_id: z.coerce.number().min(1, "Obrigatório"),
+  tipo_pessoa: z.string().readonly(),
   cpf_cnpj: z.string().readonly(),
   nome_razaoSocial: z.string().readonly(),
 
@@ -12,8 +13,17 @@ export const createContratosSchema = z.object({
 
   data_contrato: z.string().min(1, "Obrigatório").readonly(),
 
+  peridiocidade_id: z.coerce.number().min(1, "Obrigatório"),
+  dias: z.coerce.number().min(1, "Obrigatório"),
+  quantidade: z.coerce.number().min(1, "Obrigatório"),
+
+  data_vencimento: z.string().min(1, "Obrigatório"),
+
   condPag_id: z.coerce.number().min(1, "Obrigatório"),
   condicaoPagamento: z.string().readonly(),
+  desconto: z.string().readonly(),
+  juros: z.string().readonly(),
+  multa: z.string().readonly(),
 
   situacao: z.string().min(1, "Obrigatório"),
 
@@ -41,7 +51,6 @@ export const createContratosSchema = z.object({
         .readonly(),
     })
   ),
-  // .readonly(),
 });
 
 export type ContratosSchema = z.infer<typeof createContratosSchema>;

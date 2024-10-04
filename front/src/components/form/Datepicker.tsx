@@ -3,8 +3,8 @@ import { addDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { InputHTMLAttributes } from "react";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.min.css";
 import { Controller, useFormContext } from "react-hook-form";
+import "react-datepicker/dist/react-datepicker.min.css";
 
 interface DatepickProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
@@ -24,9 +24,10 @@ export const Datepick = ({ name, days, end, disabled }: DatepickProps) => {
       <Controller
         name={name}
         control={control}
-        render={({ field: { onChange, onBlur, value, ref } }) => (
+        render={({ field: { onChange, value, ref } }) => (
           <DatePicker
             ref={ref}
+            onKeyDown={(e) => e.preventDefault()}
             wrapperClassName="input-attribute"
             locale={ptBR}
             className={`${
@@ -42,7 +43,6 @@ export const Datepick = ({ name, days, end, disabled }: DatepickProps) => {
             onChange={(date) => {
               onChange(date ? date.toISOString() : null); // Atualiza o valor do formulário com a data no formato ISO
             }}
-            onBlur={onBlur}
             monthsShown={1}
             dateFormat="dd/MM/yyyy"
             renderCustomHeader={({

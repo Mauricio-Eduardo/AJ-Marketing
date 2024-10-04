@@ -28,7 +28,7 @@ export const GeneroSelect: React.FC<GeneroSelectProps> = ({
         disabled={disabled}
         className={`${
           disabled ? "bg-gray-200 text-gray-500 cursor-not-allowed" : ""
-        } h-8 pl-2 pr-2 rounded border border-zinc-300 hover:border-violet-600 focus:ring-2 focus:outline-violet-700 shadow-sm text-zinc-800`}
+        } h-8 pl-2 pr-2 uppercase rounded border border-zinc-300 hover:border-violet-600 focus:ring-2 focus:outline-violet-700 shadow-sm text-zinc-800`}
       >
         <option value=""></option>
         <option value="masculino">Masculino</option>

@@ -40,9 +40,9 @@ namespace api.Controllers
 
         [HttpPost]
         [Route("/PostCliente")]
-        public IActionResult PostCliente([FromBody] ClientePostModel clienteInserido)
+        public IActionResult PostCliente([FromBody] ClientePostModel clienteInserido, int? proposta_id)
         {
-            string result = clientesService.PostCliente(clienteInserido);
+            string result = clientesService.PostCliente(clienteInserido, proposta_id);
             if (result != null)
                 return Ok(result);
             else

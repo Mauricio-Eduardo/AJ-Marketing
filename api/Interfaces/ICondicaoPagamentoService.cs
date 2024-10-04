@@ -1,4 +1,6 @@
 ﻿using api.Models.CondicaoPagamento;
+using api.Models.Parcelas;
+using System.Data.SqlClient;
 
 namespace api.Interfaces
 {

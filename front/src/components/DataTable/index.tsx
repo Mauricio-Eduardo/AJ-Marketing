@@ -11,6 +11,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import {
+  ClienteControllerMethods,
   ContratoControllerMethods,
   ControllerMethods,
   PropostaControllerMethods,
@@ -21,6 +22,7 @@ interface TableConfig {
   columns: ColumnDef<any>[];
   controller:
     | ControllerMethods
+    | ClienteControllerMethods
     | PropostaControllerMethods
     | ContratoControllerMethods;
   onRowSelectionChange: (selectedRow: any) => void;
@@ -49,11 +51,18 @@ export const DataTable = ({
             value: "Vigente",
           },
         ];
-      case "propostas":
+      case "propostas" || "contasReceber":
         return [
           {
             id: "situacao",
             value: "Pendente",
+          },
+        ];
+      case "propostasSub":
+        return [
+          {
+            id: "situacao",
+            value: "Aprovada",
           },
         ];
       default:
@@ -127,7 +136,7 @@ export const DataTable = ({
     <Flex direction={"column"} gap={"1"}>
       <div className="p-2 border-2 border-gray-200 rounded-lg">
         {/* Table */}
-        <table className="w-full rounded-lg text-left overflow-hidden">
+        <table className="w-full uppercase rounded-lg text-left overflow-hidden">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="bg-gray-300">

@@ -1,5 +1,4 @@
 import { CreateClienteDto } from "../models/cliente/dto/createCliente.dto";
-import { DeleteClienteDto } from "../models/cliente/dto/deleteCliente.dto";
 import { UpdateClienteDto } from "../models/cliente/dto/updateCliente.dto";
 import { ClientesService } from "../services/clientes-service";
 
@@ -18,8 +17,8 @@ export class ClientesController {
     return await this.service.getOne(pId);
   }
 
-  async create(createClienteDto: CreateClienteDto) {
-    return await this.service.create(createClienteDto);
+  async create(createClienteDto: CreateClienteDto, proposta_id: number | null) {
+    return await this.service.create(createClienteDto, proposta_id);
   }
 
   async update(updateClienteDto: UpdateClienteDto) {

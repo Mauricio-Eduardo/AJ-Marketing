@@ -1,6 +1,5 @@
 import { api } from "../config/api";
 import { CreateClienteDto } from "../models/cliente/dto/createCliente.dto";
-import { DeleteClienteDto } from "../models/cliente/dto/deleteCliente.dto";
 import { UpdateClienteDto } from "../models/cliente/dto/updateCliente.dto";
 
 export class ClientesService {
@@ -14,8 +13,11 @@ export class ClientesService {
     return response.data;
   }
 
-  async create(createClienteDto: CreateClienteDto) {
-    const response = await api.post("PostCliente", createClienteDto);
+  async create(createClienteDto: CreateClienteDto, proposta_id: number | null) {
+    const response = await api.post(
+      `/PostCliente?proposta_id=${proposta_id}`,
+      createClienteDto
+    );
     return String(response.data);
   }
 

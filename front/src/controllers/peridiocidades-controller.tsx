@@ -13,6 +13,10 @@ export class PeridiocidadesController {
     return await this.service.getAll();
   }
 
+  async getAllAtivos() {
+    return await this.service.getAllAtivos();
+  }
+
   async getOne(pId: number) {
     return await this.service.getOne(pId);
   }

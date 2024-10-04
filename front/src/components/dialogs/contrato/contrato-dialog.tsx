@@ -3,8 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Dialog } from "@radix-ui/themes";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { Form } from "../../form";
-import { formatISO } from "date-fns";
-import { X } from "@phosphor-icons/react";
+import { format, formatISO } from "date-fns";
 import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
 import { DialogProps } from "../DialogProps";
@@ -16,8 +15,13 @@ import { Contrato } from "../../../models/contrato/entity/Contrato";
 import { CondicoesPagamentoController } from "../../../controllers/condicoesPagamento-controller";
 import { CondicaoPagamento } from "../../../models/condicaoPagamento/entity/CondicaoPagamento";
 import { CondicoesPagamentoSubView } from "../../../views/condicoesPagamento/subView";
+import { PropostasController } from "../../../controllers/propostas-controller";
+import { Proposta } from "../../../models/proposta/entity/Proposta";
+import { PropostasSubView } from "../../../views/propostas/subView";
+import { PeridiocidadesSelect } from "../../form/PeridiocidadeSelect";
 
 interface ContratoDialogProps extends DialogProps {
+  propostasController: PropostasController;
   condicoesPagamentoController: CondicoesPagamentoController;
 }
 
@@ -27,6 +31,7 @@ export function ContratoDialog({
   controller,
   isOpenModal,
   onSuccess,
+  propostasController,
   condicoesPagamentoController,
 }: ContratoDialogProps) {
   //
@@ -105,6 +110,17 @@ export function ContratoDialog({
       ...data,
       cpf_cnpj: formatCpfCnpj(data.cpf_cnpj),
       total: formatCurrency(data.total),
+      desconto: formatCurrency(data.desconto),
+      juros: formatCurrency(data.juros),
+      multa: formatCurrency(data.multa),
+
+      data_contrato: data.data_contrato
+        ? format(new Date(data.data_contrato), "dd/MM/yyyy HH:mm")
+        : "",
+      data_vencimento: data.data_vencimento
+        ? format(new Date(data.data_vencimento), "dd/MM/yyyy HH:mm")
+        : "",
+
       servicos: data.servicos
         ? data.servicos.map((servico: any) => ({
             ...servico,
@@ -129,6 +145,12 @@ export function ContratoDialog({
   const onCondicaoPagamentoSubViewClose = (condicao?: CondicaoPagamento) => {
     if (condicao) {
       setCondicao(condicao);
+    }
+  };
+
+  const onPropostaSubViewClose = (proposta?: Proposta) => {
+    if (proposta) {
+      setProposta(proposta);
     }
   };
 
@@ -160,23 +182,53 @@ export function ContratoDialog({
     setValue("condicaoPagamento", "");
   };
 
-  return (
-    // <Dialog.Content
-    //   maxWidth={"900px"}
-    //   onInteractOutside={(e) => {
-    //     e.preventDefault();
-    //   }}
-    //   onEscapeKeyDown={(e) => {
-    //     e.preventDefault();
-    //   }}
-    // >
-    /* <div className="flex justify-between">
-        <Dialog.Title>{action} Proposta</Dialog.Title>
+  const getProposta = async (pId: number) => {
+    if (pId != 0) {
+      if (propostasController) {
+        try {
+          const response = await propostasController.getOne(pId);
+          if (response.ativo) {
+            setProposta(response);
+          } else {
+            setPropostaNull();
+          }
+        } catch (error) {
+          setPropostaNull();
+          console.log(error);
+        }
+      }
+    }
+  };
 
-        <Dialog.Close>
-          <X />
-        </Dialog.Close>
-      </div> */
+  const setProposta = (pProposta: Proposta) => {
+    setValue("proposta_id", pProposta.id);
+    setValue("cliente_id", pProposta.cliente_id as number);
+    setValue("tipo_pessoa", pProposta.tipo_pessoa);
+    setValue("cpf_cnpj", formatCpfCnpj(pProposta.cpf_cnpj));
+    setValue("nome_razaoSocial", pProposta.nome_razaoSocial);
+    setValue(
+      "servicos",
+      pProposta.servicos
+        ? pProposta.servicos.map((servico: any) => ({
+            ...servico,
+            valor_unitario: formatCurrency(servico.valor_unitario),
+            desconto: formatCurrency(servico.desconto),
+            valor_total: formatCurrency(servico.valor_total),
+          }))
+        : []
+    );
+  };
+
+  const setPropostaNull = () => {
+    setValue("proposta_id", 0);
+    setValue("cliente_id", 0);
+    setValue("tipo_pessoa", "");
+    setValue("cpf_cnpj", "");
+    setValue("nome_razaoSocial", "");
+    setValue("servicos", []);
+  };
+
+  return (
     <FormProvider {...contratosForm}>
       <form
         className="flex flex-col space-y-6"
@@ -194,18 +246,6 @@ export function ContratoDialog({
               disabled={true}
             />
             <Form.ErrorMessage field="id" />
-          </Form.Field>
-
-          <Form.Field>
-            <Form.Label htmlFor="proposta_id">Cod. Proposta</Form.Label>
-            <Form.Input
-              name="proposta_id"
-              placeholder="0"
-              defaultValue={data.id}
-              width={70}
-              disabled={action != "Cadastar"}
-            />
-            <Form.ErrorMessage field="proposta_id" />
           </Form.Field>
 
           <Form.Field>
@@ -230,15 +270,49 @@ export function ContratoDialog({
         {/* Linha 2 */}
         <div className="flex gap-3">
           <Form.Field>
-            <Form.Label htmlFor="cliente_id">Cod. Cliente</Form.Label>
+            <Form.Label htmlFor="proposta_id">Cód. Proposta *</Form.Label>
+            <Form.Input
+              name="proposta_id"
+              placeholder="0"
+              max={5}
+              width={110}
+              defaultValue={data.proposta_id}
+              onBlur={(e) => getProposta(Number(e.target.value))}
+              disabled={action != "Cadastrar"}
+            />
+            <Form.ErrorMessage field="proposta_id" />
+          </Form.Field>
+
+          <Form.Field>
+            <br />
+            <PropostasSubView
+              onClose={onPropostaSubViewClose}
+              controller={propostasController}
+            />
+          </Form.Field>
+
+          <Form.Field>
+            <Form.Label htmlFor="cliente_id">Cód. Cliente</Form.Label>
             <Form.Input
               name="cliente_id"
               placeholder="0"
               defaultValue={data.id}
               width={100}
-              disabled={action != "Cadastar"}
+              disabled={true}
             />
             <Form.ErrorMessage field="cliente_id" />
+          </Form.Field>
+
+          <Form.Field>
+            <Form.Label htmlFor="tipo_pessoa">Tipo Pessoa *</Form.Label>
+            <Form.Input
+              name="tipo_pessoa"
+              width={100}
+              max={15}
+              defaultValue={data.tipo_pessoa}
+              disabled={true}
+            />
+            <Form.ErrorMessage field="tipo_pessoa" />
           </Form.Field>
 
           <Form.Field>
@@ -248,7 +322,7 @@ export function ContratoDialog({
               width={170}
               max={15}
               defaultValue={data.cpf_cnpj}
-              disabled={action != "Cadastrar"}
+              disabled={true}
               // maskType={pessoa === "Física" ? "cpf" : "cnpj"}
             />
             <Form.ErrorMessage field="cpf_cnpj" />
@@ -262,7 +336,7 @@ export function ContratoDialog({
               name="nome_razaoSocial"
               width={400}
               defaultValue={data.nome_razaoSocial}
-              disabled={action != "Cadastrar"}
+              disabled={true}
             />
             <Form.ErrorMessage field="nome_razaoSocial" />
           </Form.Field>
@@ -314,6 +388,47 @@ export function ContratoDialog({
               disabled={true}
             />
             <Form.ErrorMessage field="condicaoPagamento" />
+          </Form.Field>
+        </div>
+
+        <div className="flex gap-3">
+          <Form.Field>
+            <Form.Label htmlFor="data_vencimento">
+              Vencimento do Contrato
+            </Form.Label>
+            <PeridiocidadesSelect
+              control={control}
+              name="tipo_pessoa"
+              disabled={action != "Cadastrar"}
+            />
+            <Form.ErrorMessage field="data_vencimento" />
+          </Form.Field>
+
+          <Form.Field>
+            <Form.Label htmlFor="quantidade">Quantidade</Form.Label>
+            <Form.Input
+              name="quantidade"
+              type="number"
+              placeholder="0"
+              max={3}
+              width={100}
+              value={data.quantidade}
+              disabled={false}
+            />
+            <Form.ErrorMessage field="quantidade" />
+          </Form.Field>
+
+          <Form.Field>
+            <Form.Label htmlFor="data_vencimento">
+              Data de Vencimento
+            </Form.Label>
+            <Datepick
+              name="data_vencimento"
+              days={0}
+              end={true}
+              disabled={true}
+            />
+            <Form.ErrorMessage field="data_vencimento" />
           </Form.Field>
         </div>
 

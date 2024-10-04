@@ -3,7 +3,9 @@ import { Proposta } from "../../../models/proposta/entity/Proposta";
 import { format } from "date-fns";
 import { formatCpfCnpj } from "../../form/Formats";
 
-export const PropostasColumns: ColumnDef<Proposta>[] = [
+export const PropostasColumns = (
+  disableFilters: boolean
+): ColumnDef<Proposta>[] => [
   {
     id: "id",
     size: 50,
@@ -99,15 +101,16 @@ export const PropostasColumns: ColumnDef<Proposta>[] = [
       <div className="flex flex-col items-center w-full">
         <span>Situação</span>
         <select
-          defaultValue="Pendente"
+          defaultValue={disableFilters ? "Aprovada" : "Pendente"}
           onChange={(e) => column.setFilterValue(e.target.value)}
           className="pl-2 text-sm font-normal rounded"
+          disabled={disableFilters}
         >
           <option value="">Todas</option>
           <option value="Pendente">Pendente</option>
           <option value="Aprovada">Aprovada</option>
           <option value="Recusada">Recusada</option>
-          <option value="Vencida">Vencida</option>
+          <option value="Cancelada">Cancelada</option>
         </select>
       </div>
     ),
@@ -118,7 +121,7 @@ export const PropostasColumns: ColumnDef<Proposta>[] = [
           ? "text-green-500"
           : situacao === "Recusada"
           ? "text-red-500"
-          : situacao === "Vencida"
+          : situacao === "Cancelada"
           ? "text-orange-500"
           : "";
 

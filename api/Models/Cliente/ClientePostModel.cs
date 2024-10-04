@@ -1,7 +1,7 @@
 ﻿
-using api.Models.Interesse;
-using api.Models.RamosAtividade;
-using api.Models.Usuario;
+using api.Models.Clientes_interesses;
+using api.Models.Clientes_ramos;
+using api.Models.Clientes_usuarios;
 
 namespace api.Models.Cliente
 {
@@ -24,9 +24,9 @@ namespace api.Models.Cliente
         private string _cep;
         private int _origem_id;
 
-        private List<UsuarioPutModel> _usuarios;
-        private List<InteressePutModel> _interesses;
-        private List<RamoAtividadePutModel> _ramos;
+        private List<ClienteUsuarioModel> _usuarios;
+        private List<ClienteInteresseModel> _interesses;
+        private List<ClienteRamoModel> _ramos;
 
         // Propriedades públicas para acessar as variáveis
         public string Tipo_pessoa
@@ -119,21 +119,19 @@ namespace api.Models.Cliente
             set { _origem_id = value; }
         }
 
-        // Aqui é o 'PutModel' porque vou precisar do ID para inserir na associativa, e o putModel tem exatamente o
-        // formato que preciso
-        public List<UsuarioPutModel> Usuarios
+        public List<ClienteUsuarioModel> Usuarios
         {
             get { return _usuarios; }
             set { _usuarios = value; }
         }
 
-        public List<InteressePutModel> Interesses
+        public List<ClienteInteresseModel> Interesses
         {
             get { return _interesses; }
             set { _interesses = value; }
         }
 
-        public List<RamoAtividadePutModel> Ramos
+        public List<ClienteRamoModel> Ramos
         {
             get { return _ramos; }
             set { _ramos = value; }
@@ -160,9 +158,10 @@ namespace api.Models.Cliente
             string cep,
             int origem_ID,
 
-            List<UsuarioPutModel> usuarios,
-            List<InteressePutModel> interesses,
-            List<RamoAtividadePutModel> ramos)
+            List<ClienteUsuarioModel> usuarios,
+            List<ClienteInteresseModel> interesses,
+            List<ClienteRamoModel> ramos
+            )
         {
             _tipo_pessoa = tipo_pessoa;
             _cpf_cnpj = cpf_cnpj;

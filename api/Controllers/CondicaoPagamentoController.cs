@@ -1,7 +1,8 @@
 ﻿using api.Interfaces;
 using api.Models.CondicaoPagamento;
-using api.Models.FormaPagamento;
+using api.Models.Parcelas;
 using Microsoft.AspNetCore.Mvc;
+using System.Data.SqlClient;
 
 namespace api.Controllers
 {

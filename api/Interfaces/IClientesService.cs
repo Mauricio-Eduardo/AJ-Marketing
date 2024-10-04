@@ -6,7 +6,7 @@ namespace api.Interfaces
     {
         IEnumerable<ClienteModel> GetAllClientes();
         ClienteModel GetCliente(int id);
-        string PostCliente(ClientePostModel clienteInserido);
+        string PostCliente(ClientePostModel clienteInserido, int? proposta_id);
         string PutCliente(ClientePutModel clienteAlterado);
         string DeleteCliente(int id);
     }

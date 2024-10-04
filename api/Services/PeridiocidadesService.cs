@@ -62,6 +62,56 @@ namespace api.Services
             }
         }
 
+        public IEnumerable<PeridiocidadeModel> GetAllPeridiocidadesAtivas()
+        {
+            List<PeridiocidadeModel> listaPeridiocidades = new List<PeridiocidadeModel>();
+
+            using (Connection)
+            {
+                try
+                {
+                    Connection.Open();
+
+                    SqlCommand getAllCmd = new SqlCommand(String.Format(
+                        "SELECT * FROM peridiocidades WHERE ativo = @ativo;"), Connection);
+
+                    getAllCmd.Parameters.Clear();
+                    getAllCmd.Parameters.Add("@ativo", SqlDbType.Bit).Value = 1;
+
+                    SqlDataReader reader = getAllCmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        // Para cada registro encontrado, cria um objeto e adiciona à lista
+                        listaPeridiocidades.Add(
+                            new PeridiocidadeModel
+                            {
+                                Id = reader.GetInt32("id"),
+                                Descricao = reader.GetString("descricao"),
+                                Dias = reader.GetInt32("dias"),
+                                Ativo = reader.GetBoolean("ativo"),
+                                Data_cadastro = reader.GetDateTime("data_cadastro"),
+                                Data_ult_alt = reader.IsDBNull(reader.GetOrdinal("data_ult_alt"))
+                                    ? (DateTime?)null
+                                    : reader.GetDateTime(reader.GetOrdinal("data_ult_alt"))
+                            }
+                        );
+                    }
+                    return listaPeridiocidades;
+
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception(ex.Message);
+                }
+                finally
+                {
+                    Connection.Close();
+                }
+
+            }
+        }
+
         public PeridiocidadeModel GetPeridiocidade(int id)
         {
             using (Connection)

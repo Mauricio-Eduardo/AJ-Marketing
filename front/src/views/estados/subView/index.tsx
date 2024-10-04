@@ -7,7 +7,11 @@ import { EstadosColumns } from "../../../components/datatable/columns/estados-co
 import { SubDialogProps } from "../../../components/dialogs/DialogProps";
 import { Estado } from "../../../models/estado/entity/Estado";
 
-export const EstadosSubView = ({ onClose, controller }: SubDialogProps) => {
+export const EstadosSubView = ({
+  onClose,
+  controller,
+  disabled,
+}: SubDialogProps) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [dialogAction, setDialogAction] = useState<
     "Cadastrar" | "Editar" | "Excluir" | null
@@ -38,7 +42,7 @@ export const EstadosSubView = ({ onClose, controller }: SubDialogProps) => {
     <div className="flex flex-col">
       <Dialog.Root>
         <Dialog.Trigger>
-          <Button type="button">
+          <Button type="button" disabled={disabled}>
             <MagnifyingGlass weight="bold" />
           </Button>
         </Dialog.Trigger>

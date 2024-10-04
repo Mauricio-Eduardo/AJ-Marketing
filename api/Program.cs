@@ -40,6 +40,8 @@ builder.Services.AddTransient<IInteressesService, InteresseService>();
 builder.Services.AddTransient<IRamosAtividadeService, RamosAtividadeService>();
 builder.Services.AddTransient<IPeridiocidadesService, PeridiocidadesService>();
 builder.Services.AddTransient<IContratosService, ContratosService>();
+builder.Services.AddTransient<IContasReceberService, ContasReceberService>();
+builder.Services.AddTransient<IOrdensServicoService, OrdemServicoService>();
 
 var app = builder.Build();
 

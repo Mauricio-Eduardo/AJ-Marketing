@@ -7,6 +7,10 @@ namespace api.Models.Proposta
         // Variáveis que podem ser editáveis em um registro
         private int _id; // o ID não é editável porém é necessário para a requisição do PUT
 
+        private Nullable<int> _cliente_id;
+        private string _tipo_pessoa;
+        private string _cpf_cnpj;
+        private string _nome_razaoSocial;
         private int _peridiocidade_id;
         private DateTime _data_proposta;
         private DateTime _prazo_final;
@@ -21,6 +25,30 @@ namespace api.Models.Proposta
         {
             get { return _id; }
             set { _id = value; }
+        }
+
+        public int? Cliente_id
+        {
+            get { return _cliente_id; }
+            set { _cliente_id = value; }
+        }
+
+        public string Tipo_pessoa
+        {
+            get { return _tipo_pessoa; }
+            set { _tipo_pessoa = value; }
+        }
+
+        public string Cpf_cnpj
+        {
+            get { return _cpf_cnpj; }
+            set { _cpf_cnpj = value; }
+        }
+
+        public string Nome_razaoSocial
+        {
+            get { return _nome_razaoSocial; }
+            set { _nome_razaoSocial = value; }
         }
 
         public int Peridiocidade_id
@@ -69,10 +97,15 @@ namespace api.Models.Proposta
         public PropostaPutModel() { }
 
         // Construtor com parâmetros
-        public PropostaPutModel(int id, int peridiocidade_id, DateTime data_proposta, DateTime prazo_final, 
-            DateTime data_inicio, decimal total, string situacao, List<PropostaServicoPutModel> servicos)
+        public PropostaPutModel(int id, int cliente_id, string tipo_pessoa, string cpf_cnpj, string nome_razaoSocial, int peridiocidade_id, 
+            DateTime data_proposta, DateTime prazo_final, DateTime data_inicio, decimal total, 
+            string situacao, List<PropostaServicoPutModel> servicos)
         {
             _id = id;
+            _cliente_id = cliente_id;
+            _tipo_pessoa = tipo_pessoa;
+            _cpf_cnpj = cpf_cnpj;
+            _nome_razaoSocial = nome_razaoSocial;
             _peridiocidade_id = peridiocidade_id;
             _data_proposta = data_proposta;
             _prazo_final = prazo_final;

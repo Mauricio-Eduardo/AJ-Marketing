@@ -1,5 +1,8 @@
 ﻿using api.Interfaces;
 using api.Models.Cliente;
+using api.Models.Clientes_interesses;
+using api.Models.Clientes_ramos;
+using api.Models.Clientes_usuarios;
 using api.Models.Interesse;
 using api.Models.Parcelas;
 using api.Models.RamosAtividade;
@@ -38,9 +41,9 @@ namespace api.Services
                     "cl.complemento, cl.cep, cl.origem_id, o.origem, cl.ativo, cl.data_cadastro, cl.data_ult_alt " +
 
                     "FROM clientes cl " +
-                    "INNER JOIN cidades c ON cl.cidade_ID = c.id " +
-                    "INNER JOIN estados e ON c.estado_ID = e.id " +
-                    "INNER JOIN paises p ON e.pais_ID = p.id " +
+                    "INNER JOIN cidades c ON cl.cidade_id = c.id " +
+                    "INNER JOIN estados e ON c.estado_id = e.id " +
+                    "INNER JOIN paises p ON e.pais_id = p.id " +
                     "INNER JOIN origens o ON cl.origem_ID = o.id"), Connection);
 
                     using (SqlDataReader reader = getAllCmd.ExecuteReader())
@@ -127,9 +130,9 @@ namespace api.Services
                     getCmd.Parameters.Clear();
                     getCmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
 
-                    List<UsuarioModel> usuarios = GetUsuariosFromCliente(Connection, id);
-                    List<InteresseModel> interesses = GetInteressesFromCliente(Connection, id);
-                    List<RamoAtividadeModel> ramos = GetRamosFromCliente(Connection, id);
+                    List<ClienteUsuarioModel> usuarios = GetUsuariosFromCliente(Connection, id);
+                    List<ClienteInteresseModel> interesses = GetInteressesFromCliente(Connection, id);
+                    List<ClienteRamoModel> ramos = GetRamosFromCliente(Connection, id);
 
                     SqlDataReader reader = getCmd.ExecuteReader();
                     if (reader.HasRows)
@@ -182,15 +185,14 @@ namespace api.Services
             }
         }
 
-        private List<UsuarioModel> GetUsuariosFromCliente(SqlConnection connection, int id)
+        private List<ClienteUsuarioModel> GetUsuariosFromCliente(SqlConnection connection, int id)
         {
-            List<UsuarioModel> listaUsuarios = new List<UsuarioModel>();
+            List<ClienteUsuarioModel> listaUsuarios = new List<ClienteUsuarioModel>();
 
             string query = @"
-            SELECT u.id, u.nome, u.email, u.senha, u.ativo, u.data_cadastro, u.data_ult_alt
+            SELECT cu.usuario_id, u.nome, u.email
             FROM clientes_usuarios cu
             INNER JOIN usuarios u ON cu.usuario_id = u.id
-            INNER JOIN clientes c ON cu.cliente_id = c.id
             WHERE cu.cliente_id = @id";
 
             using (SqlCommand getAllUsuarios = new SqlCommand(query, connection))
@@ -202,17 +204,11 @@ namespace api.Services
                     while (UsuariosReader.Read())
                     {
                         listaUsuarios.Add(
-                            new UsuarioModel
+                            new ClienteUsuarioModel
                             {
-                                Id = UsuariosReader.GetInt32(UsuariosReader.GetOrdinal("id")),
+                                Usuario_id = UsuariosReader.GetInt32(UsuariosReader.GetOrdinal("usuario_id")),
                                 Nome = UsuariosReader.GetString(UsuariosReader.GetOrdinal("nome")),
                                 Email = UsuariosReader.GetString(UsuariosReader.GetOrdinal("email")),
-                                Senha = UsuariosReader.GetString(UsuariosReader.GetOrdinal("senha")),
-                                Ativo = UsuariosReader.GetBoolean(UsuariosReader.GetOrdinal("ativo")),
-                                Data_cadastro = UsuariosReader.GetDateTime(UsuariosReader.GetOrdinal("data_cadastro")),
-                                Data_ult_alt = UsuariosReader.IsDBNull(UsuariosReader.GetOrdinal("data_ult_alt"))
-                                ? (DateTime?)null
-                                    : UsuariosReader.GetDateTime(UsuariosReader.GetOrdinal("data_ult_alt"))
                             });
                     }
                 }
@@ -221,15 +217,14 @@ namespace api.Services
             return listaUsuarios;
         }
 
-        private List<InteresseModel> GetInteressesFromCliente(SqlConnection connection, int id)
+        private List<ClienteInteresseModel> GetInteressesFromCliente(SqlConnection connection, int id)
         {
-            List<InteresseModel> listaInteresses = new List<InteresseModel>();
+            List<ClienteInteresseModel> listaInteresses = new List<ClienteInteresseModel>();
 
             string query = @"
-            SELECT i.id, i.interesse, i.ativo, i.data_cadastro, i.data_ult_alt
+            SELECT ci.interesse_id, i.interesse
             FROM clientes_interesses ci
             INNER JOIN interesses i ON ci.interesse_id = i.id
-            INNER JOIN clientes c ON ci.cliente_id = c.id
             WHERE ci.cliente_id = @id";
 
             using (SqlCommand getAll = new SqlCommand(query, connection))
@@ -241,15 +236,10 @@ namespace api.Services
                     while (InteressesReader.Read())
                     {
                         listaInteresses.Add(
-                            new InteresseModel
+                            new ClienteInteresseModel
                             {
-                                Id = InteressesReader.GetInt32(InteressesReader.GetOrdinal("id")),
+                                Interesse_id = InteressesReader.GetInt32(InteressesReader.GetOrdinal("interesse_id")),
                                 Interesse = InteressesReader.GetString(InteressesReader.GetOrdinal("interesse")),
-                                Ativo = InteressesReader.GetBoolean(InteressesReader.GetOrdinal("ativo")),
-                                Data_cadastro = InteressesReader.GetDateTime(InteressesReader.GetOrdinal("data_cadastro")),
-                                Data_ult_alt = InteressesReader.IsDBNull(InteressesReader.GetOrdinal("data_ult_alt"))
-                                ? (DateTime?)null
-                                    : InteressesReader.GetDateTime(InteressesReader.GetOrdinal("data_ult_alt"))
                             });
                     }
                 }
@@ -258,15 +248,14 @@ namespace api.Services
             return listaInteresses;
         }
 
-        private List<RamoAtividadeModel> GetRamosFromCliente(SqlConnection connection, int id)
+        private List<ClienteRamoModel> GetRamosFromCliente(SqlConnection connection, int id)
         {
-            List<RamoAtividadeModel> listaRamos = new List<RamoAtividadeModel>();
+            List<ClienteRamoModel> listaRamos = new List<ClienteRamoModel>();
 
             string query = @"
-            SELECT r.id, r.ramo, r.ativo, r.data_cadastro, r.data_ult_alt
+            SELECT cr.ramo_id, r.ramo
             FROM clientes_ramosAtividade cr
             INNER JOIN ramosAtividade r ON cr.ramo_id = r.id
-            INNER JOIN clientes c ON cr.cliente_id = c.id
             WHERE cr.cliente_id = @id";
 
             using (SqlCommand getAll = new SqlCommand(query, connection))
@@ -278,15 +267,10 @@ namespace api.Services
                     while (ramosReader.Read())
                     {
                         listaRamos.Add(
-                            new RamoAtividadeModel
+                            new ClienteRamoModel
                             {
-                                Id = ramosReader.GetInt32(ramosReader.GetOrdinal("id")),
+                                Ramo_id = ramosReader.GetInt32(ramosReader.GetOrdinal("ramo_id")),
                                 Ramo = ramosReader.GetString(ramosReader.GetOrdinal("ramo")),
-                                Ativo = ramosReader.GetBoolean(ramosReader.GetOrdinal("ativo")),
-                                Data_cadastro = ramosReader.GetDateTime(ramosReader.GetOrdinal("data_cadastro")),
-                                Data_ult_alt = ramosReader.IsDBNull(ramosReader.GetOrdinal("data_ult_alt"))
-                                ? (DateTime?)null
-                                    : ramosReader.GetDateTime(ramosReader.GetOrdinal("data_ult_alt"))
                             });
                     }
                 }
@@ -295,7 +279,7 @@ namespace api.Services
             return listaRamos;
         }
 
-        public string PostCliente(ClientePostModel clienteInserido)
+        public string PostCliente(ClientePostModel clienteInserido, int? proposta_id)
         {
             SqlTransaction transaction = null;
 
@@ -346,7 +330,7 @@ namespace api.Services
 
                         SqlCommand cmd = new SqlCommand(query, Connection, transaction);
                         cmd.Parameters.AddWithValue("@cliente_id", clienteID);
-                        cmd.Parameters.AddWithValue("@usuario_id", usuario.Id);
+                        cmd.Parameters.AddWithValue("@usuario_id", usuario.Usuario_id);
 
                         cmd.ExecuteNonQuery();
                     }
@@ -360,7 +344,7 @@ namespace api.Services
 
                         SqlCommand cmd = new SqlCommand(query, Connection, transaction);
                         cmd.Parameters.AddWithValue("@cliente_id", clienteID);
-                        cmd.Parameters.AddWithValue("@interesse_id", interesse.Id);
+                        cmd.Parameters.AddWithValue("@interesse_id", interesse.Interesse_id);
 
                         cmd.ExecuteNonQuery();
                     }
@@ -374,9 +358,25 @@ namespace api.Services
 
                         SqlCommand cmd = new SqlCommand(query, Connection, transaction);
                         cmd.Parameters.AddWithValue("@cliente_id", clienteID);
-                        cmd.Parameters.AddWithValue("@ramo_id", ramo.Id);
+                        cmd.Parameters.AddWithValue("@ramo_id", ramo.Ramo_id);
 
                         cmd.ExecuteNonQuery();
+                    }
+
+                    if (proposta_id != null) 
+                    {
+                        string query = @"UPDATE propostas SET cliente_id = @cliente_id, tipo_pessoa = @tipo_pessoa,
+                                        cpf_cnpj = @cpf_cnpj, nome_razaoSocial = @nome_razaoSocial 
+                                        WHERE id = @id";
+
+                        SqlCommand putCmd = new SqlCommand(query, Connection, transaction);
+                        putCmd.Parameters.AddWithValue("@cliente_id", clienteID);
+                        putCmd.Parameters.AddWithValue("@tipo_pessoa", clienteInserido.Tipo_pessoa);
+                        putCmd.Parameters.AddWithValue("@cpf_cnpj", clienteInserido.Cpf_cnpj);
+                        putCmd.Parameters.AddWithValue("@nome_razaoSocial", clienteInserido.Nome_razaoSocial);
+                        putCmd.Parameters.AddWithValue("@id", proposta_id);
+
+                        putCmd.ExecuteNonQuery();
                     }
 
                     transaction.Commit();
@@ -471,7 +471,7 @@ namespace api.Services
 
                         SqlCommand cmd = new SqlCommand(query, Connection, transaction);
                         cmd.Parameters.AddWithValue("@cliente_id", clienteAlterado.Id);
-                        cmd.Parameters.AddWithValue("@usuario_id", usuario.Id);
+                        cmd.Parameters.AddWithValue("@usuario_id", usuario.Usuario_id);
 
                         cmd.ExecuteNonQuery();
                     }
@@ -485,7 +485,7 @@ namespace api.Services
 
                         SqlCommand cmd = new SqlCommand(query, Connection, transaction);
                         cmd.Parameters.AddWithValue("@cliente_id", clienteAlterado.Id);
-                        cmd.Parameters.AddWithValue("@interesse_id", interesse.Id);
+                        cmd.Parameters.AddWithValue("@interesse_id", interesse.Interesse_id);
 
                         cmd.ExecuteNonQuery();
                     }
@@ -499,7 +499,7 @@ namespace api.Services
 
                         SqlCommand cmd = new SqlCommand(query, Connection, transaction);
                         cmd.Parameters.AddWithValue("@cliente_id", clienteAlterado.Id);
-                        cmd.Parameters.AddWithValue("@ramo_id", ramo.Id);
+                        cmd.Parameters.AddWithValue("@ramo_id", ramo.Ramo_id);
 
                         cmd.ExecuteNonQuery();
                     }

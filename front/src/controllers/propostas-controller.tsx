@@ -13,6 +13,10 @@ export class PropostasController {
     return await this.service.getAll();
   }
 
+  async getAllFiltered() {
+    return await this.service.getAllFiltered();
+  }
+
   async getOne(pId: number) {
     return await this.service.getOne(pId);
   }
@@ -25,7 +29,7 @@ export class PropostasController {
     return await this.service.update(updatePropostaDto);
   }
 
-  async aprovar(id: number) {
-    return await this.service.aprovar(id);
+  async atualizarSituacao(id: number, situacao: string) {
+    return await this.service.atualizarSituacao(id, situacao);
   }
 }

@@ -1,10 +1,26 @@
 use ajmarketing;
 
+DROP TABLE clientes_interesses
+DROP TABLE clientes_usuarios
+DROP TABLE clientes_ramosAtividade
+DROP TABLE clientes
+
+DROP TABLE PROPOSTAS
+
+SELECT * FROM propostas WHERE id = 9
+
+
+
+
 SELECT * FROM clientes_usuarios
-SELECT * FROM usuarios
+SELECT * FROM propostas
+
+ALTER TABLE propostas
 
 INSERT INTO clientes_usuarios (cliente_ID, usuario_ID)
 VALUES (2, 2);
+
+SELECT * FROM clientes WHERE id = 1
 
 SELECT cl.cliente_ID, cl.tipo_pessoa, cl.cpf_cnpj, cl.nome_razaoSocial, cl.apelido_nomeFantasia, cl.rg_inscricaoEstadual, 
 cl.dataNascimento_dataAbertura, cl.genero, cl.email, cl.celular, cl.ramo_atividade, cl.cidade_ID, c.cidade, e.estado, p.pais, 
@@ -18,6 +34,8 @@ INNER JOIN origens o ON cl.origem_ID = o.origem_ID
 WHERE cl.ativo = 1
 
 DROP TABLE servicos
+
+
 
 SELECT cl.cliente_ID, cl.tipo_pessoa, cl.cpf_cnpj, cl.nome_razaoSocial, cl.apelido_nomeFantasia, cl.rg_inscricaoEstadual,
 cl.dataNascimento_dataAbertura, cl.genero, cl.email, cl.celular, cl.ramo_atividade,
@@ -72,3 +90,51 @@ SELECT * FROM clientes_usuarios
 SELECT * FROM contratos
 
 DROP TABLE contratos
+
+SELECT c.id, c.cliente_id, cl.cpf_cnpj, cl.nome_razaoSocial, c.contrato_id, cp.condicaoPagamento, 
+c.parcela_id, p.numeroParcela, cp.quantidadeParcelas, c.data_vencimento, c.valor_inicial, c.desconto, c.juros, c.multa, 
+c.total, c.data_recebimento, c.situacao
+FROM contasReceber c
+INNER JOIN clientes cl ON c.cliente_id = cl.id 
+INNER JOIN contratos co ON c.contrato_id = co.id 
+INNER JOIN parcelas p ON c.parcela_id = p.id
+INNER JOIN condicoesPagamento cp ON p.condPag_id = cp.id
+
+
+-- Declarar variáveis
+DECLARE @data_contrato DATE;
+DECLARE @valor_inicial DECIMAL(10, 2);
+
+-- Obter a data de vencimento do contrato
+SELECT @data_contrato = data_vencimento
+FROM contratos
+WHERE id = @contrato_id;
+
+-- Obter o valor inicial das parcelas
+SELECT @valor_inicial = (valor do contrato ou algum valor necessário para calcular as parcelas)
+
+-- Loop nas parcelas associadas à condição de pagamento
+INSERT INTO contasReceber (cliente_id, contrato_id, parcela_id, data_vencimento, valor_inicial, desconto, juros, multa, total, situacao)
+SELECT 
+    @cliente_id,                         -- ID do cliente
+    @contrato_id,                        -- ID do contrato
+    p.id AS parcela_id,                  -- ID da parcela
+    DATEADD(DAY, p.dias, @data_contrato), -- Calcula a data de vencimento da parcela
+    @valor_inicial * (p.porcentagem / 100), -- Calcula o valor inicial da parcela com base na porcentagem
+    p.desconto,                          -- Desconto para a parcela (se existir)
+    p.juros,                             -- Juros para a parcela (se existir)
+    p.multa,                             -- Multa para a parcela (se existir)
+    @valor_inicial * (p.porcentagem / 100), -- Total (valor inicial, possivelmente ajustado por juros e desconto)
+    'Pendente'                           -- Situação inicial da conta a receber
+FROM parcelas p
+WHERE p.condPag_id = @condPag_id;
+
+-- Atualiza a data de alteração do contrato
+UPDATE contratos
+SET data_ult_alt = GETDATE()
+WHERE id = @contrato_id;
+
+
+SELECT desconto, juros, multa
+FROM condicoesPagamento
+WHERE id = 1

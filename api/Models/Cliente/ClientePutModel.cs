@@ -1,7 +1,7 @@
 ﻿
-using api.Models.Interesse;
-using api.Models.RamosAtividade;
-using api.Models.Usuario;
+using api.Models.Clientes_interesses;
+using api.Models.Clientes_ramos;
+using api.Models.Clientes_usuarios;
 
 namespace api.Models.Cliente
 {
@@ -23,9 +23,9 @@ namespace api.Models.Cliente
         private string _cep;
         private int _origem_id;
 
-        private List<UsuarioPutModel> _usuarios;
-        private List<InteressePutModel> _interesses;
-        private List<RamoAtividadePutModel> _ramos;
+        private List<ClienteUsuarioModel> _usuarios;
+        private List<ClienteInteresseModel> _interesses;
+        private List<ClienteRamoModel> _ramos;
 
         private bool _ativo;
 
@@ -114,19 +114,19 @@ namespace api.Models.Cliente
             set { _origem_id = value; }
         }
 
-        public List<UsuarioPutModel> Usuarios
+        public List<ClienteUsuarioModel> Usuarios
         {
             get { return _usuarios; }
             set { _usuarios = value; }
         }
 
-        public List<InteressePutModel> Interesses
+        public List<ClienteInteresseModel> Interesses
         {
             get { return _interesses; }
             set { _interesses = value; }
         }
 
-        public List<RamoAtividadePutModel> Ramos
+        public List<ClienteRamoModel> Ramos
         {
             get { return _ramos; }
             set { _ramos = value; }
@@ -158,9 +158,9 @@ namespace api.Models.Cliente
             string complemento,
             string cep,
             int origem_id,
-            List<UsuarioPutModel> usuarios,
-            List<InteressePutModel> interesses,
-            List<RamoAtividadePutModel> ramos,
+            List<ClienteUsuarioModel> usuarios,
+            List<ClienteInteresseModel> interesses,
+            List<ClienteRamoModel> ramos,
             bool ativo)
         {
             _id = id;

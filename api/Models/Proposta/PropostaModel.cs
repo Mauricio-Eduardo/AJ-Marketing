@@ -13,7 +13,7 @@ namespace api.Models.Proposta
         private int _dias; // Somente para exibição
 
         //clientes table
-        private int _cliente_id;
+        private Nullable<int> _cliente_id;
         private string _tipo_pessoa;
         private string _cpf_cnpj;
         private string _nome_razaoSocial;
@@ -55,7 +55,7 @@ namespace api.Models.Proposta
             set { _dias = value; }
         }
 
-        public int Cliente_id
+        public int? Cliente_id
         {
             get { return _cliente_id; }
             set { _cliente_id = value; }

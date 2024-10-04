@@ -10,6 +10,7 @@ import { PeridiocidadeDialog } from "../../../components/dialogs/peridiocidade/p
 export const PeridiocidadesSubView = ({
   onClose,
   controller,
+  disabled,
 }: SubDialogProps) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [dialogAction, setDialogAction] = useState<
@@ -41,7 +42,7 @@ export const PeridiocidadesSubView = ({
     <div className="flex flex-col">
       <Dialog.Root>
         <Dialog.Trigger>
-          <Button type="button">
+          <Button type="button" disabled={disabled}>
             <MagnifyingGlass weight="bold" />
           </Button>
         </Dialog.Trigger>

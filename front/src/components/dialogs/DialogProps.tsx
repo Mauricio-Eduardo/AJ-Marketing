@@ -1,17 +1,8 @@
-import {
-  ContratoControllerMethods,
-  ControllerMethods,
-  PropostaControllerMethods,
-} from "../../controllers/model";
-
 export interface DialogProps {
   data: any;
   action: string | null;
-  controller:
-    | ControllerMethods
-    | PropostaControllerMethods
-    | ContratoControllerMethods;
-  subController?: ControllerMethods;
+  controller: any;
+  subController?: any;
   isOpenModal: boolean;
   onSuccess: () => void;
   stepper?: boolean;
@@ -19,11 +10,13 @@ export interface DialogProps {
 
 export interface SubDialogProps {
   onClose: (dto: any) => void;
-  controller: ControllerMethods;
+  controller: any;
+  disabled?: boolean;
 }
 
 export interface SubArrayDialogProps {
   index: number;
   onClose: (index: number, dto: any) => void;
-  controller: ControllerMethods;
+  controller: any;
+  disabled?: boolean;
 }

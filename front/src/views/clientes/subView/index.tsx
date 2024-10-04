@@ -12,7 +12,11 @@ import { UsuariosController } from "../../../controllers/usuarios-controller";
 import { InteressesController } from "../../../controllers/interesses-controller";
 import { RamosAtividadeController } from "../../../controllers/ramosAtividade-controller";
 
-export const ClientesSubView = ({ onClose, controller }: SubDialogProps) => {
+export const ClientesSubView = ({
+  onClose,
+  controller,
+  disabled,
+}: SubDialogProps) => {
   const origensController = new OrigensController();
   const cidadesController = new CidadesController();
   const usuariosController = new UsuariosController();
@@ -49,7 +53,7 @@ export const ClientesSubView = ({ onClose, controller }: SubDialogProps) => {
     <div className="flex flex-col">
       <Dialog.Root>
         <Dialog.Trigger>
-          <Button type="button">
+          <Button type="button" disabled={disabled}>
             <MagnifyingGlass weight="bold" />
           </Button>
         </Dialog.Trigger>
@@ -110,7 +114,7 @@ export const ClientesSubView = ({ onClose, controller }: SubDialogProps) => {
 
               {isDialogOpen && (
                 <Dialog.Content
-                  maxWidth={"900px"}
+                  maxWidth={"1000px"}
                   onInteractOutside={(e) => {
                     e.preventDefault();
                   }}
@@ -119,7 +123,7 @@ export const ClientesSubView = ({ onClose, controller }: SubDialogProps) => {
                   }}
                 >
                   <div className="flex justify-between">
-                    <Dialog.Title>{dialogAction} Proposta</Dialog.Title>
+                    <Dialog.Title>{dialogAction} Cliente</Dialog.Title>
 
                     <Dialog.Close>
                       <X />
@@ -127,6 +131,7 @@ export const ClientesSubView = ({ onClose, controller }: SubDialogProps) => {
                   </div>
                   <ClienteDialog
                     key={selectedRowData?.id}
+                    proposta_id={null}
                     data={selectedRowData as Cliente}
                     action={dialogAction}
                     controller={controller}

@@ -5,12 +5,13 @@ import { DataTable } from "../../../components/datatable";
 import { ServicoDialog } from "../../../components/dialogs/servico/servico-dialog";
 import { ServicosColumns } from "../../../components/datatable/columns/servicos-columns";
 import { SubArrayDialogProps } from "../../../components/dialogs/DialogProps";
-import { Servicos } from "../../../models/servico/entity/Servico";
+import { Servico } from "../../../models/servico/entity/Servico";
 
 export const ServicosSubView = ({
   index,
   onClose,
   controller,
+  disabled,
 }: SubArrayDialogProps) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [dialogAction, setDialogAction] = useState<
@@ -42,7 +43,7 @@ export const ServicosSubView = ({
     <div className="flex flex-col">
       <Dialog.Root>
         <Dialog.Trigger>
-          <Button type="button">
+          <Button type="button" disabled={disabled}>
             <MagnifyingGlass weight="bold" />
           </Button>
         </Dialog.Trigger>
@@ -100,7 +101,7 @@ export const ServicosSubView = ({
               </Dialog.Trigger>
 
               <ServicoDialog
-                data={selectedRowData as Servicos}
+                data={selectedRowData as Servico}
                 action={dialogAction}
                 controller={controller}
                 isOpenModal={isDialogOpen}
@@ -112,7 +113,6 @@ export const ServicosSubView = ({
               columns={ServicosColumns}
               onRowSelectionChange={handleRowSelectionChange}
               controller={controller}
-              ativoFilter={false}
               refreshKey={refreshKey}
             />
           </Dialog.Root>

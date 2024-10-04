@@ -165,8 +165,6 @@ CREATE TABLE clientes (
 	origem_id INT NOT NULL, -- Foreign Key
 	FOREIGN KEY (origem_id) REFERENCES origens(id),	
 
-	--situacao VARCHAR(20) NOT NULL DEFAULT 'Sem Proposta', -- Sem Proposta, Aguardando Resposta, Contrato Vigente, Contrato Vencido, Contrato Cancelado
-
 	ativo BIT NOT NULL DEFAULT 1, -- Quando for 0, deve-ser como 'Contrato Vencido' ou 'Contrato Cancelado'
 	data_cadastro DATETIME NOT NULL DEFAULT GETDATE(),
 	data_ult_alt DATETIME DEFAULT NULL
@@ -175,14 +173,22 @@ CREATE TABLE clientes (
 CREATE TABLE propostas (
 	id INT NOT NULL PRIMARY KEY IDENTITY,
 
-	situacao VARCHAR(30) NOT NULL DEFAULT 'Pendente', -- Pendente, Aprovada, Recusada, Vencida, Cancelada
+	situacao VARCHAR(30) NOT NULL DEFAULT 'Pendente', -- Pendente, Aprovada, Recusada, Vencida
 	
 	peridiocidade_id INT NOT NULL, -- Foreign Key
-	FOREIGN KEY (peridiocidade_id) REFERENCES peridiocidades(id),	
+	FOREIGN KEY (peridiocidade_id) REFERENCES peridiocidades(id),
+	
 
-	cliente_id INT NOT NULL, -- Foreign Key
+	-- Se o cliente já estiver cadastrado, utiliza o ID dele
+	cliente_id INT NULL, -- Foreign Key
 	FOREIGN KEY (cliente_id) REFERENCES clientes(id),
 	
+	-- Caso não esteja cadastrado, preenche esses três campos e depois caso a proposta seja aprovada
+	-- utiliza esses campos para cadastrar o Cliente
+	tipo_pessoa VARCHAR(8) NOT NULL,
+	cpf_cnpj VARCHAR(14) NOT NULL,
+	nome_razaoSocial VARCHAR(50) NOT NULL,
+
 	data_proposta DATE NOT NULL DEFAULT GETDATE(),
 	prazo_final DATE NOT NULL,
 	data_inicio DATE NOT NULL,
@@ -206,24 +212,6 @@ CREATE TABLE propostas_servicos (
 	desconto DECIMAL(7,2),
 	valor_unitario DECIMAL(7,2) NOT NULL,
 	valor_total DECIMAL(9, 2) NOT NULL,
-)
-
-CREATE TABLE contratos (
-	id INT NOT NULL PRIMARY KEY IDENTITY,
-
-	cliente_id INT NOT NULL, -- Foreign Key
-	FOREIGN KEY (cliente_id) REFERENCES clientes(id),
-
-	proposta_id INT NOT NULL, -- Foreign Key
-	FOREIGN KEY (proposta_id) REFERENCES propostas(id),
-
-	condPag_id INT NOT NULL, -- Foreign Key
-	FOREIGN KEY (condPag_ID) REFERENCES condicoesPagamento(id),
-
-	data_contrato DATE NOT NULL DEFAULT GETDATE(),
-	data_vencimento DATE NOT NULL,
-
-	situacao VARCHAR(30) NOT NULL DEFAULT 'Vigente', -- Vigente, Cancelado, Vencido
 )
 
 CREATE TABLE clientes_usuarios (
@@ -253,6 +241,24 @@ CREATE TABLE clientes_ramosAtividade (
     FOREIGN KEY (ramo_id) REFERENCES ramosAtividade(id),
 )
 
+CREATE TABLE contratos (
+	id INT NOT NULL PRIMARY KEY IDENTITY,
+
+	cliente_id INT NOT NULL, -- Foreign Key
+	FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+
+	proposta_id INT NOT NULL, -- Foreign Key
+	FOREIGN KEY (proposta_id) REFERENCES propostas(id),
+
+	condPag_id INT NOT NULL, -- Foreign Key
+	FOREIGN KEY (condPag_ID) REFERENCES condicoesPagamento(id),
+
+	data_contrato DATE NOT NULL DEFAULT GETDATE(),
+	data_vencimento DATE NOT NULL,
+
+	situacao VARCHAR(30) NOT NULL DEFAULT 'Vigente', -- Vigente, Cancelado, Vencido
+)
+
 CREATE TABLE contasReceber (
 	id INT NOT NULL PRIMARY KEY IDENTITY,
 
@@ -262,7 +268,53 @@ CREATE TABLE contasReceber (
 	contrato_id INT NOT NULL, -- Foreign Key
 	FOREIGN KEY (contrato_id) REFERENCES contratos(id),
 
+	parcela_id INT NOT NULL, -- Foregin Key
+	FOREIGN KEY (parcela_id) REFERENCES parcelas(id),
+
+    valor_inicial DECIMAL(10, 2) NOT NULL,
+	
+	desconto DECIMAL(10, 2),
+	juros DECIMAL(10, 2) DEFAULT 0,
+	multa DECIMAL(10, 2) DEFAULT 0,
+
+	total DECIMAL(10, 2) NOT NULL,
+	
+	valor_pago DECIMAL(10, 2) DEFAULT 0,
+	valor_aberto DECIMAL(10, 2) DEFAULT 0,
+
     data_vencimento DATE NOT NULL,
-    valor DECIMAL(8, 2) NOT NULL,
-    situacao VARCHAR(30) NOT NULL DEFAULT 'Pendente',	
+	data_recebimento DATE,
+
+    situacao VARCHAR(30) NOT NULL DEFAULT 'Pendente', -- Pendente, Atrasada, Vencida, Recebida	
 )
+
+CREATE TABLE ordemServicos (
+	id INT NOT NULL PRIMARY KEY IDENTITY,
+
+	cliente_id INT NOT NULL, -- Foreign Key
+	FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+
+	contrato_id INT NOT NULL, -- Foreign Key
+	FOREIGN KEY (contrato_id) REFERENCES contratos(id),
+
+	usuario_id INT NULL, -- Foregin Key
+	FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+
+	servico_id INT NOT NULL, -- Foregin Key
+	FOREIGN KEY (servico_id) REFERENCES servicos(id),
+
+	data_prazo DATE NOT NULL,
+	data_entrega DATE,
+	
+	tema VARCHAR(200) DEFAULT '',
+	referencia VARCHAR(255) DEFAULT '',
+
+	situacao VARCHAR(20) DEFAULT 'Pendente',
+	postado VARCHAR(20) DEFAULT 'Não',
+)
+
+
+
+DROP TABLE ordemServicos
+DROP TABLE contasReceber
+DROP TABLE contratos

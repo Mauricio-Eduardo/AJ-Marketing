@@ -1,15 +1,15 @@
 import { Button, Dialog, Flex } from "@radix-ui/themes";
-import { Pencil, Plus, ThumbsDown } from "@phosphor-icons/react";
+import { Pencil, Plus, ThumbsDown, X } from "@phosphor-icons/react";
 import { useState } from "react";
 import { DataTable } from "../../components/datatable";
 import { ContratosController } from "../../controllers/contratos-controller";
 import { CondicoesPagamentoController } from "../../controllers/condicoesPagamento-controller";
 import { Contrato } from "../../models/contrato/entity/Contrato";
 import { ContratosColumns } from "../../components/datatable/columns/contratos-columns";
-import { ContratosStepper } from "../../components/stepper/contratos-stepper";
 import { PeridiocidadesController } from "../../controllers/peridiocidades-controller";
 import { PropostasController } from "../../controllers/propostas-controller";
 import { ServicosController } from "../../controllers/servicos-controller";
+import { ContratoDialog } from "../../components/dialogs/contrato/contrato-dialog";
 
 export const ContratosView = () => {
   const contratosController = new ContratosController();
@@ -82,18 +82,35 @@ export const ContratosView = () => {
           </div>
 
           {isDialogOpen && (
-            <ContratosStepper
-              key={selectedRowData?.id}
-              data={selectedRowData as Contrato}
-              action={dialogAction}
-              controller={contratosController}
-              propostasController={propostasController}
-              condicoesPagamentoController={condicoesPagamentoController}
-              peridiocidadesController={peridiocidadesController}
-              servicosController={servicosController}
-              isOpenModal={isDialogOpen}
-              onSuccess={handleSuccess}
-            />
+            <Dialog.Content
+              maxWidth={"1000px"}
+              onInteractOutside={(e) => {
+                e.preventDefault();
+              }}
+              onEscapeKeyDown={(e) => {
+                e.preventDefault();
+              }}
+            >
+              <div className="flex justify-between">
+                <Dialog.Title>{dialogAction} Contratos</Dialog.Title>
+
+                <Dialog.Close>
+                  <X />
+                </Dialog.Close>
+              </div>
+              <ContratoDialog
+                key={selectedRowData?.id}
+                data={selectedRowData as Contrato}
+                action={dialogAction}
+                controller={contratosController}
+                propostasController={propostasController}
+                condicoesPagamentoController={condicoesPagamentoController}
+                // peridiocidadesController={peridiocidadesController}
+                // servicosController={servicosController}
+                isOpenModal={isDialogOpen}
+                onSuccess={handleSuccess}
+              />
+            </Dialog.Content>
           )}
         </Flex>
 

@@ -102,7 +102,7 @@ export const ClientesView = () => {
               }}
             >
               <div className="flex justify-between">
-                <Dialog.Title>{dialogAction} Proposta</Dialog.Title>
+                <Dialog.Title>{dialogAction} Cliente</Dialog.Title>
 
                 <Dialog.Close>
                   <X />
@@ -110,6 +110,7 @@ export const ClientesView = () => {
               </div>
               <ClienteDialog
                 key={selectedRowData?.id}
+                proposta_id={null}
                 data={selectedRowData as Cliente}
                 action={dialogAction}
                 controller={clientesController}

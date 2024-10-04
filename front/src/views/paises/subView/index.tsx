@@ -7,7 +7,11 @@ import { PaisDialog } from "../../../components/dialogs/pais/pais-dialog";
 import { PaisesColumns } from "../../../components/datatable/columns/paises-columns";
 import { SubDialogProps } from "../../../components/dialogs/DialogProps";
 
-export const PaisesSubView = ({ onClose, controller }: SubDialogProps) => {
+export const PaisesSubView = ({
+  onClose,
+  controller,
+  disabled,
+}: SubDialogProps) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [dialogAction, setDialogAction] = useState<
     "Cadastrar" | "Editar" | "Excluir" | null
@@ -38,7 +42,7 @@ export const PaisesSubView = ({ onClose, controller }: SubDialogProps) => {
     <div className="flex flex-col">
       <Dialog.Root>
         <Dialog.Trigger>
-          <Button type="button">
+          <Button type="button" disabled={disabled}>
             <MagnifyingGlass weight="bold" />
           </Button>
         </Dialog.Trigger>

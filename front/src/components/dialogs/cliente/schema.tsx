@@ -8,7 +8,7 @@ export const createClienteSchema = z.object({
   nome_razaoSocial: z.string().min(5, "Deve ter mais que 5 caracteres").trim(),
   apelido_nomeFantasia: z.string().trim(),
   rg_inscricaoEstadual: z.string(),
-  genero: z.string().min(1, "Obrigatório"),
+  genero: z.string(),
   email: z.string().min(1, "Obrigatório").email().trim(),
   celular: z.string().min(15, "Número inválido").max(15),
   cidade_id: z.coerce.number().min(1, "Obrigatório"),
@@ -17,10 +17,7 @@ export const createClienteSchema = z.object({
   pais: z.string().readonly(),
 
   logradouro: z.string().min(1, "Obrigatório").trim(),
-  numero: z
-    .string()
-    .min(1, "Obrigatório")
-    .regex(new RegExp(/^\d+$/), "Somente números"),
+  numero: z.string().min(1, "Obrigatório").trim(),
   bairro: z.string().min(5, "Deve ter mais que 5 caracteres").trim(),
   complemento: z.string().trim(),
   cep: z
@@ -29,7 +26,6 @@ export const createClienteSchema = z.object({
     .regex(new RegExp(/^\d+$/), "Somente números"),
   origem_id: z.coerce.number().min(1, "Obrigatório"),
   origem: z.string().readonly(),
-  situacao: z.string().min(1, "Obrigatório"),
 
   usuarios: z
     .array(

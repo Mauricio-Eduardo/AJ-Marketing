@@ -1,8 +1,14 @@
-import { formatToDecimal } from "../../../components/form/Formats";
+import {
+  formatToDecimal,
+  removeFormatting,
+} from "../../../components/form/Formats";
 import { Proposta } from "../entity/Proposta";
 
 export interface CreatePropostaDto {
-  cliente_id: number;
+  cliente_id: number | null;
+  tipo_pessoa: string;
+  cpf_cnpj: string;
+  nome_razaoSocial: string;
   peridiocidade_id: number;
   data_proposta: string;
   prazo_final: string;
@@ -21,6 +27,9 @@ export interface CreatePropostaDto {
 export function transformarParaPostProposta(data: Proposta): CreatePropostaDto {
   return {
     cliente_id: data.cliente_id,
+    tipo_pessoa: data.tipo_pessoa,
+    cpf_cnpj: removeFormatting(data.cpf_cnpj),
+    nome_razaoSocial: data.nome_razaoSocial,
     peridiocidade_id: data.peridiocidade_id,
     data_proposta: data.data_proposta,
     prazo_final: data.prazo_final,

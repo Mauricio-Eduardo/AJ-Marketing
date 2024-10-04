@@ -1,6 +1,6 @@
 export class Proposta {
   id: number;
-  cliente_id: number;
+  cliente_id: number | null;
   cpf_cnpj: string;
   nome_razaoSocial: string;
   tipo_pessoa: string;
@@ -24,7 +24,7 @@ export class Proposta {
 
   constructor(
     pId: number,
-    pCliente_id: number,
+    pCliente_id: number | null,
     pTipo_pessoa: string,
     pCpf_cnpj: string,
     pNome_razaoSocial: string,

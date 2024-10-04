@@ -8,6 +8,11 @@ export class PeridiocidadesService {
     return response.data;
   }
 
+  async getAllAtivos() {
+    const response = await api.get("GetAllPeridiocidadesAtivas");
+    return response.data;
+  }
+
   async getOne(pId: number) {
     const response = await api.get("GetPeridiocidade", { params: { id: pId } });
     return response.data;

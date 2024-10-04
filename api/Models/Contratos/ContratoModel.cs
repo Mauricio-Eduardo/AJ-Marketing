@@ -10,15 +10,20 @@ namespace api.Models.Contratos
         private int _proposta_id;
         private int _condPag_id;
         private DateTime _data_contrato;
+        private DateTime _data_vencimento;
         private string _situacao;
 
         // Aqui são os atributos que serão exibidos no frontentd na tela de contratos mas que serão buscados das tabelas de 
-        // 'clientes', 'propostas' e 'propostas_servicos'
-        private string _condicaoPagamento;
+        // 'condicoesPagamento', 'clientes', 'propostas' e 'propostas_servicos'
         private string _tipo_pessoa;
         private string _cpf_cnpj;
         private string _nome_razaoSocial;
         private decimal _total;
+        private string _condicaoPagamento;
+        private decimal _desconto;
+        private decimal _juros;
+        private decimal _multa;
+
         private List<PropostaServicoModel> _servicos;
 
         // Propriedades públicas para acessar as variáveis
@@ -53,6 +58,12 @@ namespace api.Models.Contratos
             set { _data_contrato = value; }
         }
 
+        public DateTime Data_vencimento
+        {
+            get { return _data_vencimento; }
+            set { _data_vencimento = value; }
+        }
+
         public string CondicaoPagamento
         {
             get { return _condicaoPagamento; }
@@ -82,6 +93,25 @@ namespace api.Models.Contratos
             get { return _total; }
             set { _total = value; }
         }
+
+        public decimal Desconto
+        {
+            get { return _desconto; }
+            set { _desconto = value; }
+        }
+
+        public decimal Juros
+        {
+            get { return _juros; }
+            set { _juros = value; }
+        }
+
+        public decimal Multa
+        {
+            get { return _multa; }
+            set { _multa = value; }
+        }
+
         public string Situacao
         {
             get { return _situacao; }
@@ -98,8 +128,9 @@ namespace api.Models.Contratos
         public ContratoModel() { }
 
         // Construtor com parâmetros
-        public ContratoModel(int id, int cliente_id, int proposta_id, int condPag_id, DateTime data_contrato, decimal total, string situacao,
-            string condicaoPagamento, string tipo_pessoa, string cpf_cnpj, string nome_razaoSocial, List<PropostaServicoModel> servicos) 
+        public ContratoModel(int id, int cliente_id, int proposta_id, int condPag_id, DateTime data_contrato, DateTime data_vencimento, 
+            decimal total, string situacao, string condicaoPagamento, string tipo_pessoa, string cpf_cnpj, string nome_razaoSocial, 
+            decimal desconto, decimal juros, decimal multa, List<PropostaServicoModel> servicos) 
         {
             _id = id;
             _cliente_id = cliente_id;
@@ -107,11 +138,15 @@ namespace api.Models.Contratos
             _proposta_id= proposta_id;
             _condPag_id= condPag_id;
             _data_contrato= data_contrato;
+            _data_vencimento = data_vencimento;
             _situacao= situacao;
             _condicaoPagamento = condicaoPagamento;
             _cpf_cnpj = cpf_cnpj;
             _nome_razaoSocial = nome_razaoSocial;
             _total= total;
+            _desconto= desconto;
+            _juros = juros;
+            _multa= multa;
             _servicos = servicos;
         }
     }

@@ -27,11 +27,10 @@ namespace api.Services
                     Connection.Open();
 
                     SqlCommand getAllCmd = new SqlCommand(String.Format(
-                        "SELECT p.id, p.cliente_id, c.tipo_pessoa, c.cpf_cnpj, c.nome_razaoSocial, p.peridiocidade_id, p2.descricao, p2.dias, " +
+                        "SELECT p.id, p.cliente_id, p.tipo_pessoa, p.cpf_cnpj, p.nome_razaoSocial, p.peridiocidade_id, p2.descricao, p2.dias, " +
                         "p.data_proposta, p.prazo_final, p.data_inicio, p.total, p.situacao, p.data_cadastro, p.data_ult_alt " +
                         "FROM propostas p " +
-                        "INNER JOIN peridiocidades p2 ON p.peridiocidade_id = p2.id " +
-                        "INNER JOIN clientes c ON p.cliente_id = c.id"), Connection);
+                        "INNER JOIN peridiocidades p2 ON p.peridiocidade_id = p2.id"), Connection);
 
                     using (SqlDataReader reader = getAllCmd.ExecuteReader())
                     {
@@ -41,7 +40,9 @@ namespace api.Services
                             new PropostaModel
                             {
                                 Id = reader.GetInt32("id"),
-                                Cliente_id = reader.GetInt32("cliente_id"),
+                                Cliente_id = reader.IsDBNull(reader.GetOrdinal("cliente_id"))
+                                    ? (int?)null
+                                    : reader.GetInt32(reader.GetOrdinal("cliente_id")),
                                 Tipo_pessoa = reader.GetString("tipo_pessoa"),
                                 Cpf_cnpj = reader.GetString("cpf_cnpj"),
                                 Nome_razaoSocial = reader.GetString("nome_razaoSocial"),
@@ -90,11 +91,10 @@ namespace api.Services
                     Connection.Open();
 
                     SqlCommand getCmd = new SqlCommand(String.Format(
-                    "SELECT p.id, p.cliente_id, c.tipo_pessoa, c.cpf_cnpj, c.nome_razaoSocial, p.peridiocidade_id, p2.descricao, p2.dias, " +
+                    "SELECT p.id, p.cliente_id, p.tipo_pessoa, p.cpf_cnpj, p.nome_razaoSocial, p.peridiocidade_id, p2.descricao, p2.dias, " +
                     "p.data_proposta, p.prazo_final, p.data_inicio, p.total, p.situacao, p.data_cadastro, p.data_ult_alt " +
                     "FROM propostas p " +
                     "INNER JOIN peridiocidades p2 ON p.peridiocidade_id = p2.id " +
-                    "INNER JOIN clientes c ON p.cliente_id = c.id " +
                     "WHERE p.id = @id"), Connection);
 
                     getCmd.Parameters.Clear();
@@ -110,7 +110,9 @@ namespace api.Services
                         return new PropostaModel
                         {
                             Id = reader.GetInt32("id"),
-                            Cliente_id = reader.GetInt32("cliente_id"),
+                            Cliente_id = reader.IsDBNull(reader.GetOrdinal("cliente_id"))
+                                    ? (int?)null
+                                    : reader.GetInt32(reader.GetOrdinal("cliente_id")),
                             Tipo_pessoa = reader.GetString("tipo_pessoa"),
                             Cpf_cnpj = reader.GetString("cpf_cnpj"),
                             Nome_razaoSocial = reader.GetString("nome_razaoSocial"),
@@ -192,12 +194,17 @@ namespace api.Services
 
                     //Inserir a proposta
                     string postQuery = @"
-                    INSERT INTO propostas (cliente_id, peridiocidade_id, data_proposta, prazo_final, data_inicio, total) 
-                    VALUES (@cliente_id, @peridiocidade_id, @data_proposta, @prazo_final, @data_inicio, @total); 
+                    INSERT INTO propostas (cliente_id, tipo_pessoa, cpf_cnpj, nome_razaoSocial, peridiocidade_id, data_proposta, prazo_final, 
+                    data_inicio, total) 
+                    VALUES (@cliente_id, @tipo_pessoa, @cpf_cnpj, @nome_razaoSocial, @peridiocidade_id, @data_proposta, @prazo_final,
+                    @data_inicio, @total); 
                     SELECT SCOPE_IDENTITY();";
 
                     SqlCommand postCmd = new SqlCommand(postQuery, Connection, transaction);
-                    postCmd.Parameters.AddWithValue("@cliente_id", propostaInserida.Cliente_id);
+                    postCmd.Parameters.AddWithValue("@cliente_id", propostaInserida.Cliente_id == 0 ? (object)DBNull.Value : propostaInserida.Cliente_id);
+                    postCmd.Parameters.AddWithValue("@tipo_pessoa", propostaInserida.Tipo_pessoa);
+                    postCmd.Parameters.AddWithValue("@cpf_cnpj", propostaInserida.Cpf_cnpj);
+                    postCmd.Parameters.AddWithValue("@nome_razaoSocial", propostaInserida.Nome_razaoSocial);
                     postCmd.Parameters.AddWithValue("@peridiocidade_id", propostaInserida.Peridiocidade_id);
                     postCmd.Parameters.AddWithValue("@data_proposta", propostaInserida.Data_proposta);
                     postCmd.Parameters.AddWithValue("@prazo_final", propostaInserida.Prazo_final);
@@ -256,13 +263,17 @@ namespace api.Services
                     // Atualizar a condição de pagamento
                     string putQuery = @"
                     UPDATE propostas
-                    SET peridiocidade_id = @peridiocidade_id, data_proposta = @data_proposta, prazo_final = @prazo_final, 
-                    data_inicio = @data_inicio, total = @total, situacao = @situacao, 
-                    data_ult_alt = @data_ult_alt 
+                    SET cliente_id = @cliente_id, tipo_pessoa = @tipo_pessoa, cpf_cnpj = @cpf_cnpj, nome_razaoSocial = @nome_razaoSocial, 
+                    peridiocidade_id = @peridiocidade_id, data_proposta = @data_proposta, prazo_final = @prazo_final, 
+                    data_inicio = @data_inicio, total = @total, situacao = @situacao, data_ult_alt = @data_ult_alt 
                     WHERE id = @id";
 
                     SqlCommand putCmd = new SqlCommand(putQuery, Connection, transaction);
                     putCmd.Parameters.AddWithValue("@id", propostaAlterada.Id);
+                    putCmd.Parameters.AddWithValue("@cliente_id", propostaAlterada.Cliente_id == 0 ? (object)DBNull.Value : propostaAlterada.Cliente_id);
+                    putCmd.Parameters.AddWithValue("@tipo_pessoa", propostaAlterada.Tipo_pessoa);
+                    putCmd.Parameters.AddWithValue("@cpf_cnpj", propostaAlterada.Cpf_cnpj);
+                    putCmd.Parameters.AddWithValue("@nome_razaoSocial", propostaAlterada.Nome_razaoSocial);
                     putCmd.Parameters.AddWithValue("@peridiocidade_id", propostaAlterada.Peridiocidade_id);
                     putCmd.Parameters.AddWithValue("@data_proposta", propostaAlterada.Data_proposta);
                     putCmd.Parameters.AddWithValue("@prazo_final", propostaAlterada.Prazo_final);

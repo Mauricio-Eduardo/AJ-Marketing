@@ -28,6 +28,17 @@ namespace api.Controllers
         }
 
         [HttpGet]
+        [Route("/GetAllPeridiocidadesAtivas")]
+        public ActionResult<IEnumerable<PeridiocidadeModel>> GetAllPeridiocidadesAtivas()
+        {
+            IEnumerable<PeridiocidadeModel> result = peridiocidadesService.GetAllPeridiocidadesAtivas();
+            if (result != null)
+                return Ok(result);
+            else
+                return BadRequest();
+        }
+
+        [HttpGet]
         [Route("/GetPeridiocidade")]
         public IActionResult GetPeridiocidade(int id)
         {

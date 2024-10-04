@@ -1,4 +1,4 @@
-import { InputHTMLAttributes } from "react";
+import React, { InputHTMLAttributes } from "react";
 import { useFormContext } from "react-hook-form";
 import inputMask, { MaskTypes } from "./inputMask";
 
@@ -9,6 +9,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   disabled?: boolean;
   maskType?: MaskTypes;
   textColor?: string;
+  preenchidoChange?: (event: any) => void;
 }
 
 export function Input({
@@ -18,6 +19,7 @@ export function Input({
   disabled,
   maskType,
   textColor,
+  preenchidoChange,
   onChange,
   ...rest
 }: InputProps) {
@@ -63,12 +65,17 @@ export function Input({
         disabled
           ? `bg-gray-200 text-gray-500 cursor-not-allowed ${textColor}`
           : ""
-      } h-8 pl-2 pr-2 rounded border border-zinc-300 hover:border-violet-600 focus:ring-2 focus:outline-violet-700 shadow-sm ${textColor}`}
+      } h-8 pl-2 pr-2 uppercase rounded border border-zinc-300 hover:border-violet-600 focus:ring-2 focus:outline-violet-700 shadow-sm ${textColor}`}
       style={style}
       disabled={disabled}
       {...register(name)}
       {...rest}
-      onChange={handleChange}
+      onChange={(e) => {
+        handleChange(e);
+        if (preenchidoChange) {
+          preenchidoChange(e);
+        }
+      }}
     />
   );
 }

@@ -1,4 +1,7 @@
 ﻿
+using api.Models.Clientes_interesses;
+using api.Models.Clientes_ramos;
+using api.Models.Clientes_usuarios;
 using api.Models.Interesse;
 using api.Models.ModelPai;
 using api.Models.RamosAtividade;
@@ -29,9 +32,9 @@ namespace api.Models.Cliente
         private int _origem_id;
         private string _origem; // Variável usada somente para exibição 
 
-        private List<UsuarioModel> _usuarios;
-        private List<InteresseModel> _interesses;
-        private List<RamoAtividadeModel> _ramos;
+        private List<ClienteUsuarioModel> _usuarios;
+        private List<ClienteInteresseModel> _interesses;
+        private List<ClienteRamoModel> _ramos;
 
         // Propriedades públicas para acessar as variáveis
         public string Tipo_pessoa
@@ -148,19 +151,19 @@ namespace api.Models.Cliente
             set { _origem = value; }
         }
 
-        public List<UsuarioModel> Usuarios
+        public List<ClienteUsuarioModel> Usuarios
         {
             get { return _usuarios; }
             set { _usuarios = value; }
         }
 
-        public List<InteresseModel> Interesses
+        public List<ClienteInteresseModel> Interesses
         {
             get { return _interesses; }
             set { _interesses = value; }
         }
 
-        public List<RamoAtividadeModel> Ramos
+        public List<ClienteRamoModel> Ramos
         {
             get { return _ramos; }
             set { _ramos = value; }
@@ -190,9 +193,9 @@ namespace api.Models.Cliente
             string cep,
             int origem_id,
             string origem,
-            List<UsuarioModel> usuarios,
-            List<InteresseModel> interesses,
-            List<RamoAtividadeModel> ramos)
+            List<ClienteUsuarioModel> usuarios,
+            List<ClienteInteresseModel> interesses,
+            List<ClienteRamoModel> ramos)
         {
             _tipo_pessoa = tipo_pessoa;
             _cpf_cnpj = cpf_cnpj;
