@@ -1,5 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { ContaReceber } from "../../../models/contaReceber/entity/ContaReceber";
+import { format } from "date-fns";
 
 export const ContasReceberColumns: ColumnDef<ContaReceber>[] = [
   {
@@ -14,7 +15,7 @@ export const ContasReceberColumns: ColumnDef<ContaReceber>[] = [
   },
   {
     id: "nome_razaoSocial",
-    size: 200,
+    size: 500,
     accessorFn: (row) => row.nome_razaoSocial,
     header: ({ column }) => (
       <div className="flex flex-col">
@@ -30,10 +31,31 @@ export const ContasReceberColumns: ColumnDef<ContaReceber>[] = [
     footer: (props) => props.column.id,
   },
   {
-    id: "numeroParcela",
-    size: 150,
-    accessorFn: (row) => row.numeroParcela,
-    header: () => <span className="text-center w-full">N. Parcela</span>,
+    id: "parcela",
+    size: 50,
+    accessorFn: (row) => `${row.numeroParcela}/${row.quantidadeParcelas}`, // Combina os valores
+    header: () => <span className="text-center w-full">Parcela</span>,
+    cell: (info) => (
+      <div className="text-center">{String(info.getValue())}</div>
+    ),
+    footer: (props) => props.column.id,
+  },
+  {
+    id: "contrato_id",
+    size: 50,
+    accessorFn: (row) => row.contrato_id,
+    // header: () => <span className="text-center w-full">Contrato</span>,
+    header: ({ column }) => (
+      <div className="flex flex-col">
+        <span>Contrato</span>
+        <input
+          type="text"
+          value={(column.getFilterValue() as string) || ""}
+          onChange={(e) => column.setFilterValue(e.target.value)}
+          className="pl-2 w-full text-sm font-normal rounded"
+        />
+      </div>
+    ),
     cell: (info) => (
       <div className="text-center">{String(info.getValue())}</div>
     ),
@@ -45,33 +67,16 @@ export const ContasReceberColumns: ColumnDef<ContaReceber>[] = [
     accessorFn: (row) => row.data_vencimento,
     header: () => <span className="text-center w-full">Vencimento</span>,
     cell: (info) => {
-      return <div className="text-center">{String(info.getValue())}</div>;
+      const value = info.getValue() as Date;
+      return <div className="text-center">{format(value, "dd/MM/yyyy")}</div>;
     },
     footer: (props) => props.column.id,
   },
   {
-    id: "valor_pago",
+    id: "total",
     size: 100,
-    accessorFn: (row) => row.valor_pago,
-    header: () => <span className="text-center w-full">Pago</span>,
-    cell: (info) => {
-      const value = info.getValue() as number;
-      return (
-        <div className="text-center">
-          {value.toLocaleString("pt-BR", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
-        </div>
-      );
-    },
-    footer: (props) => props.column.id,
-  },
-  {
-    id: "valor_aberto",
-    size: 100,
-    accessorFn: (row) => row.valor_aberto,
-    header: () => <span className="text-center w-full">A pagar</span>,
+    accessorFn: (row) => row.total,
+    header: () => <span className="text-center w-full">Total</span>,
     cell: (info) => {
       const value = info.getValue() as number;
       return (
@@ -93,13 +98,13 @@ export const ContasReceberColumns: ColumnDef<ContaReceber>[] = [
       <div className="flex flex-col items-center w-full">
         <span>Situação</span>
         <select
-          defaultValue="Vigente"
+          defaultValue=""
           onChange={(e) => column.setFilterValue(e.target.value)}
           className="pl-2 text-sm font-normal rounded"
         >
           <option value="">Todas</option>
-          <option value="Pendente">Pendente</option>
-          <option value="Paga">Paga</option>
+          <option value={["Pendente", "Parcial"]}>Pendente</option>
+          <option value="Recebida">Recebida</option>
           <option value="Parcial">Parcial</option>
           <option value="Paga">Cancelada</option>
         </select>
@@ -108,10 +113,12 @@ export const ContasReceberColumns: ColumnDef<ContaReceber>[] = [
     cell: (info) => {
       const situacao = String(info.getValue());
       const colorClass =
-        situacao === "Vigente"
+        situacao === "Recebida"
           ? "text-green-500"
-          : situacao === "Cancelado"
+          : situacao === "Cancelada"
           ? "text-red-500"
+          : situacao === "Parcial"
+          ? "text-yellow-500"
           : "";
 
       return (

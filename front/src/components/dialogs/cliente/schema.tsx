@@ -27,16 +27,6 @@ export const createClienteSchema = z.object({
   origem_id: z.coerce.number().min(1, "Obrigatório"),
   origem: z.string().readonly(),
 
-  usuarios: z
-    .array(
-      z.object({
-        usuario_id: z.coerce.number().min(1, "Obrigatório"),
-        nome: z.string().readonly(),
-        email: z.string().email().readonly(),
-      })
-    )
-    .min(1, "Deve haver pelo menos um responsável"),
-
   interesses: z.array(
     z.object({
       interesse_id: z.coerce.number().min(1, "Obrigatório"),
@@ -48,6 +38,15 @@ export const createClienteSchema = z.object({
     z.object({
       ramo_id: z.coerce.number().min(1, "Obrigatório"),
       ramo: z.string().readonly(),
+    })
+  ),
+
+  contratos: z.array(
+    z.object({
+      contrato_id: z.coerce.number().readonly(),
+      data_contrato: z.string().readonly(),
+      data_vencimento: z.string().readonly(),
+      situacao: z.string().readonly(),
     })
   ),
 

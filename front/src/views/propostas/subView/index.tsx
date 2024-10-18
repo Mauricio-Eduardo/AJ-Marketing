@@ -1,4 +1,4 @@
-import { MagnifyingGlass, Pencil, Plus, Trash, X } from "@phosphor-icons/react";
+import { Eye, MagnifyingGlass, X } from "@phosphor-icons/react";
 import { Button, Dialog, Flex } from "@radix-ui/themes";
 import { useState } from "react";
 import { DataTable } from "../../../components/datatable";
@@ -8,8 +8,9 @@ import { Proposta } from "../../../models/proposta/entity/Proposta";
 import { PropostasColumns } from "../../../components/datatable/columns/propostas-columns";
 import { PropostasController } from "../../../controllers/propostas-controller";
 import { ClientesController } from "../../../controllers/clientes-controller";
-import { PeridiocidadesController } from "../../../controllers/peridiocidades-controller";
 import { ServicosController } from "../../../controllers/servicos-controller";
+import { CondicoesPagamentoController } from "../../../controllers/condicoesPagamento-controller";
+import { PeridiocidadesController } from "../../../controllers/peridiocidades-controller";
 
 export const PropostasSubView = ({
   onClose,
@@ -18,12 +19,13 @@ export const PropostasSubView = ({
 }: SubDialogProps) => {
   const propostasController = new PropostasController();
   const clientesController = new ClientesController();
+  const condicoesPagamentoController = new CondicoesPagamentoController();
   const peridiocidadesController = new PeridiocidadesController();
   const servicosController = new ServicosController();
 
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [dialogAction, setDialogAction] = useState<
-    "Cadastrar" | "Editar" | "Excluir" | null
+    "Visualizar" | "Cancelar" | null
   >(null);
 
   const [refreshKey, setRefreshKey] = useState(0);
@@ -39,7 +41,7 @@ export const PropostasSubView = ({
     handleOpenDialog();
   };
 
-  const handleActionChange = (action: "Cadastrar" | "Editar" | "Excluir") => {
+  const handleActionChange = (action: "Visualizar" | "Cancelar") => {
     setDialogAction(action);
   };
 
@@ -67,76 +69,54 @@ export const PropostasSubView = ({
         >
           <Dialog.Root open={isDialogOpen} onOpenChange={handleOpenDialog}>
             <Flex
-              justify={"start"}
+              justify={"between"}
               direction={"row"}
-              gap={"3"}
               className="pb-2 border-b-2 border-b-gray-200"
             >
-              <Dialog.Trigger>
-                <Button
-                  onClick={() => {
-                    handleActionChange("Cadastrar");
-                  }}
-                >
-                  <Plus />
-                  Cadastrar
-                </Button>
-              </Dialog.Trigger>
+              <div className="space-x-3">
+                <Dialog.Trigger>
+                  <Button
+                    onClick={() => {
+                      handleActionChange("Visualizar");
+                    }}
+                    disabled={!selectedRowData?.id}
+                    variant="outline"
+                  >
+                    <Eye />
+                    Visualizar
+                  </Button>
+                </Dialog.Trigger>
+              </div>
 
-              <Dialog.Trigger>
-                <Button
-                  onClick={() => {
-                    handleActionChange("Editar");
-                  }}
-                  disabled={!selectedRowData.id}
-                >
-                  <Pencil />
-                  Editar
-                </Button>
-              </Dialog.Trigger>
-
-              <Dialog.Trigger>
-                <Button
-                  onClick={() => {
-                    handleActionChange("Excluir");
-                  }}
-                  disabled={!selectedRowData.id}
-                  color="red"
-                >
-                  <Trash />
-                  Excluir
-                </Button>
-              </Dialog.Trigger>
+              <div className="flex gap-3">
+                <Dialog.Trigger>
+                  <Button
+                    onClick={() => {
+                      handleActionChange("Cancelar");
+                    }}
+                    disabled={!selectedRowData?.id}
+                    color="orange"
+                    variant="outline"
+                  >
+                    <X />
+                    Cancelar Proposta
+                  </Button>
+                </Dialog.Trigger>
+              </div>
 
               {isDialogOpen && (
-                <Dialog.Content
-                  maxWidth={"1000px"}
-                  onInteractOutside={(e) => {
-                    e.preventDefault();
-                  }}
-                  onEscapeKeyDown={(e) => {
-                    e.preventDefault();
-                  }}
-                >
-                  <div className="flex justify-between">
-                    <Dialog.Title>{dialogAction} Proposta</Dialog.Title>
-
-                    <Dialog.Close>
-                      <X />
-                    </Dialog.Close>
-                  </div>
-                  <PropostaDialog
-                    key={selectedRowData?.id}
-                    data={selectedRowData as Proposta}
-                    action={dialogAction}
-                    controller={propostasController}
-                    clientesController={clientesController}
-                    peridiocidadesController={peridiocidadesController}
-                    servicosController={servicosController}
-                    isOpenModal={isDialogOpen}
-                    onSuccess={handleSuccess}
-                  />
-                </Dialog.Content>
+                <PropostaDialog
+                  key={selectedRowData?.id}
+                  data={selectedRowData as Proposta}
+                  action={dialogAction}
+                  controller={propostasController}
+                  clientesController={clientesController}
+                  condicoesPagamentoController={condicoesPagamentoController}
+                  peridiocidadesController={peridiocidadesController}
+                  servicosController={servicosController}
+                  isOpenModal={isDialogOpen}
+                  onSuccess={handleSuccess}
+                />
               )}
             </Flex>
 

@@ -11,28 +11,30 @@ import { toast } from "react-toastify";
 import { Proposta } from "../../../models/proposta/entity/Proposta";
 import { transformarParaPostProposta } from "../../../models/proposta/dto/createProposta.dto";
 import { transformarParaPutProposta } from "../../../models/proposta/dto/updateProposta.dto";
-import { Servico } from "../../../models/servico/entity/Servico";
+import {
+  Servico,
+  ServicoProposta,
+} from "../../../models/servico/entity/Servico";
 import { DialogProps } from "../DialogProps";
 import { ServicosSubView } from "../../../views/servicos/subView";
 import { Datepick } from "../../form/Datepicker";
 import { formatCpfCnpj, formatCurrency } from "../../form/Formats";
-import { Peridiocidade } from "../../../models/peridiocidade/entity/Peridiocidade";
 import { ServicosController } from "../../../controllers/servicos-controller";
-import { PeridiocidadesController } from "../../../controllers/peridiocidades-controller";
-import { PeridiocidadesSubView } from "../../../views/peridiocidades/subView";
 import { ClientesSubView } from "../../../views/clientes/subView";
 import { ClientesController } from "../../../controllers/clientes-controller";
 import { Cliente } from "../../../models/cliente/entity/Cliente";
-import {
-  AlertCancel,
-  AlertCancelX,
-  AlertConfirm,
-  AlertSubmit,
-} from "../../form/Alerts";
+import { AlertCancel, AlertCancelX, AlertSubmit } from "../../form/Alerts";
+import { CondicoesPagamentoController } from "../../../controllers/condicoesPagamento-controller";
+import { CondicaoPagamento } from "../../../models/condicaoPagamento/entity/CondicaoPagamento";
+import { CondicoesPagamentoSubView } from "../../../views/condicoesPagamento/subView";
+import { transformarParaAtualizarProposta } from "../../../models/proposta/dto/atualizaProposta.dto";
+import { PeridiocidadesController } from "../../../controllers/peridiocidades-controller";
+import { Peridiocidade } from "../../../models/peridiocidade/entity/Peridiocidade";
+import { PeridiocidadesSubView } from "../../../views/peridiocidades/subView";
 
 interface PropostaDialogProps extends DialogProps {
-  // controller: PropostasController;
   clientesController: ClientesController;
+  condicoesPagamentoController: CondicoesPagamentoController;
   peridiocidadesController: PeridiocidadesController;
   servicosController: ServicosController;
 }
@@ -44,6 +46,7 @@ export function PropostaDialog({
   isOpenModal,
   onSuccess,
   clientesController,
+  condicoesPagamentoController,
   peridiocidadesController,
   servicosController,
 }: PropostaDialogProps) {
@@ -51,6 +54,7 @@ export function PropostaDialog({
   // Configuração do Zod para validação dos formulários
   const propostasForm = useForm<PropostasSchema>({
     resolver: zodResolver(createPropostasSchema),
+    shouldFocusError: false,
   });
   const { register, control, handleSubmit, reset, setValue, watch } =
     propostasForm;
@@ -59,28 +63,6 @@ export function PropostaDialog({
   const { fields, append, remove } = useFieldArray({
     control,
     name: "servicos",
-  });
-
-  const [isDisabled, setIsDisabled] = useState({
-    cliente_id: false,
-    tipo_pessoa: true,
-    cpf_cnpj: true,
-    nome_razaoSocial: true,
-    peridiocidade_id: false,
-    descricao: true,
-    dias: true,
-    data_proposta: false,
-    prazo_final: false,
-    data_inicio: false,
-    servicos: {
-      servico_id: false,
-      serviço: true,
-      quantidade: false,
-      valor_unitario: false,
-      desconto: false,
-      valor_total: true,
-    },
-    rest: false,
   });
 
   const addNewServico = () => {
@@ -92,6 +74,9 @@ export function PropostaDialog({
         valor_unitario: "0,00",
         desconto: "0,00",
         valor_total: "0,00",
+        peridiocidade_id: 0,
+        descricao: "",
+        dias: 0,
       });
     }
   };
@@ -102,13 +87,22 @@ export function PropostaDialog({
     }
   };
 
-  const onPeridiocidadeSubViewClose = (peridiocidade?: Peridiocidade) => {
-    if (peridiocidade) {
-      setPeridiocidade(peridiocidade);
+  const onCondicaoSubViewClose = (condicao?: CondicaoPagamento) => {
+    if (condicao) {
+      setCondicaoPagamento(condicao);
     }
   };
 
-  const onServicoSubViewClose = (index: number, servico?: Servico) => {
+  const onPeridiocidadeSubViewClose = (
+    index: number,
+    peridiocidade?: Peridiocidade
+  ) => {
+    if (peridiocidade) {
+      setPeridiocidade(index, peridiocidade);
+    }
+  };
+
+  const onServicoSubViewClose = (index: number, servico?: ServicoProposta) => {
     if (servico) {
       setServico(index, servico);
     }
@@ -142,17 +136,20 @@ export function PropostaDialog({
           autoClose: 3000,
         });
         onSuccess();
-      } else {
-        const id = pData.id;
-        const situacao =
+      } else if (["Aprovar", "Recusar", "Cancelar"].includes(action ?? "")) {
+        let payload = transformarParaAtualizarProposta(pData);
+        payload.situacao =
           action === "Aprovar"
             ? "Aprovada"
             : action === "Recusar"
             ? "Recusada"
             : "Cancelada";
-        await controller.atualizarSituacao(id, situacao);
+
+        console.log(payload);
+
+        await controller.atualizarSituacao(payload);
         toast.update(toastId, {
-          render: `Proposta ${situacao} com sucesso!`,
+          render: `Proposta ${payload.situacao} com sucesso!`,
           type: "success",
           isLoading: false,
           draggable: true,
@@ -177,16 +174,15 @@ export function PropostaDialog({
   const cleanData = () => {
     reset({
       id: 0,
-      peridiocidade_id: 0,
-      descricao: "",
-      dias: 0,
+      condPag_id: 0,
+      condicaoPagamento: "",
       cliente_id: 0,
-      tipo_pessoa: "Física",
+      tipo_pessoa: "",
       cpf_cnpj: "",
       nome_razaoSocial: "",
-      data_proposta: formatISO(new Date()),
       prazo_final: formatISO(addDays(new Date(), 30)),
-      data_inicio: formatISO(addDays(new Date(), 30)),
+      data_aprovacao: "",
+      data_inicio: "",
       total: "0,00",
       situacao: "Pendente",
       servicos: [],
@@ -221,83 +217,19 @@ export function PropostaDialog({
 
   useEffect(() => {
     if (isOpenModal && action) {
-      if (action === "Cadastrar" || action === "Editar") {
-        setIsDisabled({
-          ...isDisabled,
-          cliente_id: false,
-          tipo_pessoa: true,
-          cpf_cnpj: true,
-          nome_razaoSocial: true,
-          peridiocidade_id: false,
-          descricao: true,
-          dias: true,
-          data_proposta: false,
-          prazo_final: false,
-          data_inicio: false,
-          servicos: {
-            servico_id: false,
-            serviço: true,
-            quantidade: false,
-            valor_unitario: false,
-            desconto: false,
-            valor_total: true,
-          },
-          rest: false,
-        });
-        if (action === "Cadastrar") {
-          cleanData();
-        } else {
-          loadData();
-          setClientePreenchido(true);
-          if (propostasForm.getValues("cliente_id") === 0) {
-            setIsDisabled({
-              ...isDisabled,
-              cliente_id: true,
-              tipo_pessoa: false,
-              cpf_cnpj: false,
-              nome_razaoSocial: false,
-            });
-          }
-        }
-      } else if (
-        ["Aprovar", "Recusar", "Cancelar", "Visualizar"].includes(action)
-      ) {
-        setIsDisabled({
-          ...isDisabled,
-          cliente_id: true,
-          tipo_pessoa: true,
-          cpf_cnpj: true,
-          nome_razaoSocial: true,
-          peridiocidade_id: true,
-          descricao: true,
-          dias: true,
-          data_proposta: true,
-          prazo_final: true,
-          data_inicio: true,
-          servicos: {
-            servico_id: true,
-            serviço: true,
-            quantidade: true,
-            valor_unitario: true,
-            desconto: true,
-            valor_total: true,
-          },
-          rest: true,
-        });
+      if (action === "Cadastrar") {
+        cleanData();
+      } else if (action === "Aprovar") {
+        loadData();
+        setValue("data_inicio", formatISO(new Date()));
+        setValue("data_aprovacao", formatISO(new Date()));
+      } else {
         loadData();
       }
     }
   }, [isOpenModal, action]);
 
-  const [pessoa, setPessoa] = useState<string>("Física" || "Jurídica");
-
-  const handlePessoaChange = () => {
-    if (pessoa === "Física") {
-      setPessoa("Jurídica");
-    } else {
-      setPessoa("Física");
-    }
-  };
+  const [pessoa, setPessoa] = useState<string>("Física");
 
   const handleServicoChange = (index: number) => {
     const quantidade = watch(`servicos.${index}.quantidade`) || 0;
@@ -378,19 +310,49 @@ export function PropostaDialog({
     setValue(`servicos.${index}.valor_unitario`, "0,00");
   };
 
-  const getPeridiocidade = async (pId: number) => {
+  const getPeridiocidade = async (index: number, pId: number) => {
     if (pId != 0) {
       if (peridiocidadesController) {
         try {
           const response = await peridiocidadesController.getOne(pId);
           if (response.ativo) {
-            setPeridiocidade(response);
+            setPeridiocidade(index, response);
           } else {
-            setPeridiocidadeNull();
+            setPeridiocidadeNull(index);
           }
         } catch (error) {
-          setPeridiocidadeNull();
-          toast("Peridiocidade Inativa ou inexistente", {
+          setPeridiocidadeNull(index);
+          console.log(error);
+        }
+      }
+    }
+  };
+
+  const setPeridiocidade = (index: number, pPeridiocidade: Peridiocidade) => {
+    setValue(`servicos.${index}.peridiocidade_id`, pPeridiocidade.id);
+    setValue(`servicos.${index}.descricao`, pPeridiocidade.descricao);
+    setValue(`servicos.${index}.dias`, pPeridiocidade.dias);
+  };
+
+  const setPeridiocidadeNull = (index: number) => {
+    setValue(`servicos.${index}.peridiocidade_id`, 0);
+    setValue(`servicos.${index}.descricao`, "");
+    setValue(`servicos.${index}.dias`, 0);
+  };
+
+  const getCondicao = async (pId: number) => {
+    if (pId != 0) {
+      if (condicoesPagamentoController) {
+        try {
+          const response = await condicoesPagamentoController.getOne(pId);
+          if (response.ativo) {
+            setCondicaoPagamento(response);
+          } else {
+            setCondicaoPagamentoNull();
+          }
+        } catch (error) {
+          setCondicaoPagamentoNull();
+          toast("Condiçãoo Pagamento Inativa ou inexistente", {
             type: "error",
             isLoading: false,
             autoClose: 3000,
@@ -399,20 +361,18 @@ export function PropostaDialog({
         }
       }
     } else {
-      setPeridiocidadeNull();
+      setCondicaoPagamentoNull();
     }
   };
 
-  const setPeridiocidade = (pPeridiocidade: Peridiocidade) => {
-    setValue(`peridiocidade_id`, pPeridiocidade.id);
-    setValue(`descricao`, pPeridiocidade.descricao);
-    setValue(`dias`, pPeridiocidade.dias);
+  const setCondicaoPagamento = (pCondicaoPagamento: CondicaoPagamento) => {
+    setValue(`condPag_id`, pCondicaoPagamento.id);
+    setValue(`condicaoPagamento`, pCondicaoPagamento.condicaoPagamento);
   };
 
-  const setPeridiocidadeNull = () => {
-    setValue(`peridiocidade_id`, 0);
-    setValue(`descricao`, "");
-    setValue(`dias`, 0);
+  const setCondicaoPagamentoNull = () => {
+    setValue("condPag_id", 0);
+    setValue("condicaoPagamento", "");
   };
 
   const getCliente = async (pId: number) => {
@@ -441,15 +401,6 @@ export function PropostaDialog({
   };
 
   const [preenchido, setPreenchido] = useState<boolean>(false);
-  const [clientePreenchido, setClientePreenchido] = useState<boolean>(false);
-
-  const handleClientePreenchidoChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const value = event.target.value;
-    setClientePreenchido(value.length > 0); // Define como true se houver texto, caso contrário, false
-    setPreenchido(value.length > 0);
-  };
 
   const handlePreenchidoChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -459,33 +410,19 @@ export function PropostaDialog({
   };
 
   const setCliente = (pCliente: Cliente) => {
-    setClientePreenchido(true);
-
     setValue(`cliente_id`, pCliente.id);
     setValue(`tipo_pessoa`, pCliente.tipo_pessoa);
+    setPessoa(pCliente.tipo_pessoa);
     setValue(`cpf_cnpj`, formatCpfCnpj(pCliente.cpf_cnpj));
     setValue(`nome_razaoSocial`, pCliente.nome_razaoSocial);
   };
 
   const setClienteNull = () => {
-    setClientePreenchido(false);
-
     setValue(`cliente_id`, 0);
     setValue(`tipo_pessoa`, "Física");
+    setPessoa("Física");
     setValue(`cpf_cnpj`, "");
     setValue(`nome_razaoSocial`, "");
-  };
-
-  const limparCliente = () => {
-    setClienteNull();
-
-    setIsDisabled({
-      ...isDisabled,
-      cliente_id: !isDisabled.cliente_id,
-      tipo_pessoa: !isDisabled.tipo_pessoa,
-      cpf_cnpj: !isDisabled.cpf_cnpj,
-      nome_razaoSocial: !isDisabled.nome_razaoSocial,
-    });
   };
 
   return (
@@ -497,6 +434,7 @@ export function PropostaDialog({
       onEscapeKeyDown={(e) => {
         e.preventDefault();
       }}
+      autoFocus={false}
     >
       <div className="flex justify-between">
         <Dialog.Title>{action} Proposta</Dialog.Title>
@@ -515,6 +453,8 @@ export function PropostaDialog({
         >
           {/* Linha 1 */}
           <div className="flex justify-between">
+            {/* <pre>{pessoa}</pre> */}
+
             <Form.Field>
               <Form.Label htmlFor="id">Código</Form.Label>
               <Form.Input
@@ -551,7 +491,7 @@ export function PropostaDialog({
           {/* Linha 2 */}
           <div className="flex gap-3">
             <Form.Field>
-              <Form.Label htmlFor="cliente_id">Cód. Cliente</Form.Label>
+              <Form.Label htmlFor="cliente_id">Cód. Cliente *</Form.Label>
               <Form.Input
                 name="cliente_id"
                 placeholder="0"
@@ -559,8 +499,8 @@ export function PropostaDialog({
                 width={80}
                 defaultValue={data.cliente_id}
                 onBlur={(e) => getCliente(Number(e.target.value))}
-                disabled={isDisabled.cliente_id}
-                preenchidoChange={handleClientePreenchidoChange}
+                disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
+                preenchidoChange={handlePreenchidoChange}
               />
               <Form.ErrorMessage field="cliente_id" />
             </Form.Field>
@@ -570,33 +510,28 @@ export function PropostaDialog({
               <ClientesSubView
                 onClose={onClienteSubViewClose}
                 controller={clientesController}
-                disabled={isDisabled.rest}
+                disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
               />
             </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="tipo_pessoa">Tipo Pessoa *</Form.Label>
-              <Form.TipoPessoaSelect
-                control={control}
-                name="tipo_pessoa"
-                disabled={isDisabled.tipo_pessoa}
-                handlePessoaChange={handlePessoaChange}
-              />
+              <Form.Label htmlFor="tipo_pessoa">Tipo Pessoa</Form.Label>
+              <Form.Input name="tipo_pessoa" disabled={true} width={90} />
               <Form.ErrorMessage field="tipo_pessoa" />
             </Form.Field>
 
             <Form.Field>
               <Form.Label htmlFor="cpf_cnpj">
-                {pessoa === "Física" ? "CPF *" : "CNPJ *"}
+                {pessoa === "Física" ? "CPF" : "CNPJ"}
               </Form.Label>
               <Form.Input
                 name="cpf_cnpj"
                 width={pessoa === "Física" ? 130 : 170}
                 max={15}
                 defaultValue={data.cpf_cnpj}
-                disabled={isDisabled.cpf_cnpj}
+                disabled={true}
                 maskType={pessoa === "Física" ? "cpf" : "cnpj"}
-                preenchidoChange={handleClientePreenchidoChange}
+                preenchidoChange={handlePreenchidoChange}
               />
               <Form.ErrorMessage field="cpf_cnpj" />
             </Form.Field>
@@ -609,124 +544,51 @@ export function PropostaDialog({
                 name="nome_razaoSocial"
                 width={pessoa === "Física" ? 475 : 435}
                 defaultValue={data.nome_razaoSocial}
-                disabled={isDisabled.nome_razaoSocial}
-                preenchidoChange={handleClientePreenchidoChange}
+                disabled={true}
+                preenchidoChange={handlePreenchidoChange}
               />
               <Form.ErrorMessage field="nome_razaoSocial" />
-            </Form.Field>
-
-            <Form.Field>
-              <br />
-              {!isDisabled.cliente_id ? (
-                <div>
-                  {clientePreenchido ? (
-                    <AlertConfirm
-                      title="Manual"
-                      description={
-                        "Tem certeza que deseja informar manualmente os dados do Cliente? Os dados importados serão perdidos!"
-                      }
-                      disabled={isDisabled.rest}
-                      onConfirm={limparCliente}
-                    />
-                  ) : (
-                    <Button
-                      type="button"
-                      onClick={() => limparCliente()}
-                      disabled={isDisabled.rest}
-                    >
-                      Manual
-                    </Button>
-                  )}
-                </div>
-              ) : (
-                <div>
-                  {clientePreenchido ? (
-                    <AlertConfirm
-                      title={<X />}
-                      color="red"
-                      disabled={isDisabled.rest}
-                      description={
-                        "Tem certeza que deseja cancelar? Os dados preechidos do Cliente serão perdidos!"
-                      }
-                      onConfirm={limparCliente}
-                    />
-                  ) : (
-                    <Button
-                      type="button"
-                      color="red"
-                      disabled={isDisabled.rest}
-                      onClick={() => limparCliente()}
-                    >
-                      <X />
-                    </Button>
-                  )}
-                </div>
-              )}
             </Form.Field>
           </div>
 
           <div className="flex gap-3">
             <Form.Field>
-              <Form.Label htmlFor="peridiocidade_id">Cód. *</Form.Label>
+              <Form.Label htmlFor="condPag_id">Cód. *</Form.Label>
               <Form.Input
-                name="peridiocidade_id"
+                name="condPag_id"
                 placeholder="0"
                 max={5}
                 width={70}
-                defaultValue={data.peridiocidade_id}
-                onBlur={(e) => getPeridiocidade(Number(e.target.value))}
-                disabled={isDisabled.peridiocidade_id}
+                defaultValue={data.condPag_id}
+                onBlur={(e) => getCondicao(Number(e.target.value))}
+                disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
                 preenchidoChange={handlePreenchidoChange}
               />
-              <Form.ErrorMessage field="peridiocidade_id" />
+              <Form.ErrorMessage field="condPag_id" />
             </Form.Field>
 
             <Form.Field>
               <br />
-              <PeridiocidadesSubView
-                onClose={onPeridiocidadeSubViewClose}
-                controller={peridiocidadesController}
-                disabled={isDisabled.rest}
+              <CondicoesPagamentoSubView
+                onClose={onCondicaoSubViewClose}
+                controller={condicoesPagamentoController}
+                disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
               />
             </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="descricao">Descrição</Form.Label>
+              <Form.Label htmlFor="condicaoPagamento">
+                Condição de Pagamento
+              </Form.Label>
               <Form.Input
-                name="descricao"
-                placeholder="Selecione a Peridiocidade"
+                name="condicaoPagamento"
+                placeholder="..."
                 max={56}
                 width={250}
-                value={data.descricao}
+                value={data.condicaoPagamento}
                 disabled={true}
               />
-              <Form.ErrorMessage field="descricao" />
-            </Form.Field>
-
-            <Form.Field>
-              <Form.Label htmlFor="dias">Dias</Form.Label>
-              <Form.Input
-                name="dias"
-                placeholder="0"
-                width={100}
-                value={data.dias}
-                disabled={true}
-              />
-              <Form.ErrorMessage field="dias" />
-            </Form.Field>
-          </div>
-
-          {/* Linha 4 */}
-          <div className="flex justify-between m-10">
-            <Form.Field>
-              <Form.Label htmlFor="data_proposta">Data da Proposta</Form.Label>
-              <Datepick
-                name="data_proposta"
-                days={0}
-                end={true}
-                disabled={isDisabled.data_proposta}
-              />
-              <Form.ErrorMessage field="data_proposta" />
+              <Form.ErrorMessage field="condicaoPagamento" />
             </Form.Field>
 
             <Form.Field>
@@ -734,9 +596,17 @@ export function PropostaDialog({
               <Datepick
                 name="prazo_final"
                 days={30}
-                disabled={isDisabled.prazo_final}
+                disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
               />
               <Form.ErrorMessage field="prazo_final" />
+            </Form.Field>
+
+            <Form.Field>
+              <Form.Label htmlFor="data_aprovacao">
+                Data de Aprovação
+              </Form.Label>
+              <Datepick name="data_aprovacao" days={30} disabled={true} />
+              <Form.ErrorMessage field="data_aprovacao" />
             </Form.Field>
 
             <Form.Field>
@@ -744,7 +614,7 @@ export function PropostaDialog({
               <Datepick
                 name="data_inicio"
                 days={30}
-                disabled={isDisabled.data_inicio}
+                disabled={action != "Aprovar"}
               />
               <Form.ErrorMessage field="data_inicio" />
             </Form.Field>
@@ -752,7 +622,7 @@ export function PropostaDialog({
 
           {/* SERVICOS */}
           <div className="flex flex-col gap-1 border-t-2 pt-4 border-gray-200">
-            <div className="flex flex-row gap-3 justify-between">
+            <div className="flex gap-3 justify-between">
               <span className="text-sm font-medium">Serviços</span>
               <Form.Field>
                 <Form.Label htmlFor="total">Total da Proposta</Form.Label>
@@ -773,7 +643,10 @@ export function PropostaDialog({
                   onClick={() => {
                     addNewServico();
                   }}
-                  disabled={isDisabled.rest || fields.length >= 8}
+                  disabled={
+                    !["Cadastrar", "Editar"].includes(action ?? "") ||
+                    fields.length >= 8
+                  }
                 >
                   Adicionar Serviço
                 </Button>
@@ -783,20 +656,20 @@ export function PropostaDialog({
             {fields.map((field: any, index: any) => (
               <div
                 key={field.id}
-                className="flex gap-3 items-end border-2 border-gray-200 rounded p-2 justify-center"
+                className="flex gap-3 flex-wrap items-end border-2 border-gray-200 rounded p-2 justify-start"
               >
                 <Form.Field>
                   <Form.Label
                     htmlFor={`servicos.${index}.servico_id` as const}
                     className="flex flex-col"
                   >
-                    Cód.
+                    Cód. *
                   </Form.Label>
                   <Form.Input
                     name={`servicos.${index}.servico_id` as const}
                     width={70}
                     onBlur={(e) => getServico(index, Number(e.target.value))}
-                    disabled={isDisabled.servicos.servico_id}
+                    disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
                   />
                   <Form.ErrorMessage
                     field={`servicos.${index}.servico_id` as const}
@@ -810,20 +683,19 @@ export function PropostaDialog({
                       index={index}
                       onClose={onServicoSubViewClose}
                       controller={servicosController}
-                      disabled={isDisabled.rest}
+                      disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
                     />
                   </Form.Field>
                 )}
 
                 <Form.Field>
                   <Form.Label htmlFor={`servicos.${index}.servico` as const}>
-                    Serviço
+                    Serviço *
                   </Form.Label>
                   <Form.Input
                     name={`servicos.${index}.servico` as const}
                     placeholder="Selecione o Serviço"
-                    max={56}
-                    width={200}
+                    width={350}
                     defaultValue={`data.servicos.${index}.servico`}
                     disabled={true}
                   />
@@ -838,13 +710,13 @@ export function PropostaDialog({
                     htmlFor={`servicos.${index}.quantidade` as const}
                     className="flex flex-col"
                   >
-                    Qtd.
+                    Qtd. *
                   </Form.Label>
                   <Form.Input
                     name={`servicos.${index}.quantidade` as const}
                     width={50}
                     max={2}
-                    disabled={isDisabled.servicos.quantidade}
+                    disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
                     onChange={(e) => {
                       register(
                         `servicos.${index}.quantidade` as const
@@ -862,14 +734,14 @@ export function PropostaDialog({
                     htmlFor={`servicos.${index}.valor_unitario` as const}
                     className="flex flex-col"
                   >
-                    Valor Unitário
+                    Valor Unitário *
                   </Form.Label>
                   <Form.Input
                     name={`servicos.${index}.valor_unitario` as const}
                     width={100}
                     max={9}
                     maskType="money"
-                    disabled={isDisabled.servicos.valor_unitario}
+                    disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
                     onChange={(e) => {
                       register(
                         `servicos.${index}.quantidade` as const
@@ -894,7 +766,7 @@ export function PropostaDialog({
                     width={100}
                     max={9}
                     maskType="money"
-                    disabled={isDisabled.servicos.desconto}
+                    disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
                     onChange={(e) => {
                       register(
                         `servicos.${index}.quantidade` as const
@@ -924,10 +796,79 @@ export function PropostaDialog({
                   />
                 </Form.Field>
 
+                <Form.Field>
+                  <Form.Label
+                    htmlFor={`servicos.${index}.peridiocidade_id` as const}
+                    className="flex flex-col"
+                  >
+                    Cód. *
+                  </Form.Label>
+                  <Form.Input
+                    name={`servicos.${index}.peridiocidade_id` as const}
+                    width={70}
+                    onBlur={(e) =>
+                      getPeridiocidade(index, Number(e.target.value))
+                    }
+                    disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
+                  />
+                  <Form.ErrorMessage
+                    field={`servicos.${index}.peridiocidade_id` as const}
+                  />
+                </Form.Field>
+
+                {peridiocidadesController && (
+                  <Form.Field>
+                    <br />
+                    <PeridiocidadesSubView
+                      index={index}
+                      onClose={onPeridiocidadeSubViewClose}
+                      controller={peridiocidadesController}
+                      disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
+                    />
+                  </Form.Field>
+                )}
+
+                <Form.Field>
+                  <Form.Label htmlFor={`servicos.${index}.descricao` as const}>
+                    Peridiocidade *
+                  </Form.Label>
+                  <Form.Input
+                    name={`servicos.${index}.descricao` as const}
+                    placeholder="Selecione a Peridiocidade"
+                    max={56}
+                    width={300}
+                    defaultValue={`data.servicos.${index}.descricao`}
+                    disabled={true}
+                  />
+
+                  <Form.ErrorMessage
+                    field={`servicos.${index}.descricao` as const}
+                  />
+                </Form.Field>
+
+                <Form.Field>
+                  <Form.Label
+                    htmlFor={`servicos.${index}.quantidade` as const}
+                    className="flex flex-col"
+                  >
+                    Dias
+                  </Form.Label>
+                  <Form.Input
+                    name={`servicos.${index}.dias` as const}
+                    width={50}
+                    max={2}
+                    disabled={true}
+                  />
+                  <Form.ErrorMessage
+                    field={`servicos.${index}.dias` as const}
+                  />
+                </Form.Field>
+
                 <Button
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2"
                   type="button"
                   color="red"
-                  disabled={isDisabled.rest}
+                  disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
                   onClick={() => removeServico(index)}
                 >
                   <Trash weight="bold" />

@@ -1,5 +1,6 @@
 ﻿using api.Interfaces;
 using api.Models.Proposta;
+using api.Models.PropostaServico;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 
@@ -39,6 +40,17 @@ namespace api.Controllers
                 return BadRequest();
         }
 
+        [HttpGet]
+        [Route("/GetServicosFromProposta")]
+        public IActionResult GetServicosFromProposta(int id)
+        {
+            List<PropostaServicoModel> result = propostasService.GetServicosFromProposta(id);
+            if (result != null)
+                return Ok(result);
+            else
+                return BadRequest();
+        }
+
         [HttpPost]
         [Route("/PostProposta")]
         public IActionResult PostProposta([FromBody] PropostaPostModel propostaInserida)
@@ -63,9 +75,9 @@ namespace api.Controllers
 
         [HttpPut]
         [Route("/AtualizarSituacaoProposta")]
-        public IActionResult AtualizarSituacaoProposta(int id, string situacao)
+        public IActionResult AtualizarSituacaoProposta([FromBody] PropostaAtualizaModel propostaAtualizada)
         {
-            string result = propostasService.AtualizarSituacaoProposta(id, situacao);
+            string result = propostasService.AtualizarSituacaoProposta(propostaAtualizada);
             if (result != null)
                 return Ok(result);
             else

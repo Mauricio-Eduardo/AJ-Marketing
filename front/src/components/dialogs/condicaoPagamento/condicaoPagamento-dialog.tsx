@@ -240,8 +240,15 @@ export function CondicaoPagamentoDialog({
           }
         } catch (error) {
           setFormaPagamentoNull(index);
+          toast("Forma de Pagamento Inativa ou inexistente", {
+            type: "error",
+            isLoading: false,
+            autoClose: 3000,
+          });
           console.log(error);
         }
+      } else {
+        setFormaPagamentoNull(index);
       }
     }
   };

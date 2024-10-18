@@ -1,19 +1,12 @@
-import {
-  formatToDecimal,
-  removeFormatting,
-} from "../../../components/form/Formats";
+import { formatToDecimal } from "../../../components/form/Formats";
 import { Proposta } from "../entity/Proposta";
 
 export interface UpdatePropostaDto {
   id: number;
-  cliente_id: number | null;
-  tipo_pessoa: string;
-  cpf_cnpj: string;
-  nome_razaoSocial: string;
-  peridiocidade_id: number;
-  data_proposta: string;
+  condPag_id: number;
   prazo_final: string;
-  data_inicio: string;
+  data_aprovacao: string | null;
+  data_inicio: string | null;
   total: string;
   situacao: string;
 
@@ -23,19 +16,18 @@ export interface UpdatePropostaDto {
     valor_unitario: string;
     desconto: string;
     valor_total: string;
+    peridiocidade_id: number;
+    descricao: string;
+    dias: number;
   }[];
 }
 
 export function transformarParaPutProposta(data: Proposta): UpdatePropostaDto {
   return {
     id: data.id,
-    cliente_id: data.cliente_id,
-    tipo_pessoa: data.tipo_pessoa,
-    cpf_cnpj: removeFormatting(data.cpf_cnpj),
-    nome_razaoSocial: data.nome_razaoSocial,
-    peridiocidade_id: data.peridiocidade_id,
-    data_proposta: data.data_proposta,
+    condPag_id: data.condPag_id,
     prazo_final: data.prazo_final,
+    data_aprovacao: data.data_aprovacao,
     data_inicio: data.data_inicio,
     total: formatToDecimal(data.total),
     situacao: data.situacao,

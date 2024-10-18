@@ -4,20 +4,28 @@ export class ContaReceber {
   cpf_cnpj: string;
   nome_razaoSocial: string;
   contrato_id: number;
-  condicaoPagamento: string;
   parcela_id: number;
   numeroParcela: number;
   quantidadeParcelas: number;
-  data_vencimento: string;
-  valor_inicial: string;
-  desconto: string;
+  formaPag_id: number;
+  formaPagamento: string;
+  total: string;
   juros: string;
   multa: string;
-  total: string;
-  valor_pago: string;
-  valor_aberto: string;
-  data_recebimento: string;
+  desconto: string;
+  data_vencimento: string;
   situacao: string;
+
+  recebimentos: {
+    formaPag_id: number;
+    formaPagamento: string;
+    recebido: string;
+    juros: string;
+    multa: string;
+    desconto: string;
+    total: string;
+    data_recebimento: string;
+  }[];
 
   constructor(
     pId: number,
@@ -25,39 +33,44 @@ export class ContaReceber {
     pCpf_cnpj: string,
     pNome_razaoSocial: string,
     pContrato_id: number,
-    pCondicaoPagamento: string,
     pParcela_id: number,
     pNumeroParcela: number,
     pQuantidadeParcelas: number,
-    pData_vencimento: string,
-    pValor_inicial: string,
-    pDesconto: string,
+    pFormaPag_id: number,
+    pFormaPagamento: string,
+    pTotal: string,
     pJuros: string,
     pMulta: string,
-    pTotal: string,
-    pValor_pago: string,
-    pValor_aberto: string,
-    pData_recebimento: string,
-    pSituacao: string
+    pDesconto: string,
+    pData_vencimento: string,
+    pSituacao: string,
+    pRecebimentos: {
+      formaPag_id: number;
+      formaPagamento: string;
+      recebido: string;
+      juros: string;
+      multa: string;
+      desconto: string;
+      total: string;
+      data_recebimento: string;
+    }[]
   ) {
     this.id = pId;
     this.cliente_id = pCliente_id;
     this.cpf_cnpj = pCpf_cnpj;
     this.nome_razaoSocial = pNome_razaoSocial;
     this.contrato_id = pContrato_id;
-    this.condicaoPagamento = pCondicaoPagamento;
     this.parcela_id = pParcela_id;
     this.numeroParcela = pNumeroParcela;
     this.quantidadeParcelas = pQuantidadeParcelas;
-    this.data_vencimento = pData_vencimento;
-    this.valor_inicial = pValor_inicial;
-    this.desconto = pDesconto;
+    this.formaPag_id = pFormaPag_id;
+    this.formaPagamento = pFormaPagamento;
+    this.total = pTotal;
     this.juros = pJuros;
     this.multa = pMulta;
-    this.total = pTotal;
-    this.valor_pago = pValor_pago;
-    this.valor_aberto = pValor_aberto;
-    this.data_recebimento = pData_recebimento;
+    this.desconto = pDesconto;
+    this.data_vencimento = pData_vencimento;
     this.situacao = pSituacao;
+    this.recebimentos = pRecebimentos;
   }
 }

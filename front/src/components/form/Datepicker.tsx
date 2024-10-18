@@ -1,7 +1,7 @@
 import { CalendarDots } from "@phosphor-icons/react";
 import { addDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { InputHTMLAttributes } from "react";
+import { InputHTMLAttributes, useEffect, useRef } from "react";
 import DatePicker from "react-datepicker";
 import { Controller, useFormContext } from "react-hook-form";
 import "react-datepicker/dist/react-datepicker.min.css";
@@ -11,9 +11,16 @@ interface DatepickProps extends InputHTMLAttributes<HTMLInputElement> {
   days: number;
   end?: boolean;
   disabled?: boolean;
+  onBlur?: () => void;
 }
 
-export const Datepick = ({ name, days, end, disabled }: DatepickProps) => {
+export const Datepick = ({
+  name,
+  days,
+  end,
+  disabled,
+  onBlur,
+}: DatepickProps) => {
   const { control } = useFormContext();
 
   const startDate = new Date();
@@ -27,22 +34,29 @@ export const Datepick = ({ name, days, end, disabled }: DatepickProps) => {
         render={({ field: { onChange, value, ref } }) => (
           <DatePicker
             ref={ref}
-            onKeyDown={(e) => e.preventDefault()}
+            onKeyDown={(e) => {
+              if (e.key !== "Tab") {
+                e.preventDefault();
+              }
+            }}
             wrapperClassName="input-attribute"
             locale={ptBR}
+            disabled={disabled}
             className={`${
               disabled ? "bg-gray-200 text-gray-500 cursor-not-allowed" : ""
-            } h-8 w-32 pl-8 pr-2 rounded border border-zinc-300 hover:border-violet-600 focus:ring-2 focus:outline-violet-700 shadow-sm text-zinc-800`}
+            } h-8 w-32 z-10 pl-8 pr-2 rounded border border-zinc-300 hover:border-violet-600 focus:ring-2 focus:outline-violet-700 shadow-sm text-zinc-800`}
             excludeDateIntervals={[
               {
                 start: calculatedDate,
                 end: end ? new Date(9999, 11, 31) : calculatedDate,
               },
             ]}
-            selected={value ? new Date(value) : calculatedDate}
+            selected={value ? new Date(value) : null}
+            placeholderText="00/00/0000"
             onChange={(date) => {
-              onChange(date ? date.toISOString() : null); // Atualiza o valor do formulário com a data no formato ISO
+              onChange(date ? date.toISOString() : null);
             }}
+            onBlur={() => (onBlur ? onBlur() : null)}
             monthsShown={1}
             dateFormat="dd/MM/yyyy"
             renderCustomHeader={({
@@ -51,7 +65,7 @@ export const Datepick = ({ name, days, end, disabled }: DatepickProps) => {
               decreaseMonth,
               increaseMonth,
             }) => (
-              <div>
+              <div className="z-50">
                 <button
                   type="button"
                   aria-label="Previous Month"
@@ -75,7 +89,10 @@ export const Datepick = ({ name, days, end, disabled }: DatepickProps) => {
                 </button>
                 <span className="react-datepicker__current-month">
                   {monthDate
-                    .toLocaleString("pt-BR", { month: "long", year: "numeric" })
+                    .toLocaleString("pt-BR", {
+                      month: "long",
+                      year: "numeric",
+                    })
                     .replace(/^\w/, (c) => c.toUpperCase())}
                 </span>
                 <button

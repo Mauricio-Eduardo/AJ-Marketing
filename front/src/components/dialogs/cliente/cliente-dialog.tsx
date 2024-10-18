@@ -15,7 +15,6 @@ import { ClienteSchema, createClienteSchema } from "./schema";
 import { Cliente } from "../../../models/cliente/entity/Cliente";
 import { transformarParaPostCliente } from "../../../models/cliente/dto/createCliente.dto";
 import { transformarParaPutCliente } from "../../../models/cliente/dto/updateCliente.dto";
-import { Usuario } from "../../../models/usuario/entity/Usuario";
 import { Interesse } from "../../../models/interesse/entity/Interesse";
 import { RamoAtividade } from "../../../models/ramoAtividade/entity/RamoAtividade";
 import { OrigensController } from "../../../controllers/origens-controller";
@@ -26,7 +25,6 @@ import { Cidade } from "../../../models/cidade/entity/Cidade";
 import { CidadesSubView } from "../../../views/cidades/subView";
 import { InteressesSubView } from "../../../views/interesses/subView";
 import { RamosAtividadeSubView } from "../../../views/ramosAtividade/subView";
-import { UsuariosSubView } from "../../../views/usuarios/subView";
 import { ClientesController } from "../../../controllers/clientes-controller";
 import { formatCpfCnpj, formatPhone } from "../../form/Formats";
 import { AlertCancelX } from "../../form/Alerts";
@@ -48,7 +46,6 @@ export function ClienteDialog({
   isOpenModal,
   origensController,
   cidadesController,
-  usuariosController,
   interessesController,
   ramosAtividadeController,
   onSuccess,
@@ -61,13 +58,9 @@ export function ClienteDialog({
   });
   const { control, handleSubmit, reset, setValue } = clientesForm;
 
-  const {
-    fields: usuariosFields,
-    append: usuariosAppend,
-    remove: usuariosRemove,
-  } = useFieldArray({
+  const { fields: contratosFields } = useFieldArray({
     control,
-    name: "usuarios",
+    name: "contratos",
   });
 
   const {
@@ -97,12 +90,6 @@ export function ClienteDialog({
   const onOrigemSubViewClose = (origem?: Origem) => {
     if (origem) {
       setOrigem(origem);
-    }
-  };
-
-  const onUsuarioSubViewClose = (index: number, usuario?: Usuario) => {
-    if (usuario) {
-      setUsuario(index, usuario);
     }
   };
 
@@ -194,7 +181,7 @@ export function ClienteDialog({
       cep: "",
       origem_id: 0,
       origem: "",
-      usuarios: [],
+      contratos: [],
       interesses: [],
       ramos: [],
       ativo: true,
@@ -214,6 +201,17 @@ export function ClienteDialog({
       data_ult_alt: data.data_ult_alt
         ? format(new Date(data.data_ult_alt), "dd/MM/yyyy HH:mm")
         : "",
+      contratos: data.contratos
+        ? data.contratos.map((contrato: any) => ({
+            ...contrato,
+            data_contrato: contrato.data_contrato
+              ? format(new Date(contrato.data_contrato), "dd/MM/yyyy HH:mm")
+              : "",
+            data_vencimento: contrato.data_vencimento
+              ? format(new Date(contrato.data_vencimento), "dd/MM/yyyy HH:mm")
+              : "",
+          }))
+        : [],
     });
   };
 
@@ -307,39 +305,6 @@ export function ClienteDialog({
     setValue(`origem`, "");
   };
 
-  const getUsuario = async (index: number, pId: number) => {
-    if (pId != 0) {
-      try {
-        const response = await usuariosController.getOne(pId);
-        if (response.ativo) {
-          setUsuario(index, response);
-        } else {
-          setUsuarioNull(index);
-        }
-      } catch (error) {
-        setUsuarioNull(index);
-        toast("Usuário Inativo ou inexistente", {
-          type: "error",
-          isLoading: false,
-          autoClose: 3000,
-        });
-        console.log(error);
-      }
-    }
-  };
-
-  const setUsuario = (index: number, pUsuario: Usuario) => {
-    setValue(`usuarios.${index}.usuario_id`, pUsuario.id);
-    setValue(`usuarios.${index}.nome`, pUsuario.nome);
-    setValue(`usuarios.${index}.email`, pUsuario.email);
-  };
-
-  const setUsuarioNull = (index: number) => {
-    setValue(`usuarios.${index}.usuario_id`, 0);
-    setValue(`usuarios.${index}.nome`, "");
-    setValue(`usuarios.${index}.email`, "");
-  };
-
   const getInteresse = async (index: number, pId: number) => {
     if (pId != 0) {
       try {
@@ -404,14 +369,6 @@ export function ClienteDialog({
     setValue(`ramos.${index}.ramo`, "");
   };
 
-  const addNewUsuario = () => {
-    usuariosAppend({
-      usuario_id: 0,
-      nome: "",
-      email: "",
-    });
-  };
-
   const addNewInteresse = () => {
     interessesAppend({
       interesse_id: 0,
@@ -426,7 +383,7 @@ export function ClienteDialog({
     });
   };
 
-  const [pessoa, setPessoa] = useState<string>("Física" || "Jurídica");
+  const [pessoa, setPessoa] = useState<string>("Física");
 
   useEffect(() => {
     if (clientesForm.getValues("tipo_pessoa")) {
@@ -923,100 +880,89 @@ export function ClienteDialog({
             ))}
           </div>
 
-          {/* Usuários */}
-          <div className="flex flex-col gap-1 border-t-2 pt-4 border-gray-200">
-            <div className="flex flex-row gap-3 justify-between">
-              <span className="text-sm font-medium">Responsáveis *</span>
-
-              <Form.Field>
-                <br />
-                <Button
-                  type="button"
-                  onClick={() => {
-                    addNewUsuario();
-                  }}
-                  disabled={action != "Cadastrar" && action != "Editar"}
+          {/* Contratos */}
+          {action != "Cadastrar" && (
+            <div className="flex flex-col gap-1 border-t-2 pt-4 border-gray-200">
+              <div className="flex flex-row gap-3 justify-between">
+                <span className="text-sm font-medium">Contratos</span>
+              </div>
+              {contratosFields.map((field: any, index: any) => (
+                <div
+                  key={field.id}
+                  className="flex gap-3 items-end border-2 border-gray-200 rounded p-2 justify-center"
                 >
-                  Adicionar Usuário
-                </Button>
-                <Form.ErrorMessage field="usuarios" />
-              </Form.Field>
-            </div>
-            {usuariosFields.map((field: any, index: any) => (
-              <div
-                key={field.id}
-                className="flex gap-3 items-end border-2 border-gray-200 rounded p-2 justify-center"
-              >
-                <Form.Field>
-                  <Form.Label
-                    htmlFor={`usuarios.${index}.usuario_id` as const}
-                    className="flex flex-col"
-                  >
-                    Cód.
-                  </Form.Label>
-                  <Form.Input
-                    name={`usuarios.${index}.usuario_id` as const}
-                    width={70}
-                    onBlur={(e) => getUsuario(index, Number(e.target.value))}
-                    disabled={action != "Cadastrar" && action != "Editar"}
-                  />
-                  <Form.ErrorMessage
-                    field={`usuarios.${index}.usuario_id` as const}
-                  />
-                </Form.Field>
-
-                {usuariosController && (
                   <Form.Field>
-                    <br />
-                    <UsuariosSubView
-                      index={index}
-                      onClose={onUsuarioSubViewClose}
-                      controller={usuariosController}
+                    <Form.Label
+                      htmlFor={`contratos.${index}.contrato_id` as const}
+                    >
+                      Contrato
+                    </Form.Label>
+                    <Form.Input
+                      name={`contratos.${index}.contrato_id` as const}
+                      width={70}
+                      disabled={true}
+                    />
+                    <Form.ErrorMessage
+                      field={`contratos.${index}.contrato_id` as const}
                     />
                   </Form.Field>
-                )}
 
-                <Form.Field>
-                  <Form.Label htmlFor={`usuarios.${index}.nome` as const}>
-                    Usuário
-                  </Form.Label>
-                  <Form.Input
-                    name={`usuarios.${index}.nome` as const}
-                    placeholder="Selecione o Usuário"
-                    max={56}
-                    width={250}
-                    defaultValue={`data.usuarios.${index}.nome`}
-                    disabled={true}
-                  />
-                  <Form.ErrorMessage
-                    field={`usuarios.${index}.nome` as const}
-                  />
-                </Form.Field>
-                <Form.Field>
-                  <Form.Label htmlFor={`usuarios.${index}.email` as const}>
-                    E-mail
-                  </Form.Label>
-                  <Form.Input
-                    name={`usuarios.${index}.email` as const}
-                    max={56}
-                    width={250}
-                    defaultValue={`data.usuarios.${index}.email`}
-                    disabled={true}
-                  />
-                  <Form.ErrorMessage
-                    field={`usuarios.${index}.email` as const}
-                  />
-                </Form.Field>
-                <Button
-                  type="button"
-                  color="red"
-                  onClick={() => usuariosRemove(index)}
-                >
-                  <Trash weight="bold" />
-                </Button>
-              </div>
-            ))}
-          </div>
+                  <Form.Field>
+                    <Form.Label
+                      htmlFor={`contratos.${index}.data_contrato` as const}
+                    >
+                      Data Contrato
+                    </Form.Label>
+                    <Form.Input
+                      name={`contratos.${index}.data_contrato` as const}
+                      width={150}
+                      defaultValue={`data.contratos.${index}.data_contrato`}
+                      disabled={true}
+                    />
+                    <Form.ErrorMessage
+                      field={`contratos.${index}.data_contrato` as const}
+                    />
+                  </Form.Field>
+
+                  <Form.Field>
+                    <Form.Label
+                      htmlFor={`contratos.${index}.data_vencimento` as const}
+                    >
+                      Data Vencimento
+                    </Form.Label>
+                    <Form.Input
+                      name={`contratos.${index}.data_vencimento` as const}
+                      max={56}
+                      width={150}
+                      defaultValue={`data.contratos.${index}.data_vencimento`}
+                      disabled={true}
+                    />
+                    <Form.ErrorMessage
+                      field={`contratos.${index}.data_vencimento` as const}
+                    />
+                  </Form.Field>
+
+                  <Form.Field>
+                    <Form.Label
+                      htmlFor={`contratos.${index}.situacao` as const}
+                    >
+                      Situação
+                    </Form.Label>
+                    <Form.Input
+                      name={`contratos.${index}.situacao` as const}
+                      max={56}
+                      width={150}
+                      defaultValue={`data.contratos.${index}.situacao`}
+                      disabled={true}
+                    />
+                    <Form.ErrorMessage
+                      field={`contratos.${index}.situacao` as const}
+                    />
+                  </Form.Field>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Linha 5 */}
           <div className="flex gap-3">

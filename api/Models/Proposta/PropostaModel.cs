@@ -7,21 +7,19 @@ namespace api.Models.Proposta
         // Variáveis privadas correspondentes aos campos no banco de dados
         private int _id;
         
-        // peridiocidades table
-        private int _peridiocidade_id;
-        private string _descricao; // Somente para exibição
-        private int _dias; // Somente para exibição
+        private int _cliente_id;
+        private string _tipo_pessoa; // Somente para exibição
+        private string _cpf_cnpj; // Somente para exibição
+        private string _nome_razaoSocial; // Somente para exibição
 
-        //clientes table
-        private Nullable<int> _cliente_id;
-        private string _tipo_pessoa;
-        private string _cpf_cnpj;
-        private string _nome_razaoSocial;
+        private int _condPag_id;
+        private string _condicaoPagamento; // Somente para exibição
 
-        private DateTime _data_proposta;
         private DateTime _prazo_final;
-        private DateTime _data_inicio;
-        
+
+        private Nullable<DateTime> _data_aprovacao;
+        private Nullable<DateTime> _data_inicio;
+
         private decimal _total;
         private string _situacao;
 
@@ -37,25 +35,19 @@ namespace api.Models.Proposta
             set { _id = value; }
         }
 
-        public int Peridiocidade_id
+        public int CondPag_id
         {
-            get { return _peridiocidade_id; }
-            set { _peridiocidade_id = value; }
+            get { return _condPag_id; }
+            set { _condPag_id = value; }
         }
 
-        public string Descricao
+        public string CondicaoPagamento
         {
-            get { return _descricao; }
-            set { _descricao = value; }
+            get { return _condicaoPagamento; }
+            set { _condicaoPagamento = value; }
         }
 
-        public int Dias
-        {
-            get { return _dias; }
-            set { _dias = value; }
-        }
-
-        public int? Cliente_id
+        public int Cliente_id
         {
             get { return _cliente_id; }
             set { _cliente_id = value; }
@@ -79,19 +71,19 @@ namespace api.Models.Proposta
             set { _nome_razaoSocial = value; }
         }
 
-        public DateTime Data_proposta
-        {
-            get { return _data_proposta; }
-            set { _data_proposta = value; }
-        }
-
         public DateTime Prazo_final
         {
             get { return _prazo_final; }
             set { _prazo_final = value; }
         }
 
-        public DateTime Data_inicio
+        public DateTime? Data_aprovacao
+        {
+            get { return _data_aprovacao; }
+            set { _data_aprovacao = value; }
+        }
+
+        public DateTime? Data_inicio
         {
             get { return _data_inicio; }
             set { _data_inicio = value; }
@@ -109,7 +101,7 @@ namespace api.Models.Proposta
             set { _situacao = value; }
         }
 
-        public DateTime ?Data_ult_alt
+        public DateTime? Data_ult_alt
         {
             get { return _data_ult_alt; }
             set { _data_ult_alt = value; }
@@ -131,20 +123,19 @@ namespace api.Models.Proposta
         public PropostaModel() { }
 
         // Construtor com parâmetros
-        public PropostaModel(int id, int peridiocidade_id, string descricao, int dias, int cliente_id, string tipo_pessoa, string cpf_cnpj, string nome_razaoSocial, 
-            DateTime data_proposta, DateTime prazo_final, DateTime data_inicio, decimal total, string situacao,
+        public PropostaModel(int id, int condPag_id, string condicaoPagamento, int cliente_id, string tipo_pessoa, string cpf_cnpj, string nome_razaoSocial, 
+            DateTime prazo_final, DateTime data_aprovacao, DateTime data_inicio, decimal total, string situacao,
             Nullable<DateTime> data_ult_alt, DateTime data_cadastro, List<PropostaServicoModel> servicos)
         {
             _id = id;
-            _peridiocidade_id = peridiocidade_id;
-            _descricao = descricao;
-            _dias = dias;
+            _condPag_id = condPag_id;
+            _condicaoPagamento = condicaoPagamento;
             _cliente_id = cliente_id;
             _tipo_pessoa = tipo_pessoa;
             _cpf_cnpj = cpf_cnpj;
             _nome_razaoSocial = nome_razaoSocial;
-            _data_proposta = data_proposta;
             _prazo_final = prazo_final;
+            _data_aprovacao = data_aprovacao;
             _data_inicio = data_inicio;
             _total = total;
             _situacao = situacao;

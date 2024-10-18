@@ -3,20 +3,24 @@
   "WorkspaceRootPath": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|d:\\faculdade\\pr\u00E1tica profissional\\projeto\\api\\services\\contasreceberservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|solutionrelative:services\\contasreceberservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|d:\\faculdade\\pr\u00E1tica profissional\\projeto\\api\\services\\ordensservicoservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|solutionrelative:services\\ordensservicoservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|d:\\faculdade\\pr\u00E1tica profissional\\projeto\\api\\controllers\\peridiocidadescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|solutionrelative:controllers\\peridiocidadescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|d:\\faculdade\\pr\u00E1tica profissional\\projeto\\api\\models\\ordemservico\\ordemservicoputmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|solutionrelative:models\\ordemservico\\ordemservicoputmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|d:\\faculdade\\pr\u00E1tica profissional\\projeto\\api\\services\\peridiocidadesservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|solutionrelative:services\\peridiocidadesservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|d:\\faculdade\\pr\u00E1tica profissional\\projeto\\api\\services\\contratosservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|solutionrelative:services\\contratosservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|d:\\faculdade\\pr\u00E1tica profissional\\projeto\\api\\interfaces\\iperidiocidadeservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|solutionrelative:interfaces\\iperidiocidadeservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|d:\\faculdade\\pr\u00E1tica profissional\\projeto\\api\\models\\ordemservico\\ordemservicomodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|solutionrelative:models\\ordemservico\\ordemservicomodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|d:\\faculdade\\pr\u00E1tica profissional\\projeto\\api\\models\\modelpai\\model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|solutionrelative:models\\modelpai\\model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,58 +30,71 @@
       "DocumentGroups": [
         {
           "DockedWidth": 367,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "ContasReceberService.cs",
-              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Services\\ContasReceberService.cs",
-              "RelativeDocumentMoniker": "Services\\ContasReceberService.cs",
-              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Services\\ContasReceberService.cs",
-              "RelativeToolTip": "Services\\ContasReceberService.cs",
-              "ViewState": "AQIAAHoAAAAAAAAAAAAAAIAAAAA9AAAA",
+              "DocumentIndex": 2,
+              "Title": "ContratosService.cs",
+              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Services\\ContratosService.cs",
+              "RelativeDocumentMoniker": "Services\\ContratosService.cs",
+              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Services\\ContratosService.cs",
+              "RelativeToolTip": "Services\\ContratosService.cs",
+              "ViewState": "AQIAAAABAAAAAAAAAAAAAA8BAABjAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-04T17:39:39.765Z",
+              "WhenOpened": "2024-10-17T20:56:34.494Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "PeridiocidadesService.cs",
-              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Services\\PeridiocidadesService.cs",
-              "RelativeDocumentMoniker": "Services\\PeridiocidadesService.cs",
-              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Services\\PeridiocidadesService.cs",
-              "RelativeToolTip": "Services\\PeridiocidadesService.cs",
-              "ViewState": "AQIAAE4AAAAAAAAAAAAwwEsAAABLAAAA",
+              "DocumentIndex": 0,
+              "Title": "OrdensServicoService.cs",
+              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Services\\OrdensServicoService.cs",
+              "RelativeDocumentMoniker": "Services\\OrdensServicoService.cs",
+              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Services\\OrdensServicoService.cs",
+              "RelativeToolTip": "Services\\OrdensServicoService.cs",
+              "ViewState": "AQIAAJkAAAAAAAAAAAAAAKwAAAA5AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-04T15:50:55.275Z",
+              "WhenOpened": "2024-10-17T20:54:34.608Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "PeridiocidadesController.cs",
-              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Controllers\\PeridiocidadesController.cs",
-              "RelativeDocumentMoniker": "Controllers\\PeridiocidadesController.cs",
-              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Controllers\\PeridiocidadesController.cs",
-              "RelativeToolTip": "Controllers\\PeridiocidadesController.cs",
-              "ViewState": "AQIAAA8AAAAAAAAAAAAAABwAAAAAAAAA",
+              "Title": "OrdemServicoPutModel.cs",
+              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Models\\OrdemServico\\OrdemServicoPutModel.cs",
+              "RelativeDocumentMoniker": "Models\\OrdemServico\\OrdemServicoPutModel.cs",
+              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Models\\OrdemServico\\OrdemServicoPutModel.cs",
+              "RelativeToolTip": "Models\\OrdemServico\\OrdemServicoPutModel.cs",
+              "ViewState": "AQIAAAMAAAAAAAAAAAAAAAYAAAASAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-04T15:50:46.498Z",
+              "WhenOpened": "2024-10-17T20:54:10.841Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Model.cs",
+              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Models\\ModelPai\\Model.cs",
+              "RelativeDocumentMoniker": "Models\\ModelPai\\Model.cs",
+              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Models\\ModelPai\\Model.cs",
+              "RelativeToolTip": "Models\\ModelPai\\Model.cs",
+              "ViewState": "AQIAABIAAAAAAAAAAAAAACcAAABgAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-17T20:52:21.68Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "IPeridiocidadeService.cs",
-              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Interfaces\\IPeridiocidadeService.cs",
-              "RelativeDocumentMoniker": "Interfaces\\IPeridiocidadeService.cs",
-              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Interfaces\\IPeridiocidadeService.cs",
-              "RelativeToolTip": "Interfaces\\IPeridiocidadeService.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAcAAABCAAAA",
+              "Title": "OrdemServicoModel.cs",
+              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Models\\OrdemServico\\OrdemServicoModel.cs",
+              "RelativeDocumentMoniker": "Models\\OrdemServico\\OrdemServicoModel.cs",
+              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Models\\OrdemServico\\OrdemServicoModel.cs",
+              "RelativeToolTip": "Models\\OrdemServico\\OrdemServicoModel.cs",
+              "ViewState": "AQIAAH0AAAAAAAAAAAAAAJUAAAApAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-04T15:50:41.157Z",
+              "WhenOpened": "2024-10-17T20:43:39.552Z",
               "EditorCaption": ""
             }
           ]

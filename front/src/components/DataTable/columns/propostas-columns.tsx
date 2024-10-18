@@ -52,18 +52,6 @@ export const PropostasColumns = (
     footer: (props) => props.column.id,
   },
   {
-    id: "data_proposta",
-    size: 150,
-    accessorFn: (row) => row.data_proposta,
-    header: () => <span className="text-center w-full">Data Proposta</span>,
-    cell: (info) => (
-      <div className="text-center">
-        {format(new Date(String(info.getValue())), "dd/MM/yyyy")}
-      </div>
-    ),
-    footer: (props) => props.column.id,
-  },
-  {
     id: "prazo_final",
     size: 200,
     accessorFn: (row) => row.prazo_final,

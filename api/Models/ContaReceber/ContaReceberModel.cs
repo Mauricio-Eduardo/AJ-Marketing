@@ -1,4 +1,7 @@
 ﻿
+using api.Models.Parcelas;
+using api.Models.Recebimentos;
+
 namespace api.Models.ContaReceber
 {
     public class ContaReceberModel
@@ -9,26 +12,23 @@ namespace api.Models.ContaReceber
         private int _contrato_id;
         private int _parcela_id;
 
-        // Variáveis utilizadas somente para visualização. Select das tabelas 'clientes' e 'condicoesPagamento'
+        // Variáveis utilizadas somente para visualização
+        private int _formaPag_id;
+        private string _formaPagamento;
         private string _cpf_cnpj;
         private string _nome_razaoSocial;
         private int _quantidadeParcelas;
         private int _numeroParcela;
+        private decimal _juros;
+        private decimal _multa;
+        private decimal _desconto;
 
+        private decimal _total;
         private DateTime _data_vencimento;
 
-        private decimal _valor_inicial;
-        private Nullable<decimal> _desconto;
-        private Nullable<decimal> _juros;
-        private Nullable<decimal> _multa;
-        private decimal _total;
-
-        private Nullable<decimal> _valor_pago;
-        private Nullable<decimal> _valor_aberto;
-
-        private Nullable<DateTime> _data_recebimento;
-
         private string _situacao;
+
+        private List<RecebimentosModel> _recebimentos;
 
         // Propriedades públicas para acessar as variáveis
         public int Id
@@ -79,34 +79,34 @@ namespace api.Models.ContaReceber
             set { _numeroParcela = value; }
         }
 
-        public DateTime Data_vencimento
+        public int FormaPag_id
         {
-            get { return _data_vencimento; }
-            set { _data_vencimento = value; }
+            get { return _formaPag_id; }
+            set { _formaPag_id = value; }
         }
 
-        public decimal Valor_inicial
+        public string FormaPagamento
         {
-            get { return _valor_inicial; }
-            set { _valor_inicial = value; }
+            get { return _formaPagamento; }
+            set { _formaPagamento = value; }
         }
 
-        public Nullable<decimal> Desconto
-        {
-            get { return _desconto; }
-            set { _desconto = value; }
-        }
-
-        public Nullable<decimal> Juros
+        public decimal Juros
         {
             get { return _juros; }
             set { _juros = value; }
         }
 
-        public Nullable<decimal> Multa
+        public decimal Multa
         {
             get { return _multa; }
             set { _multa = value; }
+        }
+
+        public decimal Desconto
+        {
+            get { return _desconto; }
+            set { _desconto = value; }
         }
 
         public decimal Total
@@ -115,22 +115,10 @@ namespace api.Models.ContaReceber
             set { _total = value; }
         }
 
-        public Nullable<decimal> Valor_pago
+        public DateTime Data_vencimento
         {
-            get { return _valor_pago; }
-            set { _valor_pago = value; }
-        }
-
-        public Nullable<decimal> Valor_aberto
-        {
-            get { return _valor_aberto; }
-            set { _valor_aberto = value; }
-        }
-
-        public Nullable<DateTime> Data_recebimento
-        {
-            get { return _data_recebimento; }
-            set { _data_recebimento = value; }
+            get { return _data_vencimento; }
+            set { _data_vencimento = value; }
         }
 
         public string Situacao
@@ -139,13 +127,19 @@ namespace api.Models.ContaReceber
             set { _situacao = value; }
         }
 
+        public List<RecebimentosModel> Recebimentos
+        {
+            get { return _recebimentos; }
+            set { _recebimentos = value; }
+        }
+
         // Construtor sem parâmetros
         public ContaReceberModel() { }
 
         // Construtor com parâmetros
         public ContaReceberModel(int id, int cliente_id, int contrato_id, int parcela_id, string cpf_cnpj, string nome_razaoSocial, 
-            int quantidadeParcelas, int numeroParcela, DateTime data_vencimento, decimal valor_inicial, decimal desconto, decimal juros, 
-            decimal multa, decimal total, decimal valor_pago, decimal valor_aberto, DateTime data_recebimento, string situacao)
+            int quantidadeParcelas, int numeroParcela, int formaPag_id, string formaPagamento, decimal total, decimal juros, decimal multa, decimal desconto, DateTime data_vencimento, 
+            string situacao, List<RecebimentosModel> recebimentos)
         {
             _id = id;
             _cliente_id = cliente_id;
@@ -155,16 +149,15 @@ namespace api.Models.ContaReceber
             _nome_razaoSocial = nome_razaoSocial;
             _quantidadeParcelas = quantidadeParcelas;
             _numeroParcela = numeroParcela;
+            _formaPag_id = formaPag_id;
+            _formaPagamento = formaPagamento;
             _data_vencimento = data_vencimento;
-            _valor_inicial = valor_inicial;
-            _desconto = desconto;
+            _total = total;
             _juros = juros;
             _multa = multa;
-            _total = total;
-            _valor_pago = valor_pago;
-            _valor_aberto = valor_aberto;
-            _data_recebimento = data_recebimento;
+            _desconto = desconto;
             _situacao = situacao;
+            _recebimentos = recebimentos;
         }
     }
 }

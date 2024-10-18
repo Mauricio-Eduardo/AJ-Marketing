@@ -1,5 +1,5 @@
 import { api } from "../config/api";
-import { UpdateContaReceberDto } from "../models/contaReceber/dto/updateContaReceber.DTO";
+import { ReceberContaReceberDto } from "../models/contaReceber/dto/receberContaReceber.dto";
 
 export class ContasReceberService {
   async getAll() {
@@ -12,8 +12,8 @@ export class ContasReceberService {
     return response.data;
   }
 
-  async update(updateContaReceberDto: UpdateContaReceberDto) {
-    const response = await api.put("PutContaReceber", updateContaReceberDto);
+  async receber(receberContaReceberDto: ReceberContaReceberDto) {
+    const response = await api.post("ReceberConta", receberContaReceberDto);
     return String(response.data);
   }
 }

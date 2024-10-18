@@ -1,11 +1,7 @@
-﻿
-using api.Models.Clientes_interesses;
+﻿using api.Models.Clientes_interesses;
 using api.Models.Clientes_ramos;
-using api.Models.Clientes_usuarios;
-using api.Models.Interesse;
+using api.Models.Contratos;
 using api.Models.ModelPai;
-using api.Models.RamosAtividade;
-using api.Models.Usuario;
 
 namespace api.Models.Cliente
 {
@@ -32,7 +28,8 @@ namespace api.Models.Cliente
         private int _origem_id;
         private string _origem; // Variável usada somente para exibição 
 
-        private List<ClienteUsuarioModel> _usuarios;
+        //private List<ClienteUsuarioModel> _usuarios;
+        private List<ContratosClienteModel> _contratos;
         private List<ClienteInteresseModel> _interesses;
         private List<ClienteRamoModel> _ramos;
 
@@ -151,10 +148,10 @@ namespace api.Models.Cliente
             set { _origem = value; }
         }
 
-        public List<ClienteUsuarioModel> Usuarios
+        public List<ContratosClienteModel> Contratos
         {
-            get { return _usuarios; }
-            set { _usuarios = value; }
+            get { return _contratos; }
+            set { _contratos = value; }
         }
 
         public List<ClienteInteresseModel> Interesses
@@ -193,7 +190,7 @@ namespace api.Models.Cliente
             string cep,
             int origem_id,
             string origem,
-            List<ClienteUsuarioModel> usuarios,
+            List<ContratosClienteModel> contratos,
             List<ClienteInteresseModel> interesses,
             List<ClienteRamoModel> ramos)
         {
@@ -216,7 +213,7 @@ namespace api.Models.Cliente
             _cep = cep;
             _origem_id = origem_id;
             _origem = origem;
-            _usuarios = usuarios;
+            _contratos = contratos;
             _interesses = interesses;
             _ramos = ramos;
         }

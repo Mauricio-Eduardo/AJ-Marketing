@@ -5,6 +5,7 @@ namespace api.Models.PropostaServico
     {
         // Variáveis privadas correspondentes aos campos no banco de dados
         private int _servico_id;
+        private int _peridiocidade_id;
 
         private int _quantidade;
         private decimal _valor_unitario;
@@ -16,6 +17,12 @@ namespace api.Models.PropostaServico
         {
             get { return _servico_id; }
             set { _servico_id = value; }
+        }
+
+        public int Peridiocidade_id
+        {
+            get { return _peridiocidade_id; }
+            set { _peridiocidade_id = value; }
         }
 
         public int Quantidade
@@ -46,10 +53,11 @@ namespace api.Models.PropostaServico
         public PropostaServicoPostModel() { }
 
         // Construtor com parâmetros
-        public PropostaServicoPostModel(int servico_id, int quantidade, decimal valor_unitario, decimal desconto, 
+        public PropostaServicoPostModel(int servico_id, int peridiocidade_id, int quantidade, decimal valor_unitario, decimal desconto, 
             decimal valor_total)
         {
             _servico_id = servico_id;
+            _peridiocidade_id = peridiocidade_id;
             _quantidade = quantidade;
             _valor_unitario = valor_unitario;
             _valor_total = valor_total;

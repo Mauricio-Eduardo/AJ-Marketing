@@ -20,9 +20,7 @@ export class ContratosService {
   }
 
   async cancelar(id: number) {
-    const response = await api.put("CancelarContrato", {
-      params: { id: id },
-    });
+    const response = await api.put(`CancelarContrato/${id}`);
     return String(response.data);
   }
 }

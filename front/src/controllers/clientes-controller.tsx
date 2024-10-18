@@ -17,7 +17,10 @@ export class ClientesController {
     return await this.service.getOne(pId);
   }
 
-  async create(createClienteDto: CreateClienteDto, proposta_id: number | null) {
+  async create(
+    createClienteDto: CreateClienteDto,
+    proposta_id: number | null | undefined
+  ) {
     return await this.service.create(createClienteDto, proposta_id);
   }
 

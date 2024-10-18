@@ -1,12 +1,5 @@
 import { Button, Dialog, Flex } from "@radix-ui/themes";
-import {
-  Eye,
-  Pencil,
-  Plus,
-  ThumbsDown,
-  ThumbsUp,
-  X,
-} from "@phosphor-icons/react";
+import { Eye, Pencil, Plus, ThumbsDown, X } from "@phosphor-icons/react";
 import { useState } from "react";
 import { DataTable } from "../../components/datatable";
 import { PropostasController } from "../../controllers/propostas-controller";
@@ -14,30 +7,16 @@ import { Proposta } from "../../models/proposta/entity/Proposta";
 import { ServicosController } from "../../controllers/servicos-controller";
 import { PropostaDialog } from "../../components/dialogs/proposta/proposta-dialog";
 import { PropostasColumns } from "../../components/datatable/columns/propostas-columns";
-import { PeridiocidadesController } from "../../controllers/peridiocidades-controller";
 import { ClientesController } from "../../controllers/clientes-controller";
-import { ClienteDialog } from "../../components/dialogs/cliente/cliente-dialog";
-import { RamosAtividadeController } from "../../controllers/ramosAtividade-controller";
-import { InteressesController } from "../../controllers/interesses-controller";
-import { UsuariosController } from "../../controllers/usuarios-controller";
-import { CidadesController } from "../../controllers/cidades-controller";
-import { OrigensController } from "../../controllers/origens-controller";
-import { formatCpfCnpj } from "../../components/form/Formats";
-import { Cliente } from "../../models/cliente/entity/Cliente";
-import { AlertConfirm } from "../../components/form/Alerts";
+import { CondicoesPagamentoController } from "../../controllers/condicoesPagamento-controller";
+import { PeridiocidadesController } from "../../controllers/peridiocidades-controller";
 
 export const PropostasView = () => {
   const propostasController = new PropostasController();
   const clientesController = new ClientesController();
+  const condicoesPagamentoController = new CondicoesPagamentoController();
   const peridiocidadesController = new PeridiocidadesController();
   const servicosController = new ServicosController();
-
-  // Controllers para chamar caso precise cadastrar o cliente antes de aprovar a proposta
-  const origensController = new OrigensController();
-  const cidadesController = new CidadesController();
-  const usuariosController = new UsuariosController();
-  const interessesController = new InteressesController();
-  const ramosAtividadeController = new RamosAtividadeController();
 
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [dialogAction, setDialogAction] = useState<
@@ -132,31 +111,18 @@ export const PropostasView = () => {
             </Dialog.Trigger>
           </div>
           <div className="flex gap-3">
-            {!selectedRowData?.cliente_id ? (
-              <AlertConfirm
-                title="Aprovar Proposta"
-                icon={<ThumbsUp />}
-                description="Antes de aprovar esta proposta é necessário fazer o cadastro do cliente. Você será direcionado para a tela de cadastro."
-                onConfirm={() => {
+            <Dialog.Trigger>
+              <Button
+                onClick={() => {
                   handleActionChange("Aprovar");
-                  handleOpenDialog();
                 }}
+                disabled={selectedRowData?.situacao != "Pendente"}
                 color="green"
-              />
-            ) : (
-              <Dialog.Trigger>
-                <Button
-                  onClick={() => {
-                    handleActionChange("Aprovar");
-                  }}
-                  disabled={selectedRowData?.situacao != "Pendente"}
-                  color="green"
-                >
-                  <ThumbsUp />
-                  Aprovar Proposta
-                </Button>
-              </Dialog.Trigger>
-            )}
+              >
+                <ThumbsDown />
+                Aprovar Proposta
+              </Button>
+            </Dialog.Trigger>
 
             <Dialog.Trigger>
               <Button
@@ -187,73 +153,20 @@ export const PropostasView = () => {
           </div>
 
           {/* Dialogs */}
-          {isDialogOpen &&
-            (dialogAction === "Aprovar" && !selectedRowData?.cliente_id ? (
-              <div>
-                <ClienteDialog
-                  key={selectedRowData?.id}
-                  proposta_id={selectedRowData?.id as number}
-                  data={
-                    {
-                      id: 0,
-                      tipo_pessoa: selectedRowData?.tipo_pessoa,
-                      cpf_cnpj: selectedRowData?.cpf_cnpj
-                        ? formatCpfCnpj(selectedRowData?.cpf_cnpj)
-                        : "",
-                      nome_razaoSocial: selectedRowData?.nome_razaoSocial,
-                      apelido_nomeFantasia: "",
-                      rg_inscricaoEstadual: "",
-                      genero: "",
-                      email: "",
-                      celular: "",
-                      cidade_id: 0,
-                      cidade: "",
-                      estado: "",
-                      pais: "",
-                      logradouro: "",
-                      numero: "",
-                      bairro: "",
-                      complemento: "",
-                      cep: "",
-                      origem_id: 0,
-                      origem: "",
-                      usuarios: [],
-                      interesses: [],
-                      ramos: [],
-                      ativo: true,
-                      data_cadastro: "",
-                      data_ult_alt: "",
-                    } as Cliente
-                  }
-                  action={"Cadastrar"}
-                  controller={clientesController}
-                  origensController={origensController}
-                  cidadesController={cidadesController}
-                  usuariosController={usuariosController}
-                  interessesController={interessesController}
-                  ramosAtividadeController={ramosAtividadeController}
-                  isOpenModal={isDialogOpen}
-                  // onSuccess={() => {
-                  //   handleSuccess();
-                  //   handleOpenDialog();
-                  //   setDialogAction("Aprovar");
-                  // }}
-                  onSuccess={handleSuccess}
-                />
-              </div>
-            ) : (
-              <PropostaDialog
-                key={selectedRowData?.id}
-                data={selectedRowData as Proposta}
-                action={dialogAction}
-                controller={propostasController}
-                clientesController={clientesController}
-                peridiocidadesController={peridiocidadesController}
-                servicosController={servicosController}
-                isOpenModal={isDialogOpen}
-                onSuccess={handleSuccess}
-              />
-            ))}
+          {isDialogOpen && (
+            <PropostaDialog
+              key={selectedRowData?.id}
+              data={selectedRowData as Proposta}
+              action={dialogAction}
+              controller={propostasController}
+              clientesController={clientesController}
+              condicoesPagamentoController={condicoesPagamentoController}
+              peridiocidadesController={peridiocidadesController}
+              servicosController={servicosController}
+              isOpenModal={isDialogOpen}
+              onSuccess={handleSuccess}
+            />
+          )}
         </Flex>
 
         <DataTable

@@ -3,6 +3,7 @@ using api.Models.Cliente;
 using api.Models.Clientes_interesses;
 using api.Models.Clientes_ramos;
 using api.Models.Clientes_usuarios;
+using api.Models.Contratos;
 using api.Models.Interesse;
 using api.Models.Parcelas;
 using api.Models.RamosAtividade;
@@ -44,7 +45,7 @@ namespace api.Services
                     "INNER JOIN cidades c ON cl.cidade_id = c.id " +
                     "INNER JOIN estados e ON c.estado_id = e.id " +
                     "INNER JOIN paises p ON e.pais_id = p.id " +
-                    "INNER JOIN origens o ON cl.origem_ID = o.id"), Connection);
+                    "INNER JOIN origens o ON cl.origem_id = o.id"), Connection);
 
                     using (SqlDataReader reader = getAllCmd.ExecuteReader())
                     {
@@ -85,7 +86,7 @@ namespace api.Services
 
                     foreach (var cliente in listaClientes)
                     {
-                        cliente.Usuarios = GetUsuariosFromCliente(Connection, cliente.Id);
+                        cliente.Contratos = GetContratosFromCliente(Connection, cliente.Id);
                         cliente.Interesses = GetInteressesFromCliente(Connection, cliente.Id);
                         cliente.Ramos = GetRamosFromCliente(Connection, cliente.Id);
                     }
@@ -130,7 +131,7 @@ namespace api.Services
                     getCmd.Parameters.Clear();
                     getCmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
 
-                    List<ClienteUsuarioModel> usuarios = GetUsuariosFromCliente(Connection, id);
+                    List<ContratosClienteModel> contratos = GetContratosFromCliente(Connection, id);
                     List<ClienteInteresseModel> interesses = GetInteressesFromCliente(Connection, id);
                     List<ClienteRamoModel> ramos = GetRamosFromCliente(Connection, id);
 
@@ -165,7 +166,7 @@ namespace api.Services
                             Data_ult_alt = reader.IsDBNull(reader.GetOrdinal("data_ult_alt"))
                                     ? (DateTime?)null
                                     : reader.GetDateTime(reader.GetOrdinal("data_ult_alt")),
-                            Usuarios = usuarios,
+                            Contratos = contratos,
                             Interesses = interesses,
                             Ramos = ramos,
                         };
@@ -185,36 +186,35 @@ namespace api.Services
             }
         }
 
-        private List<ClienteUsuarioModel> GetUsuariosFromCliente(SqlConnection connection, int id)
+        private List<ContratosClienteModel> GetContratosFromCliente(SqlConnection connection, int id)
         {
-            List<ClienteUsuarioModel> listaUsuarios = new List<ClienteUsuarioModel>();
+            List<ContratosClienteModel> listaContratos = new List<ContratosClienteModel>();
 
             string query = @"
-            SELECT cu.usuario_id, u.nome, u.email
-            FROM clientes_usuarios cu
-            INNER JOIN usuarios u ON cu.usuario_id = u.id
-            WHERE cu.cliente_id = @id";
+                SELECT * FROM contratos c
+                WHERE c.cliente_id = @id";
 
-            using (SqlCommand getAllUsuarios = new SqlCommand(query, connection))
+            using (SqlCommand getAllContratos = new SqlCommand(query, connection))
             {
-                getAllUsuarios.Parameters.Add("@id", SqlDbType.Int).Value = id;
+                getAllContratos.Parameters.Add("@id", SqlDbType.Int).Value = id;
 
-                using (SqlDataReader UsuariosReader = getAllUsuarios.ExecuteReader())
+                using (SqlDataReader ContratosReader = getAllContratos.ExecuteReader())
                 {
-                    while (UsuariosReader.Read())
+                    while (ContratosReader.Read())
                     {
-                        listaUsuarios.Add(
-                            new ClienteUsuarioModel
+                        listaContratos.Add(
+                            new ContratosClienteModel
                             {
-                                Usuario_id = UsuariosReader.GetInt32(UsuariosReader.GetOrdinal("usuario_id")),
-                                Nome = UsuariosReader.GetString(UsuariosReader.GetOrdinal("nome")),
-                                Email = UsuariosReader.GetString(UsuariosReader.GetOrdinal("email")),
+                                Contrato_id = ContratosReader.GetInt32(ContratosReader.GetOrdinal("id")),
+                                Data_contrato = ContratosReader.GetDateTime(ContratosReader.GetOrdinal("data_contrato")),
+                                Data_vencimento = ContratosReader.GetDateTime(ContratosReader.GetOrdinal("data_vencimento")),
+                                Situacao = ContratosReader.GetString(ContratosReader.GetOrdinal("situacao"))
                             });
                     }
                 }
             }
 
-            return listaUsuarios;
+            return listaContratos;
         }
 
         private List<ClienteInteresseModel> GetInteressesFromCliente(SqlConnection connection, int id)
@@ -279,7 +279,7 @@ namespace api.Services
             return listaRamos;
         }
 
-        public string PostCliente(ClientePostModel clienteInserido, int? proposta_id)
+        public string PostCliente(ClientePostModel clienteInserido, Nullable<int> proposta_id)
         {
             SqlTransaction transaction = null;
 

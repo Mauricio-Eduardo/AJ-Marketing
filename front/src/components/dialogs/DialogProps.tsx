@@ -20,3 +20,10 @@ export interface SubArrayDialogProps {
   controller: any;
   disabled?: boolean;
 }
+
+export interface UsuarioSubArrayDialogProps {
+  index?: number;
+  onClose: (index: number, dto: any) => void;
+  controller: any;
+  disabled?: boolean;
+}

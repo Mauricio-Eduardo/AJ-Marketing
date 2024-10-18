@@ -13,11 +13,20 @@ export class ClientesService {
     return response.data;
   }
 
-  async create(createClienteDto: CreateClienteDto, proposta_id: number | null) {
-    const response = await api.post(
-      `/PostCliente?proposta_id=${proposta_id}`,
-      createClienteDto
-    );
+  async create(
+    createClienteDto: CreateClienteDto,
+    proposta_id: number | null | undefined
+  ) {
+    let response;
+
+    if (proposta_id) {
+      response = await api.post(
+        `/PostCliente?proposta_id=${proposta_id}`,
+        createClienteDto
+      );
+    } else {
+      response = await api.post(`/PostCliente`, createClienteDto);
+    }
     return String(response.data);
   }
 

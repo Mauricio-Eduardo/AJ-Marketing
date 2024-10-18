@@ -1,6 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { formatCpfCnpj } from "../../form/Formats";
 import { Contrato } from "../../../models/contrato/entity/Contrato";
+import { format } from "date-fns";
 
 export const ContratosColumns: ColumnDef<Contrato>[] = [
   {
@@ -81,6 +82,17 @@ export const ContratosColumns: ColumnDef<Contrato>[] = [
           })}
         </div>
       );
+    },
+    footer: (props) => props.column.id,
+  },
+  {
+    id: "data_vencimento",
+    size: 100,
+    accessorFn: (row) => row.data_vencimento,
+    header: () => <span className="text-center w-full">Vencimento</span>,
+    cell: (info) => {
+      const value = info.getValue() as Date;
+      return <div className="text-center">{format(value, "dd/MM/yyyy")}</div>;
     },
     footer: (props) => props.column.id,
   },

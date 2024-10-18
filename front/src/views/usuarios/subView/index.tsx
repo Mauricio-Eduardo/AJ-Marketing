@@ -2,7 +2,7 @@ import { MagnifyingGlass, Pencil, Plus, Trash } from "@phosphor-icons/react";
 import { Button, Dialog, Flex } from "@radix-ui/themes";
 import { useState } from "react";
 import { DataTable } from "../../../components/datatable";
-import { SubArrayDialogProps } from "../../../components/dialogs/DialogProps";
+import { UsuarioSubArrayDialogProps } from "../../../components/dialogs/DialogProps";
 import { UsuarioDialog } from "../../../components/dialogs/usuario/usuario-dialog";
 import { Usuario } from "../../../models/usuario/entity/Usuario";
 import { UsuariosColumns } from "../../../components/datatable/columns/usuarios-columns";
@@ -12,7 +12,7 @@ export const UsuariosSubView = ({
   onClose,
   controller,
   disabled,
-}: SubArrayDialogProps) => {
+}: UsuarioSubArrayDialogProps) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [dialogAction, setDialogAction] = useState<
     "Cadastrar" | "Editar" | "Excluir" | null
@@ -124,7 +124,9 @@ export const UsuariosSubView = ({
               <Button variant="outline">Cancelar</Button>
             </Dialog.Close>
             <Dialog.Close>
-              <Button onClick={() => onClose(index, selectedRowData)}>
+              <Button
+                onClick={() => onClose(index ? index : 0, selectedRowData)}
+              >
                 Selecionar
               </Button>
             </Dialog.Close>

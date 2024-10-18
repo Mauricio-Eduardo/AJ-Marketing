@@ -6,10 +6,6 @@ export class Contrato {
   nome_razaoSocial: string;
   proposta_id: number;
   total: string;
-  desconto: string;
-  multa: string;
-  juros: string;
-  condPag_id: number;
   condicaoPagamento: string;
   data_contrato: string;
   data_vencimento: string;
@@ -17,10 +13,14 @@ export class Contrato {
 
   servicos: {
     servico_id: number;
+    servico: string;
     quantidade: number;
     valor_unitario: string;
     desconto: string;
     valor_total: string;
+    peridiocidade_id: number;
+    descricao: string;
+    dias: number;
   }[];
 
   constructor(
@@ -31,20 +31,20 @@ export class Contrato {
     pNome_razaoSocial: string,
     pProposta_id: number,
     pTotal: string,
-    pDesconto: string,
-    pJuros: string,
-    pMulta: string,
-    pCondPag_id: number,
     pCondicaoPagamento: string,
     pData_contrato: string,
     pData_vencimento: string,
     pSituacao: string,
     pServicos: {
       servico_id: number;
+      servico: string;
       quantidade: number;
       valor_unitario: string;
       desconto: string;
       valor_total: string;
+      peridiocidade_id: number;
+      descricao: string;
+      dias: number;
     }[]
   ) {
     this.id = pId;
@@ -54,10 +54,6 @@ export class Contrato {
     this.nome_razaoSocial = pNome_razaoSocial;
     this.proposta_id = pProposta_id;
     this.total = pTotal;
-    this.condPag_id = pCondPag_id;
-    this.desconto = pDesconto;
-    this.juros = pJuros;
-    this.multa = pMulta;
     this.condicaoPagamento = pCondicaoPagamento;
     this.data_contrato = pData_contrato;
     this.data_vencimento = pData_vencimento;

@@ -23,6 +23,8 @@ import { RamosAtividadeView } from "./views/ramosAtividade/index.tsx";
 import { ClientesView } from "./views/clientes/index.tsx";
 import { PeridiocidadesView } from "./views/peridiocidades/index.tsx";
 import { ContratosView } from "./views/contratos/index.tsx";
+import { ContasReceberView } from "./views/contasReceber/index.tsx";
+import { OrdensServicoView } from "./views/ordensServico/index.tsx";
 
 const router = createBrowserRouter([
   {
@@ -89,6 +91,14 @@ const router = createBrowserRouter([
       {
         path: "contratos",
         element: <ContratosView />,
+      },
+      {
+        path: "contasReceber",
+        element: <ContasReceberView />,
+      },
+      {
+        path: "ordensServico",
+        element: <OrdensServicoView />,
       },
     ],
   },

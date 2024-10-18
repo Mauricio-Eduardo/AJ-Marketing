@@ -2,7 +2,7 @@ import { MagnifyingGlass, Pencil, Plus, Trash } from "@phosphor-icons/react";
 import { Button, Dialog, Flex } from "@radix-ui/themes";
 import { useState } from "react";
 import { DataTable } from "../../../components/datatable";
-import { SubDialogProps } from "../../../components/dialogs/DialogProps";
+import { SubArrayDialogProps } from "../../../components/dialogs/DialogProps";
 import { PeridiocidadesColumns } from "../../../components/datatable/columns/peridiocidades-columns";
 import { Peridiocidade } from "../../../models/peridiocidade/entity/Peridiocidade";
 import { PeridiocidadeDialog } from "../../../components/dialogs/peridiocidade/peridiocidade-dialog";
@@ -11,7 +11,8 @@ export const PeridiocidadesSubView = ({
   onClose,
   controller,
   disabled,
-}: SubDialogProps) => {
+  index,
+}: SubArrayDialogProps) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [dialogAction, setDialogAction] = useState<
     "Cadastrar" | "Editar" | "Excluir" | null
@@ -121,7 +122,7 @@ export const PeridiocidadesSubView = ({
               <Button variant="outline">Cancelar</Button>
             </Dialog.Close>
             <Dialog.Close>
-              <Button onClick={() => onClose(selectedRowData)}>
+              <Button onClick={() => onClose(index, selectedRowData)}>
                 Selecionar
               </Button>
             </Dialog.Close>

@@ -10,21 +10,17 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ClienteControllerMethods,
-  ContratoControllerMethods,
-  ControllerMethods,
-  PropostaControllerMethods,
-} from "../../controllers/model";
 
 interface TableConfig {
   type?: string;
   columns: ColumnDef<any>[];
-  controller:
-    | ControllerMethods
-    | ClienteControllerMethods
-    | PropostaControllerMethods
-    | ContratoControllerMethods;
+  controller: any;
+  // controller:
+  //   | ControllerMethods
+  //   | ClienteControllerMethods
+  //   | PropostaControllerMethods
+  //   | ContratoControllerMethods
+  //   | ContasReceberControllerMethods;
   onRowSelectionChange: (selectedRow: any) => void;
   refreshKey: number;
 }
@@ -51,7 +47,7 @@ export const DataTable = ({
             value: "Vigente",
           },
         ];
-      case "propostas" || "contasReceber":
+      case "propostas":
         return [
           {
             id: "situacao",
@@ -170,10 +166,10 @@ export const DataTable = ({
             {table.getRowModel().rows.map((row, index) => {
               const rowClass =
                 row.id === selectedRowId
-                  ? "bg-violet-200"
+                  ? "bg-violet-200 cursor-pointer"
                   : index % 2 === 0
-                  ? "bg-gray-100"
-                  : "bg-gray-200";
+                  ? "bg-gray-100 cursor-pointer"
+                  : "bg-gray-200 cursor-pointer";
 
               return (
                 <tr

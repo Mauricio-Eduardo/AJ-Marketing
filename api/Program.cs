@@ -22,8 +22,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-string _connectionString = 
-    "Server=localhost;Database=ajmarketing;Trusted_Connection=True;Integrated Security=True;TrustServerCertificate=True";
+string _connectionString =
+    "Server=localhost;Database=ajmarketing;Trusted_Connection=True;Integrated Security=True;TrustServerCertificate=True;MultipleActiveResultSets=True;";
 builder.Services.AddTransient<SqlConnection>(sc => new SqlConnection(_connectionString));
 
 builder.Services.AddTransient<IPaisesService, PaisesService>();

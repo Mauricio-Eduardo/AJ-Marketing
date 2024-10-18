@@ -50,7 +50,7 @@ namespace api.Controllers
         }
 
         [HttpPut]
-        [Route("/CancelarContrato")]
+        [Route("/CancelarContrato/{id}")]
         public IActionResult CancelarContrato(int id)
         {
             string result = contratosService.CancelarContrato(id);

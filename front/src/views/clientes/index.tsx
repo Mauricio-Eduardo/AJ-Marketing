@@ -92,37 +92,20 @@ export const ClientesView = () => {
           </Dialog.Trigger>
 
           {isDialogOpen && (
-            <Dialog.Content
-              maxWidth={"1000px"}
-              onInteractOutside={(e) => {
-                e.preventDefault();
-              }}
-              onEscapeKeyDown={(e) => {
-                e.preventDefault();
-              }}
-            >
-              <div className="flex justify-between">
-                <Dialog.Title>{dialogAction} Cliente</Dialog.Title>
-
-                <Dialog.Close>
-                  <X />
-                </Dialog.Close>
-              </div>
-              <ClienteDialog
-                key={selectedRowData?.id}
-                proposta_id={null}
-                data={selectedRowData as Cliente}
-                action={dialogAction}
-                controller={clientesController}
-                origensController={origensController}
-                cidadesController={cidadesController}
-                usuariosController={usuariosController}
-                interessesController={interessesController}
-                ramosAtividadeController={ramosAtividadeController}
-                isOpenModal={isDialogOpen}
-                onSuccess={handleSuccess}
-              />
-            </Dialog.Content>
+            <ClienteDialog
+              key={selectedRowData?.id}
+              proposta_id={null}
+              data={selectedRowData as Cliente}
+              action={dialogAction}
+              controller={clientesController}
+              origensController={origensController}
+              cidadesController={cidadesController}
+              usuariosController={usuariosController}
+              interessesController={interessesController}
+              ramosAtividadeController={ramosAtividadeController}
+              isOpenModal={isDialogOpen}
+              onSuccess={handleSuccess}
+            />
           )}
         </Flex>
 

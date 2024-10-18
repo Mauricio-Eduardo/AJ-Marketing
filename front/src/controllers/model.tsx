@@ -19,7 +19,7 @@ export interface PropostaControllerMethods {
   getOne: (pId: number) => Promise<any>;
   create: (createDto: any) => Promise<any>;
   update: (updateDto: any) => Promise<any>;
-  atualizarSituacao: (id: number, situacao: string) => Promise<any>;
+  atualizarSituacao: (atualizarDto: any) => Promise<any>;
 }
 
 export interface ContratoControllerMethods {
@@ -27,4 +27,10 @@ export interface ContratoControllerMethods {
   getOne: (pId: number) => Promise<any>;
   create: (createDto: any) => Promise<any>;
   cancelar: (id: number) => Promise<any>;
+}
+
+export interface ContasReceberControllerMethods {
+  getAll: () => Promise<any[]>;
+  getOne: (pId: number) => Promise<any>;
+  receber: (receberDto: any) => Promise<any>;
 }

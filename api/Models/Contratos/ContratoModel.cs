@@ -8,26 +8,20 @@ namespace api.Models.Contratos
         private int _id;
         private int _cliente_id;
         private int _proposta_id;
-        private int _condPag_id;
         private DateTime _data_contrato;
         private DateTime _data_vencimento;
         private string _situacao;
 
         // Aqui são os atributos que serão exibidos no frontentd na tela de contratos mas que serão buscados das tabelas de 
-        // 'condicoesPagamento', 'clientes', 'propostas' e 'propostas_servicos'
+        // 'clientes', 'condicoesPagamento', 'propostas' e 'propostas_servicos'
         private string _tipo_pessoa;
         private string _cpf_cnpj;
         private string _nome_razaoSocial;
         private decimal _total;
         private string _condicaoPagamento;
-        private decimal _desconto;
-        private decimal _juros;
-        private decimal _multa;
-
         private List<PropostaServicoModel> _servicos;
 
         // Propriedades públicas para acessar as variáveis
-
         public int Id
         {
             get { return _id; }
@@ -46,12 +40,6 @@ namespace api.Models.Contratos
             set { _proposta_id = value; }
         }
 
-        public int CondPag_id
-        {
-            get { return _condPag_id; }
-            set { _condPag_id = value; }
-        }
-
         public DateTime Data_contrato
         {
             get { return _data_contrato; }
@@ -62,12 +50,6 @@ namespace api.Models.Contratos
         {
             get { return _data_vencimento; }
             set { _data_vencimento = value; }
-        }
-
-        public string CondicaoPagamento
-        {
-            get { return _condicaoPagamento; }
-            set { _condicaoPagamento = value; }
         }
 
         public string Tipo_pessoa
@@ -94,22 +76,10 @@ namespace api.Models.Contratos
             set { _total = value; }
         }
 
-        public decimal Desconto
+        public string CondicaoPagamento
         {
-            get { return _desconto; }
-            set { _desconto = value; }
-        }
-
-        public decimal Juros
-        {
-            get { return _juros; }
-            set { _juros = value; }
-        }
-
-        public decimal Multa
-        {
-            get { return _multa; }
-            set { _multa = value; }
+            get { return _condicaoPagamento; }
+            set { _condicaoPagamento = value; }
         }
 
         public string Situacao
@@ -128,25 +98,21 @@ namespace api.Models.Contratos
         public ContratoModel() { }
 
         // Construtor com parâmetros
-        public ContratoModel(int id, int cliente_id, int proposta_id, int condPag_id, DateTime data_contrato, DateTime data_vencimento, 
-            decimal total, string situacao, string condicaoPagamento, string tipo_pessoa, string cpf_cnpj, string nome_razaoSocial, 
-            decimal desconto, decimal juros, decimal multa, List<PropostaServicoModel> servicos) 
+        public ContratoModel(int id, int cliente_id, int proposta_id, DateTime data_contrato, DateTime data_vencimento, 
+            decimal total, string condicaoPagamento, string situacao, string tipo_pessoa, string cpf_cnpj, string nome_razaoSocial, 
+            List<PropostaServicoModel> servicos) 
         {
             _id = id;
             _cliente_id = cliente_id;
             _tipo_pessoa = tipo_pessoa;
             _proposta_id= proposta_id;
-            _condPag_id= condPag_id;
             _data_contrato= data_contrato;
             _data_vencimento = data_vencimento;
             _situacao= situacao;
-            _condicaoPagamento = condicaoPagamento;
             _cpf_cnpj = cpf_cnpj;
             _nome_razaoSocial = nome_razaoSocial;
             _total= total;
-            _desconto= desconto;
-            _juros = juros;
-            _multa= multa;
+            _condicaoPagamento = condicaoPagamento;
             _servicos = servicos;
         }
     }

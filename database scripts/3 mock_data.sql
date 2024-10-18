@@ -76,20 +76,16 @@ VALUES
 ('30/60/90', 0, 0.00, 3.50, 0.00),
 ('30/60/90/120', 0, 0.00, 4.00, 0.00),
 ('30/60/90/120/150', 0, 0.00, 4.50, 0.00),
-('30/60/90/120/150/180', 0, 0.00, 5.00, 0.00);
+('30/60/90/120/150/180', 6, 1.00, 2.00, 5.00);
 
 INSERT INTO parcelas (numeroParcela, dias, porcentagem, condPag_ID, formaPag_ID)
 VALUES
-(1, 30, 10.00, 1, 1),
-(2, 60, 20.00, 2, 2),
-(3, 90, 30.00, 2, 3),
-(4, 120, 40.00, 3, 4),
-(5, 150, 50.00, 3, 5),
-(6, 180, 60.00, 3, 6),
-(7, 210, 70.00, 4, 7),
-(8, 240, 80.00, 4, 8),
-(9, 270, 90.00, 4, 9),
-(10, 300, 100.00, 4, 10);
+(1, 30, 16.70, 10, 4),
+(2, 60, 16.66, 10, 4),
+(3, 90, 16.66, 10, 4),
+(4, 120, 16.66, 10, 4),
+(5, 150, 16.66, 10, 4),
+(6, 180, 16.66, 10, 4);
 
 INSERT INTO peridiocidades (descricao, dias)
 VALUES 
@@ -185,23 +181,6 @@ VALUES
 ('Jurídica', '12345678000595', 'Empresa JKL', 'JKL Ltda', 'SP12345682', '', 'contato@empresajkl.com', '11987654330', 10, 'Rua J', '1000', 'Bairro H', '', '12345687', 10);
 
 -- Inserindo os usuarios para cada cliente inserido
-INSERT INTO clientes_usuarios(cliente_id, usuario_id)
-SELECT 
-    c.ClienteID, 
-    1
-FROM @Clientes c
-UNION ALL
-SELECT 
-    c.ClienteID, 
-    2
-FROM @Clientes c
-UNION ALL
-SELECT 
-    c.ClienteID, 
-    3
-FROM @Clientes c;
-
--- Inserindo os usuarios para cada cliente inserido
 INSERT INTO clientes_interesses(cliente_id, interesse_id)
 SELECT 
     c.ClienteID, 
@@ -239,25 +218,26 @@ FROM @Clientes c;
 DECLARE @Propostas TABLE (PropostaID INT);
 
 -- Inserindo as propostas e capturando os IDs gerados
-INSERT INTO propostas (cliente_id, peridiocidade_id, data_proposta, prazo_final, data_inicio, total)
+INSERT INTO propostas (cliente_id, condPag_id, prazo_final, total)
 OUTPUT INSERTED.id INTO @Propostas(PropostaID)  -- Captura o ID das propostas inseridas
 VALUES 
-(1, 1, GETDATE(), GETDATE(), GETDATE(), 100.00),
-(2, 2, GETDATE(), GETDATE(), GETDATE(), 200.00),
-(3, 2, GETDATE(), GETDATE(), GETDATE(), 300.00),
-(4, 2, GETDATE(), GETDATE(), GETDATE(), 400.00),
-(5, 3, GETDATE(), GETDATE(), GETDATE(), 500.00),
-(6, 3, GETDATE(), GETDATE(), GETDATE(), 600.00),
-(7, 4, GETDATE(), GETDATE(), GETDATE(), 700.00),
-(8, 4, GETDATE(), GETDATE(), GETDATE(), 800.00),
-(9, 1, GETDATE(), GETDATE(), GETDATE(), 900.00),
-(10, 1, GETDATE(), GETDATE(), GETDATE(), 1000.00);
+(1, 1, GETDATE(), 100.00),
+(2, 2, GETDATE(), 200.00),
+(3, 3, GETDATE(), 300.00),
+(4, 4, GETDATE(), 400.00),
+(5, 5, GETDATE(), 500.00),
+(6, 6, GETDATE(), 600.00),
+(7, 7, GETDATE(), 700.00),
+(8, 8, GETDATE(), 800.00),
+(9, 9, GETDATE(), 900.00),
+(10, 10, GETDATE(), 1000.00);
 
 -- Inserindo os serviços para cada proposta inserida
-INSERT INTO propostas_servicos(proposta_id, servico_id, quantidade, valor_unitario, desconto, valor_total)
+INSERT INTO propostas_servicos(proposta_id, servico_id, peridiocidade_id, quantidade, valor_unitario, desconto, valor_total)
 SELECT 
     p.PropostaID, 
     1,
+	1,
     1, -- Quantidade
     10.00, -- Valor Unitário
     0.00, -- Desconto
@@ -268,6 +248,7 @@ SELECT
     p.PropostaID, 
     2,
     2, 
+	2,
     20.00, 
     5.00, 
     30.00
@@ -277,33 +258,28 @@ SELECT
     p.PropostaID, 
     3,
     3, 
+	3,
     30.00, 
     10.00, 
     60.00
 FROM @Propostas p;
 
-INSERT INTO contratos (proposta_id, cliente_id, condPag_id, data_contrato, data_vencimento, situacao)
-VALUES 
-(1, 1, 1, GETDATE(), GETDATE(), 'Vigente'),
-(2, 2, 2, GETDATE(), GETDATE(), 'Vigente'),
-(3, 3, 3, GETDATE(), GETDATE(), 'Vigente'),
-(4, 4, 4, GETDATE(), GETDATE(), 'Cancelado'),
-(5, 5, 5, GETDATE(), GETDATE(), 'Cancelado'),
-(6, 6, 6, GETDATE(), GETDATE(), 'Cancelado'),
-(7, 7, 7, GETDATE(), GETDATE(), 'Cancelado'),
-(8, 8, 8, GETDATE(), GETDATE(), 'Vigente'),
-(9, 9, 9, GETDATE(), GETDATE(), 'Vigente'),
-(10, 10, 10, GETDATE(), GETDATE(), 'Vigente');
+--INSERT INTO contratos (proposta_id, data_vencimento)
+--VALUES 
+--(1, GETDATE()-2),
+--(2, GETDATE()-1),
+--(3, GETDATE());
 
-INSERT INTO contasReceber (cliente_ID, contrato_ID, data_vencimento, valor, situacao)
-VALUES 
-(1, 1, '2024-02-01', 1000.00, 'Pendente'),
-(2, 2, '2024-02-02', 2000.00, 'Pendente'),	
-(3, 3, '2024-02-03', 1500.00, 'Pendente'),
-(4, 4, '2024-02-04', 2500.00, 'Pendente'),
-(5, 5, '2024-02-05', 3000.00, 'Pendente'),
-(6, 6, '2024-02-06', 3500.00, 'Pendente'),
-(7, 7, '2024-02-07', 4000.00, 'Pendente'),
-(8, 8, '2024-02-08', 4500.00, 'Pendente'),
-(9, 9, '2024-02-09', 5000.00, 'Pendente'),
-(10, 10, '2024-02-10', 5500.00, 'Pendente');
+INSERT INTO contasReceber (cliente_ID, contrato_ID, parcela_id, data_vencimento, total)
+VALUES (2, 2, 2, '2024-02-02', 2000.00);
+--(3, 3, '2024-02-03', 1500.00, 'Pendente'),
+--(4, 4, '2024-02-04', 2500.00, 'Pendente'),
+--(5, 5, '2024-02-05', 3000.00, 'Pendente'),
+--(6, 6, '2024-02-06', 3500.00, 'Pendente'),
+--(7, 7, '2024-02-07', 4000.00, 'Pendente'),
+--(8, 8, '2024-02-08', 4500.00, 'Pendente'),
+--(9, 9, '2024-02-09', 5000.00, 'Pendente'),
+--(10, 10, '2024-02-10', 5500.00, 'Pendente');
+
+SELECT * FROM parcelas
+WHERE condPag_id = 10

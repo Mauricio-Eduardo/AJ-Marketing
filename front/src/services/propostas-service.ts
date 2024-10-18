@@ -1,4 +1,5 @@
 import { api } from "../config/api";
+import { AtualizaPropostaDto } from "../models/proposta/dto/atualizaProposta.dto";
 import { CreatePropostaDto } from "../models/proposta/dto/createProposta.dto";
 import { UpdatePropostaDto } from "../models/proposta/dto/updateProposta.dto";
 
@@ -30,9 +31,10 @@ export class PropostasService {
     return String(response.data);
   }
 
-  async atualizarSituacao(id: number, situacao: string) {
+  async atualizarSituacao(atualizarPropostaDto: AtualizaPropostaDto) {
     const response = await api.put(
-      `/AtualizarSituacaoProposta?id=${id}&situacao=${situacao}`
+      "/AtualizarSituacaoProposta",
+      atualizarPropostaDto
     );
     return String(response.data);
   }

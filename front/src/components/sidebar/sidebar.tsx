@@ -136,12 +136,17 @@ export const MySidebar: React.FC<ThemeSwitcherProps> = ({ darkMode }) => {
                 >
                   Propostas
                 </MenuItem>
+                <MenuItem icon={<Scroll />} component={<Link to="contratos" />}>
+                  Contratos
+                </MenuItem>
+                <MenuItem component={<Link to="contasReceber" />}>
+                  Contas a Receber
+                </MenuItem>
                 <MenuItem
-                  icon={<Scroll />}
-                  component={<Link to="contratos" />}
+                  component={<Link to="ordensServico" />}
                   className={style.menuseparator}
                 >
-                  Contratos{" "}
+                  Ordens de Serviço
                 </MenuItem>
 
                 <MenuItem
@@ -153,9 +158,14 @@ export const MySidebar: React.FC<ThemeSwitcherProps> = ({ darkMode }) => {
                 <MenuItem
                   icon={<MoneyWavy />}
                   component={<Link to="condicoesPagamento" />}
-                  className={style.menuseparator}
                 >
                   Condições de Pag.
+                </MenuItem>
+                <MenuItem
+                  component={<Link to="peridiocidades" />}
+                  className={style.menuseparator}
+                >
+                  Peridiocidades
                 </MenuItem>
                 <MenuItem
                   icon={<User />}

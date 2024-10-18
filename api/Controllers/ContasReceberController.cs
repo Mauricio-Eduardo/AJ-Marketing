@@ -1,6 +1,8 @@
 ﻿using api.Interfaces;
 using api.Models.ContaReceber;
+using api.Models.Recebimentos;
 using Microsoft.AspNetCore.Mvc;
+using System.Data.SqlClient;
 
 
 namespace api.Controllers
@@ -49,11 +51,11 @@ namespace api.Controllers
         //        return BadRequest();
         //}
 
-        [HttpPut]
-        [Route("/PutContaReceber")]
-        public IActionResult PutContaReceber([FromBody] ContaReceberPutModel contaAlterada)
+        [HttpPost]
+        [Route("/ReceberConta")]
+        public IActionResult ReceberConta([FromBody] RecebimentosPostModel recebimento)
         {
-            string result = contasReceberService.PutContaReceber(contaAlterada);
+            string result = contasReceberService.ReceberConta(recebimento);
             if (result != null)
                 return Ok(result);
             else

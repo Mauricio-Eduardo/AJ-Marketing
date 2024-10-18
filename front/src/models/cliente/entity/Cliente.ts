@@ -21,7 +21,7 @@ export class Cliente extends ModelPai {
   origem_id: number;
   origem: string;
 
-  usuarios: any;
+  contratos: any;
   interesses: any;
   ramos: any;
 
@@ -50,7 +50,7 @@ export class Cliente extends ModelPai {
     pOrigem_id: number,
     pOrigem: string,
 
-    pUsuarios: any,
+    pContratos: any,
     pInteresses: any,
     pRamos: any
   ) {
@@ -74,7 +74,7 @@ export class Cliente extends ModelPai {
     this.cep = pCep;
     this.origem_id = pOrigem_id;
     this.origem = pOrigem;
-    this.usuarios = pUsuarios;
+    this.contratos = pContratos;
     this.interesses = pInteresses;
     this.ramos = pRamos;
   }

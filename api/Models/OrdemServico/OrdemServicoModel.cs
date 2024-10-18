@@ -1,7 +1,9 @@
 ﻿
+using api.Models.ModelPai;
+
 namespace api.Models.OrdemServico
 {
-    public class OrdemServicoModel
+    public class OrdemServicoModel: Model   
     {
         // Variáveis que podem ser editáveis em um registro
         private int _id; // o ID não é editável porém é necessário para a requisição do PUT
@@ -21,6 +23,9 @@ namespace api.Models.OrdemServico
         private string _situacao;
         private string _postado;
         private string _referencia;
+
+        private DateTime _data_cadastro;
+        private Nullable<DateTime> _data_ult_alt;
 
         // Propriedades públicas para acessar as variáveis
         public int Id
@@ -107,12 +112,25 @@ namespace api.Models.OrdemServico
             set { _postado = value; }
         }
 
+        public DateTime Data_cadastro
+        {
+            get { return _data_cadastro; }
+            set { _data_cadastro = value; }
+        }
+
+        public DateTime? Data_ult_alt
+        {
+            get { return _data_ult_alt; }
+            set { _data_ult_alt = value; }
+        }
+
         // Construtor sem parâmetros
         public OrdemServicoModel() { }
 
         // Construtor com parâmetros
         public OrdemServicoModel(int id, int cliente_id, string nome_razaoSocial, int contrato_id, int usuario_id, string nome, int servico_id,
-            string servico, DateTime data_prazo, DateTime data_entrega, string tema, string referencia, string situacao, string postado)
+            string servico, DateTime data_prazo, DateTime data_entrega, string tema, string referencia, string situacao, string postado,
+            DateTime data_cadastro, Nullable<DateTime> data_ult_alt)
         {
             _id = id;
             _cliente_id = cliente_id;
@@ -128,6 +146,8 @@ namespace api.Models.OrdemServico
             _referencia = referencia;
             _situacao = situacao;
             _postado = postado;
+            _data_cadastro = data_cadastro;
+            _data_ult_alt = data_ult_alt;
         }
     }
 }

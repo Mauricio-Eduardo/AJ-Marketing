@@ -7,6 +7,10 @@
         private int _servico_id;
         private string _servico; // somente para exibição
 
+        private int _peridiocidade_id;
+        private string _descricao; // somente para exibição
+        private int _dias; // somente para exibição
+
         private int _quantidade;
         private decimal _valor_unitario;
         private decimal _desconto;
@@ -29,6 +33,24 @@
         {
             get { return _servico; }
             set { _servico = value; }
+        }
+
+        public int Peridiocidade_id
+        {
+            get { return _peridiocidade_id; }
+            set { _peridiocidade_id = value; }
+        }
+
+        public string Descricao
+        {
+            get { return _descricao; }
+            set { _descricao = value; }
+        }
+
+        public int Dias
+        {
+            get { return _dias; }
+            set { _dias = value; }
         }
 
         public int Quantidade
@@ -59,12 +81,15 @@
         public PropostaServicoModel() { }
 
         // Construtor com parâmetros
-        public PropostaServicoModel(int id, int servico_id, string servico, int quantidade, decimal valor_unitario, decimal desconto, 
-            decimal valor_total)
+        public PropostaServicoModel(int id, int servico_id, string servico, int peridiocidade_id, string descricao, int dias, int quantidade, 
+            decimal valor_unitario, decimal desconto, decimal valor_total)
         {
             _id = id;
             _servico_id = servico_id;
             _quantidade = quantidade;
+            _peridiocidade_id = peridiocidade_id;
+            _dias = dias;
+            _descricao = descricao;
             _valor_unitario = valor_unitario;
             _valor_total = valor_total;
             _desconto = desconto;

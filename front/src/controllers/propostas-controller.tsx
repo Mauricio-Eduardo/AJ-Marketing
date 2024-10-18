@@ -1,3 +1,4 @@
+import { AtualizaPropostaDto } from "../models/proposta/dto/atualizaProposta.dto";
 import { CreatePropostaDto } from "../models/proposta/dto/createProposta.dto";
 import { UpdatePropostaDto } from "../models/proposta/dto/updateProposta.dto";
 import { PropostasService } from "../services/propostas-service";
@@ -29,7 +30,7 @@ export class PropostasController {
     return await this.service.update(updatePropostaDto);
   }
 
-  async atualizarSituacao(id: number, situacao: string) {
-    return await this.service.atualizarSituacao(id, situacao);
+  async atualizarSituacao(atualizarPropostaDto: AtualizaPropostaDto) {
+    return await this.service.atualizarSituacao(atualizarPropostaDto);
   }
 }

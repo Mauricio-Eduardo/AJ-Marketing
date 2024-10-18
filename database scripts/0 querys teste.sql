@@ -138,3 +138,54 @@ WHERE id = @contrato_id;
 SELECT desconto, juros, multa
 FROM condicoesPagamento
 WHERE id = 1
+
+SELECT * FROM contasReceber
+
+SELECT * FROM contratos
+WHERE id = 1
+
+SELECT o.id, o.cliente_id, c.nome_razaoSocial, o.contrato_id, o.usuario_id, u.nome, o.servico_id, s.servico,
+o.data_prazo, o.data_entrega, o.tema, o.referencia, o.situacao, o.postado
+FROM ordensServico o
+INNER JOIN clientes c ON o.cliente_id = c.id
+INNER JOIN servicos s ON o.servico_id = s.id
+LEFT JOIN usuarios u ON o.usuario_id = u.id
+
+
+SELECT o.id, o.cliente_id, o.contrato_id, o.usuario_id, o.servico_id,
+o.data_prazo, o.data_entrega, o.tema, o.referencia, o.situacao, o.postado
+FROM ordensServico o
+
+SELECT * FROM ordensServico
+
+SELECT * FROM peridiocidades WHERE ativo = 1
+
+SELECT * FROM contratos
+
+INSERT INTO paises (pais, sigla, ddi)
+VALUES ('TESTE', 'tt', '444')
+
+DELETE FROM ordensServico
+DELETE FROM contasReceber
+DELETE FROM contratos
+DELETE FROM propostas_servicos
+DELETE FROM propostas
+
+SELECT * FROM contratos
+SELECT * FROM propostas 
+
+SELECT * FROM ordensServico
+WHERE contrato_id = 9
+
+SELECT * FROM contasReceber
+
+SELECT * FROM contasReceber
+ORDER BY data_vencimento ASC
+
+SELECT * FROM contasReceber
+WHERE cliente_id = 9
+
+SELECT * FROM recebimentos
+
+
+DELETE FROM contratos
