@@ -65,7 +65,7 @@ export function Input({
         disabled
           ? `bg-gray-200 text-gray-500 cursor-not-allowed ${textColor}`
           : ""
-      } h-8 pl-2 pr-2 uppercase rounded border border-zinc-300 hover:border-violet-600 focus:ring-2 focus:outline-violet-700 shadow-sm ${textColor}`}
+      } h-8 pl-2 pr-2 w-full uppercase rounded border border-zinc-300 hover:border-violet-600 focus:ring-2 focus:outline-violet-700 shadow-sm ${textColor}`}
       style={style}
       disabled={disabled}
       {...register(name)}

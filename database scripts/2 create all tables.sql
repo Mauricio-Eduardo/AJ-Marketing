@@ -255,29 +255,15 @@ CREATE TABLE contasReceber (
 
     total DECIMAL(10, 2) NOT NULL,
     data_vencimento DATE NOT NULL,
+
+	jurosRecebido DECIMAL(10, 2) DEFAULT 0,
+    multaRecebida DECIMAL(10, 2) DEFAULT 0,
+	descontoConcedido DECIMAL(10, 2) DEFAULT 0,
+	totalRecebido DECIMAL(10, 2) DEFAULT 0,
+	data_recebimento DATE NULL,
 	
     situacao VARCHAR(30) NOT NULL DEFAULT 'Pendente', -- Pendente, Vencida, Recebida, Parcial
 )
-
-CREATE TABLE recebimentos (
-	id INT NOT NULL PRIMARY KEY IDENTITY,
-
-	contaReceber_id INT NOT NULL, -- Foreign Key
-	FOREIGN KEY (contaReceber_id) REFERENCES contasReceber(id),
-
-	formaPag_id INT NOT NULL, -- Foreign Key
-	FOREIGN KEY (formaPag_id) REFERENCES formasPagamento(id),
-
-	recebido DECIMAL(10, 2) NOT NULL,
-	juros DECIMAL(10, 2),
-    multa DECIMAL(10, 2),
-	desconto DECIMAL(10, 2),
-	total DECIMAL(10, 2) NOT NULL,
-
-	data_recebimento DATE NOT NULL,
-)
-
---DROP TABLE RECEBIMENTOS
 
 CREATE TABLE ordensServico (
 	id INT NOT NULL PRIMARY KEY IDENTITY,
@@ -303,9 +289,8 @@ CREATE TABLE ordensServico (
 	situacao VARCHAR(20) DEFAULT 'Pendente',
 	postado VARCHAR(20) DEFAULT 'Não',
 
+	observacoes VARCHAR(255) DEFAULT '',
+
 	data_cadastro DATETIME NOT NULL DEFAULT GETDATE(),
 	data_ult_alt DATETIME DEFAULT NULL
 )
-
-
---DROP TABLE ordensServico

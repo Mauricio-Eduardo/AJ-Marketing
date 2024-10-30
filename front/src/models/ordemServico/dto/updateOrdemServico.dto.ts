@@ -9,6 +9,7 @@ export interface UpdateOrdemServicoDto {
   situacao: string;
   postado: string;
   referencia: string;
+  observacoes: string;
 }
 
 export function transformarParaPutOrdemServico(
@@ -23,5 +24,6 @@ export function transformarParaPutOrdemServico(
     situacao: data.situacao,
     postado: data.postado,
     referencia: data.referencia,
+    observacoes: data.observacoes,
   };
 }

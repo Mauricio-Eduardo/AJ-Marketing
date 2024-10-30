@@ -1,7 +1,7 @@
 import { CalendarDots } from "@phosphor-icons/react";
 import { addDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { InputHTMLAttributes, useEffect, useRef } from "react";
+import { InputHTMLAttributes } from "react";
 import DatePicker from "react-datepicker";
 import { Controller, useFormContext } from "react-hook-form";
 import "react-datepicker/dist/react-datepicker.min.css";
@@ -10,6 +10,7 @@ interface DatepickProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
   days: number;
   end?: boolean;
+  minDate?: boolean;
   disabled?: boolean;
   onBlur?: () => void;
 }
@@ -18,6 +19,7 @@ export const Datepick = ({
   name,
   days,
   end,
+  minDate,
   disabled,
   onBlur,
 }: DatepickProps) => {
@@ -31,9 +33,9 @@ export const Datepick = ({
       <Controller
         name={name}
         control={control}
-        render={({ field: { onChange, value, ref } }) => (
+        render={({ field: { onChange, value } }) => (
           <DatePicker
-            ref={ref}
+            // ref={ref}
             onKeyDown={(e) => {
               if (e.key !== "Tab") {
                 e.preventDefault();
@@ -51,6 +53,7 @@ export const Datepick = ({
                 end: end ? new Date(9999, 11, 31) : calculatedDate,
               },
             ]}
+            minDate={minDate ? startDate : calculatedDate}
             selected={value ? new Date(value) : null}
             placeholderText="00/00/0000"
             onChange={(date) => {

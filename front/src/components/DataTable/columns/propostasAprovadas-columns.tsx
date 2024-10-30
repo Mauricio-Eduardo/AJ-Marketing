@@ -3,7 +3,7 @@ import { Proposta } from "../../../models/proposta/entity/Proposta";
 import { format } from "date-fns";
 import { formatCpfCnpj } from "../../form/Formats";
 
-export const PropostasColumns: ColumnDef<Proposta>[] = [
+export const PropostasAprovadasColumns: ColumnDef<Proposta>[] = [
   {
     id: "id",
     size: 50,
@@ -87,9 +87,10 @@ export const PropostasColumns: ColumnDef<Proposta>[] = [
       <div className="flex flex-col items-center w-full">
         <span>Situação</span>
         <select
-          defaultValue="Pendente"
+          defaultValue={"Aprovada"}
           onChange={(e) => column.setFilterValue(e.target.value)}
           className="pl-2 text-sm font-normal rounded"
+          disabled={true}
         >
           <option value="">Todas</option>
           <option value="Vigente">Vigente</option>

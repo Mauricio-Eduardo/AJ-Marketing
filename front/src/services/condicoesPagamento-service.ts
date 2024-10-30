@@ -1,6 +1,7 @@
 import { api } from "../config/api";
 import { CreateCondicaoPagamentoDto } from "../models/condicaoPagamento/dto/createCondicaoPagamento.dto";
 import { UpdateCondicaoPagamentoDto } from "../models/condicaoPagamento/dto/updateCondicaoPagamento.dto";
+import { CondicaoPagamento } from "../models/condicaoPagamento/entity/CondicaoPagamento";
 
 export class CondicoesPagamentoService {
   async getAll() {
@@ -8,9 +9,16 @@ export class CondicoesPagamentoService {
     return response.data;
   }
 
-  async getOne(pId: number) {
+  async getOne(pId: number): Promise<CondicaoPagamento> {
     const response = await api.get("GetCondicaoPagamento", {
       params: { id: pId },
+    });
+    return response.data;
+  }
+
+  async getValores(pParcela_id: number) {
+    const response = await api.get("GetValoresCondicao", {
+      params: { parcela_id: pParcela_id },
     });
     return response.data;
   }

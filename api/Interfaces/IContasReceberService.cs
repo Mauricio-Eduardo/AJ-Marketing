@@ -1,7 +1,5 @@
 ﻿using api.Models.ContaReceber;
-using api.Models.Recebimentos;
 using Microsoft.AspNetCore.Mvc;
-using System.Data.SqlClient;
 
 namespace api.Interfaces
 {
@@ -9,6 +7,7 @@ namespace api.Interfaces
     {
         IEnumerable<ContaReceberModel> GetAllContasReceber();
         ContaReceberModel GetContaReceber(int id);
-        string ReceberConta([FromBody] RecebimentosPostModel recebimento);
+        string ReceberConta([FromBody] ContaReceberPutModel contaRecebida);
+        string ReabrirConta(int id);
     }
 }

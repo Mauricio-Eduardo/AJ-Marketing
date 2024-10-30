@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Dialog } from "@radix-ui/themes";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { Form } from "../../form";
-import { formatISO } from "date-fns";
+import { addDays, formatISO } from "date-fns";
 import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
 import { DialogProps } from "../DialogProps";
@@ -15,11 +15,14 @@ import { Contrato } from "../../../models/contrato/entity/Contrato";
 import { PropostasController } from "../../../controllers/propostas-controller";
 import { Proposta } from "../../../models/proposta/entity/Proposta";
 import { PropostasSubView } from "../../../views/propostas/subView";
-import { AlertCancel, AlertSubmit } from "../../form/Alerts";
+import { AlertCancel, AlertCancelX, AlertSubmit } from "../../form/Alerts";
 import { X } from "@phosphor-icons/react";
+import { CondicoesPagamentoController } from "../../../controllers/condicoesPagamento-controller";
+import { CondicaoPagamento } from "../../../models/condicaoPagamento/entity/CondicaoPagamento";
 
 interface ContratoDialogProps extends DialogProps {
   propostasController: PropostasController;
+  condicoesPagamentoController: CondicoesPagamentoController;
 }
 
 export function ContratoDialog({
@@ -29,6 +32,7 @@ export function ContratoDialog({
   isOpenModal,
   onSuccess,
   propostasController,
+  condicoesPagamentoController,
 }: ContratoDialogProps) {
   //
   // Configuração do Zod para validação dos formulários
@@ -150,8 +154,16 @@ export function ContratoDialog({
       if (propostasController) {
         try {
           const response = await propostasController.getOne(pId);
-          if (response.situacao === "Aprovada") {
+          if (response.situacao === "Aprovada" && response.data_inicio) {
             setProposta(response);
+            getCondicao(response);
+          } else if (response.situacao != "Pendente") {
+            setPropostaNull();
+            toast("Proposta já utilizada!", {
+              type: "error",
+              isLoading: false,
+              autoClose: 3000,
+            });
           } else {
             setPropostaNull();
             toast("Proposta não aprovada!", {
@@ -175,6 +187,47 @@ export function ContratoDialog({
     }
   };
 
+  const calcularDataVencimento = (
+    pCondicao: CondicaoPagamento,
+    dataInicio: string
+  ) => {
+    let dias = 0;
+    if (pCondicao.parcelas.length > 0) {
+      dias = pCondicao.parcelas[pCondicao.parcelas.length - 1].dias;
+    }
+    console.log(dias);
+    const dataVencimento = new Date(addDays(new Date(dataInicio), dias));
+    console.log(dataVencimento);
+    setValue("data_vencimento", formatISO(String(dataVencimento)));
+  };
+
+  const getCondicao = async (pProposta: Proposta) => {
+    if (condicoesPagamentoController) {
+      try {
+        const response = await condicoesPagamentoController.getOne(
+          pProposta.condPag_id
+        );
+        if (response.ativo) {
+          calcularDataVencimento(response, String(pProposta.data_inicio));
+        } else {
+          toast("Condição de Pagamento não possui parcelas!", {
+            type: "error",
+            isLoading: false,
+            autoClose: 3000,
+          });
+        }
+      } catch (error) {
+        setPropostaNull();
+        toast("Condição de Pagamento inexistente!", {
+          type: "error",
+          isLoading: false,
+          autoClose: 3000,
+        });
+        console.log(error);
+      }
+    }
+  };
+
   const setProposta = (pProposta: Proposta) => {
     setValue("proposta_id", pProposta.id);
     setValue("cliente_id", pProposta.cliente_id);
@@ -183,6 +236,7 @@ export function ContratoDialog({
     setValue("cpf_cnpj", formatCpfCnpj(pProposta.cpf_cnpj));
     setValue("nome_razaoSocial", pProposta.nome_razaoSocial);
     setValue("condicaoPagamento", pProposta.condicaoPagamento);
+    setValue("total", formatCurrency(pProposta.total));
     setValue(
       "servicos",
       pProposta.servicos
@@ -204,6 +258,8 @@ export function ContratoDialog({
     setValue("cpf_cnpj", "");
     setValue("nome_razaoSocial", "");
     setValue("condicaoPagamento", "");
+    setValue("total", "0,00");
+    setValue("data_vencimento", "");
     setValue("servicos", []);
     setPreenchido(false);
   };
@@ -221,9 +277,13 @@ export function ContratoDialog({
       <div className="flex justify-between">
         <Dialog.Title>{action} Contrato</Dialog.Title>
 
-        <Dialog.Close>
-          <X />
-        </Dialog.Close>
+        {preenchido ? (
+          <AlertCancelX />
+        ) : (
+          <Dialog.Close>
+            <X />
+          </Dialog.Close>
+        )}
       </div>
       <FormProvider {...contratosForm}>
         <form
@@ -266,12 +326,12 @@ export function ContratoDialog({
           {/* Linha 2 */}
           <div className="flex gap-3">
             <Form.Field>
-              <Form.Label htmlFor="proposta_id">Proposta *</Form.Label>
+              <Form.Label htmlFor="proposta_id">Código Proposta *</Form.Label>
               <Form.Input
                 name="proposta_id"
                 placeholder="0"
                 max={5}
-                width={70}
+                width={100}
                 defaultValue={data.proposta_id}
                 onBlur={(e) => getProposta(Number(e.target.value))}
                 disabled={action != "Cadastrar"}
@@ -290,12 +350,12 @@ export function ContratoDialog({
             </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="cliente_id">Cliente</Form.Label>
+              <Form.Label htmlFor="cliente_id">Código Cliente</Form.Label>
               <Form.Input
                 name="cliente_id"
                 placeholder="0"
                 max={5}
-                width={70}
+                width={100}
                 defaultValue={data.cliente_id}
                 disabled={true}
                 preenchidoChange={handlePreenchidoChange}
@@ -325,13 +385,12 @@ export function ContratoDialog({
               <Form.ErrorMessage field="cpf_cnpj" />
             </Form.Field>
 
-            <Form.Field>
+            <Form.Field className="flex-1">
               <Form.Label htmlFor="nome_razaoSocial">
                 {pessoa === "Física" ? "Nome" : "Razão Social"}
               </Form.Label>
               <Form.Input
                 name="nome_razaoSocial"
-                width={pessoa === "Física" ? 475 : 435}
                 defaultValue={data.nome_razaoSocial}
                 disabled={true}
                 preenchidoChange={handlePreenchidoChange}
@@ -354,12 +413,12 @@ export function ContratoDialog({
             </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="data_vencimento">Vencimento</Form.Label>
+              <Form.Label htmlFor="data_vencimento">Vencimento *</Form.Label>
               <Datepick
                 name="data_vencimento"
-                days={30}
+                days={0}
+                minDate={true}
                 disabled={action != "Cadastrar"}
-                preenchidoChange={handlePreenchidoChange}
               />
               <Form.ErrorMessage field="data_vencimento" />
             </Form.Field>
@@ -376,13 +435,12 @@ export function ContratoDialog({
               <Form.ErrorMessage field="total" />
             </Form.Field>
 
-            <Form.Field>
+            <Form.Field className="flex-1">
               <Form.Label htmlFor="condicaoPagamento">
                 Condição de Pagamento
               </Form.Label>
               <Form.Input
                 name="condicaoPagamento"
-                width={200}
                 defaultValue={data.condicaoPagamento}
                 disabled={true}
               ></Form.Input>

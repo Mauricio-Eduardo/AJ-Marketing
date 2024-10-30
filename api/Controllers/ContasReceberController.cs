@@ -1,9 +1,6 @@
 ﻿using api.Interfaces;
 using api.Models.ContaReceber;
-using api.Models.Recebimentos;
 using Microsoft.AspNetCore.Mvc;
-using System.Data.SqlClient;
-
 
 namespace api.Controllers
 {
@@ -40,22 +37,22 @@ namespace api.Controllers
                 return BadRequest();
         }
 
-        //[HttpPost]
-        //[Route("/PostContaReceber")]
-        //public IActionResult PostContaReceber([FromBody] ContaReceberPostModel contaInserida)
-        //{
-        //    string result = contasReceberService.PostContaReceber(contaInserida);
-        //    if (result != null)
-        //        return Ok(result);
-        //    else
-        //        return BadRequest();
-        //}
-
-        [HttpPost]
+        [HttpPut]
         [Route("/ReceberConta")]
-        public IActionResult ReceberConta([FromBody] RecebimentosPostModel recebimento)
+        public IActionResult ReceberConta([FromBody] ContaReceberPutModel contaRecebida)
         {
-            string result = contasReceberService.ReceberConta(recebimento);
+            string result = contasReceberService.ReceberConta(contaRecebida);
+            if (result != null)
+                return Ok(result);
+            else
+                return BadRequest();
+        }
+       
+        [HttpPut]
+        [Route("/ReabrirConta")]
+        public IActionResult ReabrirConta(int id)
+        {
+            string result = contasReceberService.ReabrirConta(id);
             if (result != null)
                 return Ok(result);
             else

@@ -38,12 +38,12 @@ export const AlertSubmit = ({
 
         <Flex gap="3" mt="6" justify="end">
           <AlertDialog.Cancel>
-            <Button variant="soft" color="gray">
+            <Button type="button" variant="soft" color="gray">
               Cancelar
             </Button>
           </AlertDialog.Cancel>
           <AlertDialog.Action>
-            <Button variant="solid" onClick={onConfirm}>
+            <Button type="submit" variant="solid" onClick={onConfirm}>
               Confirmar
             </Button>
           </AlertDialog.Action>
@@ -93,12 +93,12 @@ export const AlertConfirm = ({
 
         <Flex gap="3" mt="6" justify="end">
           <AlertDialog.Cancel>
-            <Button variant="soft" color="gray">
+            <Button type="button" variant="soft" color="gray">
               Cancelar
             </Button>
           </AlertDialog.Cancel>
           <AlertDialog.Action>
-            <Button variant="solid" onClick={onConfirm}>
+            <Button type="submit" variant="solid" onClick={onConfirm}>
               Sim
             </Button>
           </AlertDialog.Action>
@@ -117,18 +117,20 @@ export const AlertCancel = () => {
       <AlertDialog.Content maxWidth="450px">
         <AlertDialog.Title>Sair</AlertDialog.Title>
         <AlertDialog.Description size="3">
-          Tem certeza que deseja sair? Todos os dados preenchidos serão
+          Tem certeza que deseja cancelar? Todos os novos dados digitados serão
           perdidos!
         </AlertDialog.Description>
 
         <Flex gap="3" mt="6" justify="end">
           <AlertDialog.Cancel>
-            <Button variant="soft" color="gray">
+            <Button type="button" variant="soft" color="gray">
               Cancelar
             </Button>
           </AlertDialog.Cancel>
           <Dialog.Close>
-            <Button variant="solid">Sim</Button>
+            <Button type="button" variant="solid">
+              Sim
+            </Button>
           </Dialog.Close>
         </Flex>
       </AlertDialog.Content>
@@ -151,15 +153,88 @@ export const AlertCancelX = () => {
 
         <Flex gap="3" mt="6" justify="end">
           <AlertDialog.Cancel>
-            <Button variant="soft" color="gray">
+            <Button type="button" variant="soft" color="gray">
               Cancelar
             </Button>
           </AlertDialog.Cancel>
           <Dialog.Close>
-            <Button variant="solid">Sim</Button>
+            <Button type="button" variant="solid">
+              Sim
+            </Button>
           </Dialog.Close>
         </Flex>
       </AlertDialog.Content>
+    </AlertDialog.Root>
+  );
+};
+
+interface AlertOrdemServicoProps {
+  action: string;
+  permission: boolean;
+  icon: ReactNode;
+  color: "green" | "amber" | "gray" | undefined;
+  onConfirm: () => void;
+  disabled: boolean;
+}
+
+export const AlertOrdemServico = ({
+  action,
+  permission,
+  icon,
+  color,
+  onConfirm,
+  disabled,
+}: AlertOrdemServicoProps) => {
+  return (
+    <AlertDialog.Root>
+      <AlertDialog.Trigger disabled={disabled}>
+        <Button color={color}>
+          {icon} {action}
+        </Button>
+      </AlertDialog.Trigger>
+
+      {permission ? (
+        <AlertDialog.Content maxWidth="450px">
+          <AlertDialog.Title>{action} Ordem de Serviço</AlertDialog.Title>
+          <AlertDialog.Description size="3">
+            Tem certeza que deseja {action.toLocaleLowerCase()} este serviço?
+          </AlertDialog.Description>
+
+          <Flex gap="3" mt="6" justify="end">
+            <AlertDialog.Cancel>
+              <Button variant="soft" color="gray">
+                Cancelar
+              </Button>
+            </AlertDialog.Cancel>
+            <AlertDialog.Cancel>
+              <Button variant="solid" color={color} onClick={onConfirm}>
+                {icon} {action}
+              </Button>
+            </AlertDialog.Cancel>
+          </Flex>
+        </AlertDialog.Content>
+      ) : (
+        <AlertDialog.Content maxWidth="450px">
+          <AlertDialog.Title className="flex gap-4 text-amber-600 items-center">
+            <Warning />
+            Atenção
+          </AlertDialog.Title>
+          <AlertDialog.Description size="3">
+            Para {action.toLocaleLowerCase()} este serviço, é obrigatório
+            preencher os seguintes dados:
+            <br />
+            <br />
+            - Usuário responsável pelo serviço;
+            <br />- Tema do serviço.
+          </AlertDialog.Description>
+
+          <Flex gap="3" mt="6" justify="end">
+            <AlertDialog.Cancel>
+              <Button variant="solid">Entendi</Button>
+            </AlertDialog.Cancel>
+          </Flex>
+        </AlertDialog.Content>
+      )}
     </AlertDialog.Root>
   );
 };

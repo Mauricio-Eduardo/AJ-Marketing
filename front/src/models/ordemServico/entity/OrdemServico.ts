@@ -15,6 +15,7 @@ export class OrdemServico {
   situacao: string;
   postado: string;
   referencia: string;
+  observacoes: string;
 
   data_cadastro: string;
   data_ult_alt: string;
@@ -34,6 +35,7 @@ export class OrdemServico {
     pSituacao: string,
     pPostado: string,
     pReferencia: string,
+    pObservacoes: string,
     pData_cadastro: string,
     pData_ult_alt: string
   ) {
@@ -51,6 +53,7 @@ export class OrdemServico {
       (this.situacao = pSituacao),
       (this.postado = pPostado),
       (this.referencia = pReferencia),
+      (this.observacoes = pObservacoes),
       (this.data_cadastro = pData_cadastro),
       (this.data_ult_alt = pData_ult_alt);
   }

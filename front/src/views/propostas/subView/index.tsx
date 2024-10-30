@@ -5,12 +5,12 @@ import { DataTable } from "../../../components/datatable";
 import { SubDialogProps } from "../../../components/dialogs/DialogProps";
 import { PropostaDialog } from "../../../components/dialogs/proposta/proposta-dialog";
 import { Proposta } from "../../../models/proposta/entity/Proposta";
-import { PropostasColumns } from "../../../components/datatable/columns/propostas-columns";
 import { PropostasController } from "../../../controllers/propostas-controller";
 import { ClientesController } from "../../../controllers/clientes-controller";
 import { ServicosController } from "../../../controllers/servicos-controller";
 import { CondicoesPagamentoController } from "../../../controllers/condicoesPagamento-controller";
 import { PeridiocidadesController } from "../../../controllers/peridiocidades-controller";
+import { PropostasAprovadasColumns } from "../../../components/datatable/columns/propostasAprovadas-columns";
 
 export const PropostasSubView = ({
   onClose,
@@ -122,7 +122,7 @@ export const PropostasSubView = ({
 
             <DataTable
               type="propostasSub"
-              columns={PropostasColumns(true)}
+              columns={PropostasAprovadasColumns}
               onRowSelectionChange={handleRowSelectionChange}
               controller={controller}
               refreshKey={refreshKey}

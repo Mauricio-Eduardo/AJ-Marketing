@@ -12,9 +12,8 @@ namespace api.Models.OrdemServico
 
         private string _tema;
 
-        private string _situacao;
-        private string _postado;
         private string _referencia;
+        private string _observacoes;
 
         // Propriedades públicas para acessar as variáveis
         public int Id
@@ -53,16 +52,10 @@ namespace api.Models.OrdemServico
             set { _referencia = value; }
         }
 
-        public string Situacao
+        public string Observacoes
         {
-            get { return _situacao; }
-            set { _situacao = value; }
-        }
-
-        public string Postado
-        {
-            get { return _postado; }
-            set { _postado = value; }
+            get { return _observacoes; }
+            set { _observacoes = value; }
         }
 
         // Construtor sem parâmetros
@@ -70,7 +63,7 @@ namespace api.Models.OrdemServico
 
         // Construtor com parâmetros
         public OrdemServicoPutModel(int id, int usuario_id, DateTime data_prazo, DateTime data_entrega, string tema, string referencia, 
-            string situacao, string postado)
+            string observacoes)
         {
             _id = id;
             _usuario_id = usuario_id;
@@ -78,8 +71,7 @@ namespace api.Models.OrdemServico
             _data_entrega = data_entrega;
             _tema = tema;
             _referencia = referencia;
-            _situacao = situacao;
-            _postado = postado;
+            _observacoes = observacoes;
         }
     }
 }

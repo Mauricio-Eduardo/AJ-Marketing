@@ -263,23 +263,3 @@ SELECT
     10.00, 
     60.00
 FROM @Propostas p;
-
---INSERT INTO contratos (proposta_id, data_vencimento)
---VALUES 
---(1, GETDATE()-2),
---(2, GETDATE()-1),
---(3, GETDATE());
-
-INSERT INTO contasReceber (cliente_ID, contrato_ID, parcela_id, data_vencimento, total)
-VALUES (2, 2, 2, '2024-02-02', 2000.00);
---(3, 3, '2024-02-03', 1500.00, 'Pendente'),
---(4, 4, '2024-02-04', 2500.00, 'Pendente'),
---(5, 5, '2024-02-05', 3000.00, 'Pendente'),
---(6, 6, '2024-02-06', 3500.00, 'Pendente'),
---(7, 7, '2024-02-07', 4000.00, 'Pendente'),
---(8, 8, '2024-02-08', 4500.00, 'Pendente'),
---(9, 9, '2024-02-09', 5000.00, 'Pendente'),
---(10, 10, '2024-02-10', 5500.00, 'Pendente');
-
-SELECT * FROM parcelas
-WHERE condPag_id = 10

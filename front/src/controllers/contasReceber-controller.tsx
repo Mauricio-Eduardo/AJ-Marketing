@@ -1,4 +1,4 @@
-import { ReceberContaReceberDto } from "../models/contaReceber/dto/receberContaReceber.dto.ts";
+import { UpdateContaReceberDto } from "../models/contaReceber/dto/receberContaReceber.dto";
 import { ContasReceberService } from "../services/contaReceber-service";
 
 export class ContasReceberController {
@@ -16,7 +16,11 @@ export class ContasReceberController {
     return await this.service.getOne(pId);
   }
 
-  async receber(receberContaReceberDto: ReceberContaReceberDto) {
-    return await this.service.receber(receberContaReceberDto);
+  async receber(updateContaReceberDto: UpdateContaReceberDto) {
+    return await this.service.receber(updateContaReceberDto);
+  }
+
+  async reabrir(pId: number) {
+    return await this.service.reabrir(pId);
   }
 }

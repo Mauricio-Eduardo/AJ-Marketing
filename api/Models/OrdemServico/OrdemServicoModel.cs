@@ -3,7 +3,7 @@ using api.Models.ModelPai;
 
 namespace api.Models.OrdemServico
 {
-    public class OrdemServicoModel: Model   
+    public class OrdemServicoModel
     {
         // Variáveis que podem ser editáveis em um registro
         private int _id; // o ID não é editável porém é necessário para a requisição do PUT
@@ -23,6 +23,7 @@ namespace api.Models.OrdemServico
         private string _situacao;
         private string _postado;
         private string _referencia;
+        private string _observacoes;
 
         private DateTime _data_cadastro;
         private Nullable<DateTime> _data_ult_alt;
@@ -100,6 +101,12 @@ namespace api.Models.OrdemServico
             set { _referencia = value; }
         }
 
+        public string Observacoes
+        {
+            get { return _observacoes; }
+            set { _observacoes = value; }
+        }
+
         public string Situacao
         {
             get { return _situacao; }
@@ -130,7 +137,7 @@ namespace api.Models.OrdemServico
         // Construtor com parâmetros
         public OrdemServicoModel(int id, int cliente_id, string nome_razaoSocial, int contrato_id, int usuario_id, string nome, int servico_id,
             string servico, DateTime data_prazo, DateTime data_entrega, string tema, string referencia, string situacao, string postado,
-            DateTime data_cadastro, Nullable<DateTime> data_ult_alt)
+            string observacoes, DateTime data_cadastro, Nullable<DateTime> data_ult_alt)
         {
             _id = id;
             _cliente_id = cliente_id;
@@ -144,6 +151,7 @@ namespace api.Models.OrdemServico
             _data_entrega = data_entrega;
             _tema = tema;
             _referencia = referencia;
+            _observacoes = observacoes;
             _situacao = situacao;
             _postado = postado;
             _data_cadastro = data_cadastro;

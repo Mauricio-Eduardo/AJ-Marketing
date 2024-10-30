@@ -1,6 +1,5 @@
 ﻿using api.Interfaces;
 using api.Models.ContaReceber;
-using api.Models.Recebimentos;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;  
 using System.Data.SqlClient;
@@ -30,8 +29,10 @@ namespace api.Services
 
                     SqlCommand getAllCmd = new SqlCommand(String.Format(
                     "SELECT c.id, c.cliente_id, cl.cpf_cnpj, cl.nome_razaoSocial, c.contrato_id, cp.condicaoPagamento, " +
-                    "c.parcela_id, p.numeroParcela, cp.quantidadeParcelas, p.formaPag_id, f.formaPagamento, c.total, cp.juros, " +
-                    "cp.multa, cp.desconto, c.data_vencimento, c.situacao " +
+                    "c.parcela_id, p.numeroParcela, cp.quantidadeParcelas, p.formaPag_id, f.formaPagamento, c.total, " +
+                    "c.data_vencimento, cp.juros, c.jurosRecebido, cp.multa, c.multaRecebida, cp.desconto, c.descontoConcedido, " +
+                    "c.totalRecebido, c.data_recebimento, c.situacao " +
+
                     "FROM contasReceber c " +
                     "INNER JOIN clientes cl ON c.cliente_id = cl.id " +
                     "INNER JOIN contratos co ON c.contrato_id = co.id " +
@@ -59,18 +60,20 @@ namespace api.Services
                                 FormaPag_id = reader.GetInt32("formaPag_id"),
                                 FormaPagamento = reader.GetString("formaPagamento"),
                                 Total = reader.GetDecimal("total"),
-                                Juros = reader.GetDecimal("juros"),
-                                Multa = reader.GetDecimal("multa"),
-                                Desconto = reader.GetDecimal("desconto"),
                                 Data_vencimento = reader.GetDateTime("data_vencimento"),
+                                PercentJuros = reader.GetDecimal("juros"),
+                                JurosRecebido = reader.GetDecimal("jurosRecebido"),
+                                PercentMulta = reader.GetDecimal("multa"),
+                                MultaRecebida = reader.GetDecimal("multaRecebida"),
+                                PercentDesconto = reader.GetDecimal("desconto"),
+                                DescontoConcedido = reader.GetDecimal("descontoConcedido"),
+                                TotalRecebido = reader.GetDecimal("totalRecebido"),
+                                Data_recebimento = reader.IsDBNull(reader.GetOrdinal("data_recebimento"))
+                                    ? (DateTime?)null
+                                    : reader.GetDateTime(reader.GetOrdinal("data_recebimento")),
                                 Situacao = reader.GetString("situacao")
                             }
                         );
-                    }
-
-                    foreach (var conta in listaContas)
-                    {
-                        conta.Recebimentos = GetRecebimentosFromContaReceber(Connection, conta.Id);
                     }
 
                     return listaContas;
@@ -102,8 +105,10 @@ namespace api.Services
 
                     SqlCommand getCmd = new SqlCommand(String.Format(
                     "SELECT c.id, c.cliente_id, cl.cpf_cnpj, cl.nome_razaoSocial, c.contrato_id, cp.condicaoPagamento, " +
-                    "c.parcela_id, p.numeroParcela, cp.quantidadeParcelas, p.formaPag_id, f.formaPagamento, c.total, cp.juros, cp.multa, cp.desconto, " +
-                    "c.data_vencimento, c.situacao " +
+                    "c.parcela_id, p.numeroParcela, cp.quantidadeParcelas, p.formaPag_id, f.formaPagamento, c.total, " +
+                    "c.data_vencimento, cp.juros, c.jurosRecebido, cp.multa, c.multaRecebida, cp.desconto, c.descontoConcedido, " +
+                    "c.totalRecebido, c.data_recebimento, c.situacao " +
+
                     "FROM contasReceber c " +
                     "INNER JOIN clientes cl ON c.cliente_id = cl.id " +
                     "INNER JOIN contratos co ON c.contrato_id = co.id " +
@@ -115,8 +120,6 @@ namespace api.Services
                     getCmd.Parameters.Clear();
                     getCmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
                     SqlDataReader reader = getCmd.ExecuteReader();
-
-                    List<RecebimentosModel> recebimentos = GetRecebimentosFromContaReceber(Connection, id);
 
                     if (reader.HasRows)
                     {
@@ -134,12 +137,18 @@ namespace api.Services
                             FormaPag_id = reader.GetInt32("formaPag_id"),
                             FormaPagamento = reader.GetString("formaPagamento"),
                             Total = reader.GetDecimal("total"),
-                            Juros = reader.GetDecimal("juros"),
-                            Multa = reader.GetDecimal("multa"),
-                            Desconto = reader.GetDecimal("desconto"),
                             Data_vencimento = reader.GetDateTime("data_vencimento"),
-                            Situacao = reader.GetString("situacao"),
-                            Recebimentos = recebimentos
+                            PercentJuros = reader.GetDecimal("juros"),
+                            JurosRecebido = reader.GetDecimal("jurosRecebido"),
+                            PercentMulta = reader.GetDecimal("multa"),
+                            MultaRecebida = reader.GetDecimal("multaRecebida"),
+                            PercentDesconto = reader.GetDecimal("desconto"),
+                            DescontoConcedido = reader.GetDecimal("descontoConcedido"),
+                            TotalRecebido = reader.GetDecimal("totalRecebido"),
+                            Data_recebimento = reader.IsDBNull(reader.GetOrdinal("data_recebimento"))
+                                    ? (DateTime?)null
+                                    : reader.GetDateTime(reader.GetOrdinal("data_recebimento")),
+                            Situacao = reader.GetString("situacao")
                         };
                     }
                     else
@@ -159,108 +168,39 @@ namespace api.Services
             }
         }
 
-        private List<RecebimentosModel> GetRecebimentosFromContaReceber(SqlConnection connection, int id)
-        {
-            try
-            {
-                List<RecebimentosModel> listaRecebimentos = new List<RecebimentosModel>();
-
-                string queryParcelas = @"
-                SELECT r.id, r.formaPag_id, f.formaPagamento, r.recebido, r.juros, r.multa, r.desconto, r.total, 
-                r.data_recebimento
-                FROM recebimentos r
-                INNER JOIN formasPagamento f ON r.formaPag_id = f.id
-                WHERE r.contaReceber_id = @id";
-
-                using (SqlCommand getAllParcelas = new SqlCommand(queryParcelas, connection))
-                {
-                    getAllParcelas.Parameters.Add("@id", SqlDbType.Int).Value = id;
-
-                    using (SqlDataReader ParcelaReader = getAllParcelas.ExecuteReader()) 
-                    {
-                        while (ParcelaReader.Read())
-                        {
-                            listaRecebimentos.Add(
-                                new RecebimentosModel
-                                {
-                                    Id = ParcelaReader.GetInt32(ParcelaReader.GetOrdinal("id")),
-                                    FormaPag_id = ParcelaReader.GetInt32(ParcelaReader.GetOrdinal("formaPag_id")),
-                                    FormaPagamento = ParcelaReader.GetString(ParcelaReader.GetOrdinal("formaPagamento")),
-                                    Recebido = ParcelaReader.GetDecimal(ParcelaReader.GetOrdinal("recebido")),
-                                    Juros = ParcelaReader.GetDecimal(ParcelaReader.GetOrdinal("juros")),
-                                    Multa = ParcelaReader.GetDecimal(ParcelaReader.GetOrdinal("multa")),
-                                    Desconto = ParcelaReader.GetDecimal(ParcelaReader.GetOrdinal("desconto")),
-                                    Total = ParcelaReader.GetDecimal(ParcelaReader.GetOrdinal("total")),
-                                    Data_recebimento = ParcelaReader.GetDateTime(ParcelaReader.GetOrdinal("data_recebimento")),
-                                });
-                        }
-                    }
-
-                    return listaRecebimentos;
-                }
-            }
-            catch (SqlException ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public string ReceberConta([FromBody] RecebimentosPostModel recebimento)
+        public string ReceberConta([FromBody] ContaReceberPutModel contaRecebida)
         {
             using (Connection)
             {
-                SqlTransaction transaction = null;
 
                 try
                 {
                     Connection.Open();
-                    transaction = Connection.BeginTransaction();
 
                     string query = @"
-                        INSERT INTO recebimentos 
-                        (contaReceber_id, formaPag_id, recebido, juros, multa, desconto, total, data_recebimento)
-                        VALUES (@contaReceber_id, @formaPag_id, @recebido, @juros, @multa, @desconto, @total, @data_recebimento);";
+                        UPDATE contasReceber
+                        SET data_vencimento = @data_vencimento, jurosRecebido = @jurosRecebido, multaRecebida = @multaRecebida, 
+                        descontoConcedido = @descontoConcedido, totalRecebido = @totalRecebido, data_recebimento = @data_recebimento, 
+                        situacao = @situacao
+                        WHERE id = @id;";
 
-                    SqlCommand postCmd = new SqlCommand(query, Connection, transaction);
-                    postCmd.Parameters.AddWithValue("@contaReceber_id", recebimento.ContaReceber_id);
-                    postCmd.Parameters.AddWithValue("@formaPag_id", recebimento.FormaPag_id);
-                    postCmd.Parameters.AddWithValue("@recebido", recebimento.Recebido);
-                    postCmd.Parameters.AddWithValue("@juros", recebimento.Juros);
-                    postCmd.Parameters.AddWithValue("@multa", recebimento.Multa);
-                    postCmd.Parameters.AddWithValue("@desconto", recebimento.Desconto);
-                    postCmd.Parameters.AddWithValue("@total", recebimento.Total);
-                    postCmd.Parameters.AddWithValue("@data_recebimento", recebimento.Data_recebimento);
+                    SqlCommand postCmd = new SqlCommand(query, Connection);
+                    postCmd.Parameters.AddWithValue("@id", contaRecebida.Id);
+                    postCmd.Parameters.AddWithValue("@data_vencimento", contaRecebida.Data_recebimento);
+                    postCmd.Parameters.AddWithValue("@jurosRecebido", contaRecebida.JurosRecebido);
+                    postCmd.Parameters.AddWithValue("@multaRecebida", contaRecebida.MultaRecebida);
+                    postCmd.Parameters.AddWithValue("@descontoConcedido", contaRecebida.DescontoConcedido);
+                    postCmd.Parameters.AddWithValue("@totalRecebido", contaRecebida.TotalRecebido);
+                    postCmd.Parameters.AddWithValue("@data_recebimento", contaRecebida.Data_recebimento);
+                    postCmd.Parameters.AddWithValue("@situacao", "Recebida");
 
                     postCmd.ExecuteNonQuery();
 
-                    // Atualizar a situação da conta a receber com base nos recebimentos anteriores
-                    string situacao = "";
-                    if (recebimento.Receber > 0 )
-                    {
-                        situacao = "Parcial";
-                    } else if (recebimento.Receber == 0)
-                    {
-                        situacao = "Recebida";
-                    }
-
-                    query = @"
-                        UPDATE contasReceber SET situacao = @situacao
-                        WHERE id = @id";
-                    SqlCommand updateCmd = new SqlCommand(query, Connection, transaction);
-                    updateCmd.Parameters.AddWithValue("@id", recebimento.ContaReceber_id);
-                    updateCmd.Parameters.AddWithValue("@situacao", situacao);
-
-                    updateCmd.ExecuteNonQuery();
-
-                    transaction.Commit();
-                    return "Recebido com Sucesso!";
+                    return "Recebida com Sucesso!";
                 }
                 catch (SqlException ex)
                 {
-                    if (transaction != null)
-                    {
-                        transaction.Rollback();
-                    }
+                    
                     throw new Exception(ex.Message);
                 }
                 finally
@@ -270,6 +210,46 @@ namespace api.Services
             }
         }
 
-        
+        public string ReabrirConta(int id)
+        {
+            using (Connection)
+            {
+
+                try
+                {
+                    Connection.Open();
+
+                    string query = @"
+                        UPDATE contasReceber
+                        SET jurosRecebido = @jurosRecebido, multaRecebida = @multaRecebida, descontoConcedido = @descontoConcedido, 
+                        totalRecebido = @totalRecebido, data_recebimento = @data_recebimento, 
+                        situacao = @situacao
+                        WHERE id = @id;";
+
+                    SqlCommand postCmd = new SqlCommand(query, Connection);
+                    postCmd.Parameters.AddWithValue("@id", id);
+                    postCmd.Parameters.AddWithValue("@jurosRecebido", 0);
+                    postCmd.Parameters.AddWithValue("@multaRecebida", 0);
+                    postCmd.Parameters.AddWithValue("@descontoConcedido", 0);
+                    postCmd.Parameters.AddWithValue("@totalRecebido", 0);
+                    postCmd.Parameters.AddWithValue("@data_recebimento", DBNull.Value);
+                    postCmd.Parameters.AddWithValue("@situacao", "Pendente");
+
+                    postCmd.ExecuteNonQuery();
+
+                    return "Conta reaberta com Sucesso!";
+                }
+                catch (SqlException ex)
+                {
+
+                    throw new Exception(ex.Message);
+                }
+                finally
+                {
+                    Connection.Close();
+                }
+            }
+        }
+
     }
 }

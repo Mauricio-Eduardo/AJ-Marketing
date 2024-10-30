@@ -10,22 +10,16 @@ export class ContaReceber {
   formaPag_id: number;
   formaPagamento: string;
   total: string;
-  juros: string;
-  multa: string;
-  desconto: string;
   data_vencimento: string;
+  percentJuros: string;
+  jurosRecebido: string;
+  percentMulta: string;
+  multaRecebida: string;
+  percentDesconto: string;
+  descontoConcedido: string;
+  totalRecebido: string;
+  data_recebimento: string;
   situacao: string;
-
-  recebimentos: {
-    formaPag_id: number;
-    formaPagamento: string;
-    recebido: string;
-    juros: string;
-    multa: string;
-    desconto: string;
-    total: string;
-    data_recebimento: string;
-  }[];
 
   constructor(
     pId: number,
@@ -39,21 +33,16 @@ export class ContaReceber {
     pFormaPag_id: number,
     pFormaPagamento: string,
     pTotal: string,
-    pJuros: string,
-    pMulta: string,
-    pDesconto: string,
     pData_vencimento: string,
-    pSituacao: string,
-    pRecebimentos: {
-      formaPag_id: number;
-      formaPagamento: string;
-      recebido: string;
-      juros: string;
-      multa: string;
-      desconto: string;
-      total: string;
-      data_recebimento: string;
-    }[]
+    pPercentJuros: string,
+    pJurosRecebido: string,
+    pPercentMulta: string,
+    pMultaRecebida: string,
+    pPercentDesconto: string,
+    pDescontoConcedido: string,
+    pTotalRecebido: string,
+    pData_recebimento: string,
+    pSituacao: string
   ) {
     this.id = pId;
     this.cliente_id = pCliente_id;
@@ -66,11 +55,15 @@ export class ContaReceber {
     this.formaPag_id = pFormaPag_id;
     this.formaPagamento = pFormaPagamento;
     this.total = pTotal;
-    this.juros = pJuros;
-    this.multa = pMulta;
-    this.desconto = pDesconto;
     this.data_vencimento = pData_vencimento;
+    this.percentJuros = pPercentJuros;
+    this.jurosRecebido = pJurosRecebido;
+    this.percentMulta = pPercentMulta;
+    this.multaRecebida = pMultaRecebida;
+    this.percentDesconto = pPercentDesconto;
+    this.descontoConcedido = pDescontoConcedido;
+    this.totalRecebido = pTotalRecebido;
+    this.data_recebimento = pData_recebimento;
     this.situacao = pSituacao;
-    this.recebimentos = pRecebimentos;
   }
 }

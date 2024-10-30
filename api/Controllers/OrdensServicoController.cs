@@ -17,10 +17,21 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("/GetAllOrdensServico")]
-        public ActionResult<IEnumerable<OrdemServicoModel>> GetAllOrdensServico()
+        [Route("/GetAllOrdens")]
+        public ActionResult<IEnumerable<OrdemServicoModel>> GetAllOrdensServico(string situacao)
         {
-            IEnumerable<OrdemServicoModel> result = ordensServicoService.GetAllOrdensServico();
+            IEnumerable<OrdemServicoModel> result = ordensServicoService.GetAllOrdens(situacao);
+            if (result != null)
+                return Ok(result);
+            else
+                return BadRequest();
+        }
+
+        [HttpGet]
+        [Route("/GetAllPostados")]
+        public ActionResult<IEnumerable<OrdemServicoModel>> GetAllPostados()
+        {
+            IEnumerable<OrdemServicoModel> result = ordensServicoService.GetAllPostados();
             if (result != null)
                 return Ok(result);
             else
@@ -38,22 +49,44 @@ namespace api.Controllers
                 return BadRequest();
         }
 
-        //[HttpPost]
-        //[Route("/PostContaReceber")]
-        //public IActionResult PostContaReceber([FromBody] ContaReceberPostModel contaInserida)
-        //{
-        //    string result = contasReceberService.PostContaReceber(contaInserida);
-        //    if (result != null)
-        //        return Ok(result);
-        //    else
-        //        return BadRequest();
-        //}
-
         [HttpPut]
         [Route("/PutOrdemServico")]
         public IActionResult PutOrdemServico([FromBody] OrdemServicoPutModel contaAlterada)
         {
             string result = ordensServicoService.PutOrdemServico(contaAlterada);
+            if (result != null)
+                return Ok(result);
+            else
+                return BadRequest();
+        }
+
+        [HttpPut]
+        [Route("/IniciarPausar")]
+        public IActionResult IniciarPausar(int id, string situacao)
+        {
+            string result = ordensServicoService.IniciarPausar(id, situacao);
+            if (result != null)
+                return Ok(result);
+            else
+                return BadRequest();
+        }
+
+        [HttpPut]
+        [Route("/Entregar")]
+        public IActionResult Entregar(int id)
+        {
+            string result = ordensServicoService.Entregar(id);
+            if (result != null)
+                return Ok(result);
+            else
+                return BadRequest();
+        }
+
+        [HttpPut]
+        [Route("/Postar")]
+        public IActionResult Postar(int id)
+        {
+            string result = ordensServicoService.Postar(id);
             if (result != null)
                 return Ok(result);
             else

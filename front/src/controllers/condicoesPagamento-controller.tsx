@@ -17,6 +17,10 @@ export class CondicoesPagamentoController {
     return await this.service.getOne(pId);
   }
 
+  async getValores(pParcela_id: number) {
+    return await this.service.getValores(pParcela_id);
+  }
+
   async create(createCondicaoPagamentoDto: CreateCondicaoPagamentoDto) {
     return await this.service.create(createCondicaoPagamentoDto);
   }

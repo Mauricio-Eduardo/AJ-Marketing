@@ -7,10 +7,12 @@ import { Contrato } from "../../models/contrato/entity/Contrato";
 import { ContratosColumns } from "../../components/datatable/columns/contratos-columns";
 import { PropostasController } from "../../controllers/propostas-controller";
 import { ContratoDialog } from "../../components/dialogs/contrato/contrato-dialog";
+import { CondicoesPagamentoController } from "../../controllers/condicoesPagamento-controller";
 
 export const ContratosView = () => {
   const contratosController = new ContratosController();
   const propostasController = new PropostasController();
+  const condicoesPagamentoController = new CondicoesPagamentoController();
 
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [dialogAction, setDialogAction] = useState<
@@ -100,6 +102,7 @@ export const ContratosView = () => {
               action={dialogAction}
               controller={contratosController}
               propostasController={propostasController}
+              condicoesPagamentoController={condicoesPagamentoController}
               isOpenModal={isDialogOpen}
               onSuccess={handleSuccess}
             />

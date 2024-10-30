@@ -1,7 +1,4 @@
 ﻿
-using api.Models.Parcelas;
-using api.Models.Recebimentos;
-
 namespace api.Models.ContaReceber
 {
     public class ContaReceberModel
@@ -19,16 +16,23 @@ namespace api.Models.ContaReceber
         private string _nome_razaoSocial;
         private int _quantidadeParcelas;
         private int _numeroParcela;
-        private decimal _juros;
-        private decimal _multa;
-        private decimal _desconto;
 
         private decimal _total;
         private DateTime _data_vencimento;
 
-        private string _situacao;
+        private decimal _percentJuros;
+        private decimal _jurosRecebido;
 
-        private List<RecebimentosModel> _recebimentos;
+        private decimal _percentMulta;
+        private decimal _multaRecebida;
+
+        private decimal _percentDesconto;
+        private decimal _descontoConcedido;
+
+        private decimal _totalRecebido;
+        private Nullable<DateTime> _data_recebimento;
+
+        private string _situacao;
 
         // Propriedades públicas para acessar as variáveis
         public int Id
@@ -91,28 +95,52 @@ namespace api.Models.ContaReceber
             set { _formaPagamento = value; }
         }
 
-        public decimal Juros
-        {
-            get { return _juros; }
-            set { _juros = value; }
-        }
-
-        public decimal Multa
-        {
-            get { return _multa; }
-            set { _multa = value; }
-        }
-
-        public decimal Desconto
-        {
-            get { return _desconto; }
-            set { _desconto = value; }
-        }
-
         public decimal Total
         {
             get { return _total; }
             set { _total = value; }
+        }
+
+        public decimal PercentJuros
+        {
+            get { return _percentJuros; }
+            set { _percentJuros = value; }
+        }
+
+        public decimal JurosRecebido
+        {
+            get { return _jurosRecebido; }
+            set { _jurosRecebido = value; }
+        }
+
+        public decimal PercentMulta
+        {
+            get { return _percentMulta; }
+            set { _percentMulta = value; }
+        }
+
+        public decimal MultaRecebida
+        {
+            get { return _multaRecebida; }
+            set { _multaRecebida = value; }
+        }
+
+        public decimal PercentDesconto
+        {
+            get { return _percentDesconto; }
+            set { _percentDesconto = value; }
+        }
+
+        public decimal DescontoConcedido
+        {
+            get { return _descontoConcedido; }
+            set { _descontoConcedido = value; }
+        }
+
+        public decimal TotalRecebido
+        {
+            get { return _totalRecebido; }
+            set { _totalRecebido = value; }
         }
 
         public DateTime Data_vencimento
@@ -121,25 +149,27 @@ namespace api.Models.ContaReceber
             set { _data_vencimento = value; }
         }
 
+        public Nullable<DateTime> Data_recebimento
+        {
+            get { return _data_recebimento; }
+            set { _data_recebimento = value; }
+        }
+
         public string Situacao
         {
             get { return _situacao; }
             set { _situacao = value; }
         }
 
-        public List<RecebimentosModel> Recebimentos
-        {
-            get { return _recebimentos; }
-            set { _recebimentos = value; }
-        }
-
         // Construtor sem parâmetros
         public ContaReceberModel() { }
 
         // Construtor com parâmetros
-        public ContaReceberModel(int id, int cliente_id, int contrato_id, int parcela_id, string cpf_cnpj, string nome_razaoSocial, 
-            int quantidadeParcelas, int numeroParcela, int formaPag_id, string formaPagamento, decimal total, decimal juros, decimal multa, decimal desconto, DateTime data_vencimento, 
-            string situacao, List<RecebimentosModel> recebimentos)
+        public ContaReceberModel(int id, int cliente_id, int contrato_id, int parcela_id, string cpf_cnpj, 
+            string nome_razaoSocial, int quantidadeParcelas, int numeroParcela, int formaPag_id, string formaPagamento, 
+            decimal total, decimal percentJuros, decimal jurosRecebido, decimal percentMulta, decimal multaRecebida, 
+            decimal percentDesconto, decimal descontoConcedido, decimal totalRecebido, DateTime data_vencimento, 
+            DateTime data_recebimento, string situacao)
         {
             _id = id;
             _cliente_id = cliente_id;
@@ -151,13 +181,17 @@ namespace api.Models.ContaReceber
             _numeroParcela = numeroParcela;
             _formaPag_id = formaPag_id;
             _formaPagamento = formaPagamento;
-            _data_vencimento = data_vencimento;
             _total = total;
-            _juros = juros;
-            _multa = multa;
-            _desconto = desconto;
+            _data_vencimento = data_vencimento;
+            _percentJuros = percentJuros;
+            _jurosRecebido = jurosRecebido;
+            _percentMulta = percentMulta;
+            _multaRecebida = multaRecebida;
+            _percentDesconto = percentDesconto;
+            _descontoConcedido = descontoConcedido;
+            _totalRecebido = totalRecebido;
+            _data_recebimento = data_recebimento;
             _situacao = situacao;
-            _recebimentos = recebimentos;
         }
     }
 }

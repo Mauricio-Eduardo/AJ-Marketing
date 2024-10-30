@@ -1,5 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { format } from "date-fns";
+import { differenceInDays, format, isSameDay } from "date-fns";
 import { OrdemServico } from "../../../models/ordemServico/entity/OrdemServico";
 
 export const OrdensServicoColumns: ColumnDef<OrdemServico>[] = [
@@ -18,7 +18,7 @@ export const OrdensServicoColumns: ColumnDef<OrdemServico>[] = [
     accessorFn: (row) => row.nome_razaoSocial,
     header: ({ column }) => (
       <div className="flex flex-col">
-        <span>Nome/Razão Social</span>
+        <span>Cliente</span>
         <input
           type="text"
           value={(column.getFilterValue() as string) || ""}
@@ -32,6 +32,7 @@ export const OrdensServicoColumns: ColumnDef<OrdemServico>[] = [
   },
   {
     id: "servico",
+    size: 100,
     accessorFn: (row) => row.servico,
     header: ({ column }) => (
       <div className="flex flex-col">
@@ -48,12 +49,20 @@ export const OrdensServicoColumns: ColumnDef<OrdemServico>[] = [
     footer: (props) => props.column.id,
   },
   {
+    id: "tema",
+    size: 250,
+    accessorFn: (row) => row.tema,
+    header: () => <span>Tema</span>,
+    cell: (info) => info.getValue(),
+    footer: (props) => props.column.id,
+  },
+  {
     id: "nome",
     size: 200,
     accessorFn: (row) => row.nome,
-    header: () => <span className="text-center w-full">Responsável</span>,
+    header: () => <span className="text-left w-full">Responsável</span>,
     cell: (info) => (
-      <div className="text-center">
+      <div className="text-left">
         {info.getValue() ? String(info.getValue()) : "-"}
       </div>
     ),
@@ -61,19 +70,28 @@ export const OrdensServicoColumns: ColumnDef<OrdemServico>[] = [
   },
   {
     id: "data_prazo",
-    size: 200,
+    size: 90,
     accessorFn: (row) => row.data_prazo,
     header: () => <span className="text-center w-full">Prazo</span>,
-    cell: (info) => (
-      <div className="text-center">
-        {format(new Date(String(info.getValue())), "dd/MM/yyyy")}
-      </div>
-    ),
+    cell: (info) => {
+      const dias = differenceInDays(
+        new Date(String(info.getValue())),
+        new Date()
+      );
+      const colorClass =
+        dias < 0 ? "text-red-500" : dias == 0 ? "text-orange-500" : "";
+
+      return (
+        <div className={`text-center font-bold ${colorClass}`}>
+          {format(new Date(String(info.getValue())), "dd/MM/yyyy")}
+        </div>
+      );
+    },
     footer: (props) => props.column.id,
   },
   {
     id: "data_entrega",
-    size: 200,
+    size: 90,
     accessorFn: (row) => row.data_entrega,
     header: () => <span className="text-center w-full">Entrega</span>,
     cell: (info) => (
@@ -89,26 +107,14 @@ export const OrdensServicoColumns: ColumnDef<OrdemServico>[] = [
     id: "situacao",
     size: 150,
     accessorFn: (row) => row.situacao,
-    header: ({ column }) => (
-      <div className="flex flex-col items-center w-full">
-        <span>Situação</span>
-        <select
-          defaultValue=""
-          onChange={(e) => column.setFilterValue(e.target.value)}
-          className="pl-2 text-sm font-normal rounded"
-        >
-          <option value="">Todas</option>
-          <option value="Pendente">Pendente</option>
-          <option value="Em andamento">Em andamento</option>
-          <option value="Concluído">Concluído</option>
-        </select>
-      </div>
-    ),
+    header: () => <span className="w-full text-center">Situação</span>,
     cell: (info) => {
       const situacao = String(info.getValue());
       const colorClass =
-        situacao === "Em andamento"
+        situacao === "Em Andamento"
           ? "text-blue-500"
+          : situacao === "Pausado"
+          ? "text-amber-500"
           : situacao === "Concluído"
           ? "text-green-500"
           : "";
@@ -123,19 +129,7 @@ export const OrdensServicoColumns: ColumnDef<OrdemServico>[] = [
     id: "postado",
     size: 100,
     accessorFn: (row) => row.postado,
-    header: ({ column }) => (
-      <div className="flex flex-col items-center w-full">
-        <span>Postado</span>
-        <select
-          onChange={(e) => column.setFilterValue(e.target.value)}
-          className="pl-2 text-sm font-normal rounded"
-        >
-          <option value="">Todas</option>
-          <option value="Sim">Sim</option>
-          <option value="Não">Não</option>
-        </select>
-      </div>
-    ),
+    header: () => <span className="items-center w-full">Postado</span>,
     cell: (info) => {
       const situacao = String(info.getValue());
       const colorClass =

@@ -15,12 +15,6 @@ interface TableConfig {
   type?: string;
   columns: ColumnDef<any>[];
   controller: any;
-  // controller:
-  //   | ControllerMethods
-  //   | ClienteControllerMethods
-  //   | PropostaControllerMethods
-  //   | ContratoControllerMethods
-  //   | ContasReceberControllerMethods;
   onRowSelectionChange: (selectedRow: any) => void;
   refreshKey: number;
 }
@@ -61,6 +55,7 @@ export const DataTable = ({
             value: "Aprovada",
           },
         ];
+
       default:
         return [
           {
@@ -109,7 +104,37 @@ export const DataTable = ({
 
   async function getAll() {
     try {
-      const result = await controller.getAll();
+      let result;
+
+      if (type?.startsWith("ordens")) {
+        switch (type) {
+          case "ordensPendentes":
+            result = await controller.getAll("Pendente");
+            break;
+
+          case "ordensEmAndamento":
+            result = await controller.getAll("Em Andamento");
+            break;
+
+          case "ordensPausadas":
+            result = await controller.getAll("Pausado");
+            break;
+
+          case "ordensConcluidas":
+            result = await controller.getAll("Concluído");
+            break;
+
+          case "ordensPostados":
+            result = await controller.getAllPostados();
+            break;
+
+          default:
+            result = await controller.getAll("Pendente");
+        }
+      } else {
+        result = await controller.getAll();
+      }
+
       setData(result);
     } catch (error) {
       console.error("Error fetching data", error);
@@ -132,7 +157,7 @@ export const DataTable = ({
     <Flex direction={"column"} gap={"1"}>
       <div className="p-2 border-2 border-gray-200 rounded-lg">
         {/* Table */}
-        <table className="w-full uppercase rounded-lg text-left overflow-hidden">
+        <table className="w-full rounded-lg text-left overflow-hidden">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="bg-gray-300">
@@ -162,7 +187,7 @@ export const DataTable = ({
               </tr>
             ))}
           </thead>
-          <tbody>
+          <tbody className="uppercase">
             {table.getRowModel().rows.map((row, index) => {
               const rowClass =
                 row.id === selectedRowId

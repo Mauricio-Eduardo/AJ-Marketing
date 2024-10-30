@@ -18,17 +18,6 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("/GetAllCondicoesPagamentoAtivas")]
-        public ActionResult<IEnumerable<CondicaoPagamentoModel>> GetAllCondicoesPagamentoAtivas()
-        {
-            IEnumerable<CondicaoPagamentoModel> result = condicaoPagamentoService.GetAllCondicoesPagamentoAtivas();
-            if (result != null)
-                return Ok(result);
-            else
-                return BadRequest();
-        }
-
-        [HttpGet]
         [Route("/GetAllCondicoesPagamento")]
         public ActionResult<IEnumerable<CondicaoPagamentoModel>> GetAllCondicoesPagamento()
         {
@@ -44,6 +33,17 @@ namespace api.Controllers
         public IActionResult GetCondicaoPagamento(int id)
         {
             CondicaoPagamentoModel result = condicaoPagamentoService.GetCondicaoPagamento(id);
+            if (result != null)
+                return Ok(result);
+            else
+                return BadRequest();
+        }
+
+        [HttpGet]
+        [Route("/GetValoresCondicao")]
+        public ActionResult<IEnumerable<CondicaoPagamentoValoresModel>> GetValoresCondicao(int parcela_id)
+        {
+            CondicaoPagamentoValoresModel result = condicaoPagamentoService.GetValoresCondicao(parcela_id);
             if (result != null)
                 return Ok(result);
             else

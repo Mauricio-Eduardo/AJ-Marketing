@@ -19,6 +19,8 @@ import {
   CreditCard,
   MoneyWavy,
   User,
+  Coins,
+  Package,
 } from "@phosphor-icons/react";
 import { Button, Flex } from "@radix-ui/themes";
 import style from "./styles.module.css";
@@ -115,34 +117,67 @@ export const MySidebar: React.FC<ThemeSwitcherProps> = ({ darkMode }) => {
                 }}
                 className="inline min-w-full justify-center"
               >
-                <MenuItem icon={<Wrench />} component={<Link to="servicos" />}>
+                <MenuItem
+                  // icon={<User />}
+                  component={<Link to="usuarios" />}
+                >
+                  Usuários
+                </MenuItem>
+                <MenuItem
+                  //  icon={<Wrench />}
+                  component={<Link to="servicos" />}
+                >
                   Serviços
                 </MenuItem>
-                <MenuItem icon={<Heart />} component={<Link to="clientes" />}>
+
+                <MenuItem
+                  component={<Link to="peridiocidades" />}
+                  className={style.menuseparator}
+                >
+                  Peridiocidades
+                </MenuItem>
+
+                <MenuItem
+                  //  icon={<Heart />}
+                  component={<Link to="clientes" />}
+                >
                   Clientes
                 </MenuItem>
-                <MenuItem icon={<Globe />} component={<Link to="origens" />}>
+                <MenuItem
+                  // icon={<Globe />}
+                  component={<Link to="origens" />}
+                >
                   Origens
                 </MenuItem>
                 <MenuItem component={<Link to="interesses" />}>
                   Interesses
                 </MenuItem>
-                <MenuItem component={<Link to="ramosAtividade" />}>
+                <MenuItem
+                  component={<Link to="ramosAtividade" />}
+                  className={style.menuseparator}
+                >
                   Ramos de Atividade
                 </MenuItem>
                 <MenuItem
-                  icon={<HandArrowUp />}
+                  // icon={<HandArrowUp />}
                   component={<Link to="propostas" />}
                 >
                   Propostas
                 </MenuItem>
-                <MenuItem icon={<Scroll />} component={<Link to="contratos" />}>
+                <MenuItem
+                  // icon={<Scroll />}
+                  component={<Link to="contratos" />}
+                >
                   Contratos
                 </MenuItem>
-                <MenuItem component={<Link to="contasReceber" />}>
+                <MenuItem
+                  // icon={<Coins />}
+                  component={<Link to="contasReceber" />}
+                >
                   Contas a Receber
                 </MenuItem>
                 <MenuItem
+                  // icon={<Package />}
                   component={<Link to="ordensServico" />}
                   className={style.menuseparator}
                 >
@@ -150,41 +185,35 @@ export const MySidebar: React.FC<ThemeSwitcherProps> = ({ darkMode }) => {
                 </MenuItem>
 
                 <MenuItem
-                  icon={<CreditCard />}
+                  // icon={<CreditCard />}
                   component={<Link to="formasPagamento" />}
                 >
                   Formas de Pag.
                 </MenuItem>
                 <MenuItem
-                  icon={<MoneyWavy />}
+                  // icon={<MoneyWavy />}
                   component={<Link to="condicoesPagamento" />}
+                  className={style.menuseparator}
                 >
                   Condições de Pag.
                 </MenuItem>
-                <MenuItem
-                  component={<Link to="peridiocidades" />}
-                  className={style.menuseparator}
-                >
-                  Peridiocidades
-                </MenuItem>
-                <MenuItem
-                  icon={<User />}
-                  component={<Link to="usuarios" />}
-                  className={style.menuseparator}
-                >
-                  Usuários
-                </MenuItem>
 
-                <MenuItem icon={<City />} component={<Link to="cidades" />}>
+                <MenuItem
+                  // icon={<City />}
+                  component={<Link to="cidades" />}
+                >
                   Cidades
                 </MenuItem>
 
-                <MenuItem icon={<Flag />} component={<Link to="estados" />}>
+                <MenuItem
+                  // icon={<Flag />}
+                  component={<Link to="estados" />}
+                >
                   Estados
                 </MenuItem>
 
                 <MenuItem
-                  icon={<GlobeHemisphereEast />}
+                  // icon={<GlobeHemisphereEast />}
                   component={<Link to="paises" />}
                 >
                   Países

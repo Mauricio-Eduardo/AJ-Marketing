@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Dialog } from "@radix-ui/themes";
+import { Button, Dialog, TextArea } from "@radix-ui/themes";
 import { FormProvider, useForm } from "react-hook-form";
 import { Form } from "../../form";
 import { format } from "date-fns";
@@ -16,8 +16,6 @@ import { Usuario } from "../../../models/usuario/entity/Usuario";
 import { transformarParaPutOrdemServico } from "../../../models/ordemServico/dto/updateOrdemServico.dto";
 import { OrdemServico } from "../../../models/ordemServico/entity/OrdemServico";
 import { UsuariosSubView } from "../../../views/usuarios/subView";
-import { PostadoSelect } from "../../form/PostadoSelect";
-import { SituacaoSelect } from "../../form/SituacaoSelect";
 
 interface OrdemServicoDialogProps extends DialogProps {
   usuariosController: UsuariosController;
@@ -37,11 +35,12 @@ export function OrdemServicoDialog({
     resolver: zodResolver(createOrdensServicoSchema),
     shouldFocusError: false,
   });
-  const { control, handleSubmit, reset, setValue } = ordensServicoForm;
+  const { register, handleSubmit, reset, setValue } = ordensServicoForm;
 
-  const onUsuarioSubViewClose = (index: number, usuario?: Usuario) => {
+  const onUsuarioSubViewClose = (usuario?: Usuario) => {
     if (usuario) {
       setUsuario(usuario);
+      setPreenchido(true);
     }
   };
 
@@ -52,6 +51,44 @@ export function OrdemServicoDialog({
       if (action === "Editar") {
         const payload = transformarParaPutOrdemServico(pData);
         await controller.update(payload);
+        toast.update(toastId, {
+          render: "Ordem de Serviço atualizada com sucesso!",
+          type: "success",
+          isLoading: false,
+          draggable: true,
+          draggableDirection: "x",
+          autoClose: 3000,
+        });
+        onSuccess();
+      } else if (action === "Iniciar" || action === "Pausar") {
+        const situacao =
+          pData.situacao === "Em Andamento" ? "Pausado" : "Em Andamento";
+        const pId = pData.id;
+        await controller.iniciarPausar(pId, situacao);
+        toast.update(toastId, {
+          render: "Ordem de Serviço atualizada com sucesso!",
+          type: "success",
+          isLoading: false,
+          draggable: true,
+          draggableDirection: "x",
+          autoClose: 3000,
+        });
+        onSuccess();
+      } else if (action === "Entregar") {
+        const pId = pData.id;
+        await controller.entregar(pId);
+        toast.update(toastId, {
+          render: "Ordem de Serviço atualizada com sucesso!",
+          type: "success",
+          isLoading: false,
+          draggable: true,
+          draggableDirection: "x",
+          autoClose: 3000,
+        });
+        onSuccess();
+      } else if (action === "Postar") {
+        const pId = pData.id;
+        await controller.postar(pId);
         toast.update(toastId, {
           render: "Ordem de Serviço atualizada com sucesso!",
           type: "success",
@@ -100,6 +137,7 @@ export function OrdemServicoDialog({
     reset({
       ...data,
       usuario_id: data.usuario_id === null ? 0 : data.usuario_id,
+      nome: data.nome === null ? "" : data.nome,
       data_cadastro: data.data_cadastro
         ? format(new Date(data.data_cadastro), "dd/MM/yyyy HH:mm")
         : "",
@@ -181,7 +219,7 @@ export function OrdemServicoDialog({
     >
       <div className="flex justify-between">
         <Dialog.Title>{action} Ordem de Serviço</Dialog.Title>
-        {preenchido && action === "Cadastrar" ? (
+        {preenchido ? (
           <AlertCancelX />
         ) : (
           <Dialog.Close>
@@ -208,28 +246,34 @@ export function OrdemServicoDialog({
               <Form.ErrorMessage field="id" />
             </Form.Field>
 
-            <Form.Field>
-              <Form.Label htmlFor="situacao">Situação *</Form.Label>
-              <SituacaoSelect
-                name="situacao"
-                control={control}
-                defaultValue={data.situacao}
-                width={100}
-                disabled={action == "Visualizar"}
-              />
-              <Form.ErrorMessage field="situacao" />
-            </Form.Field>
+            <div className="flex gap-3">
+              <Form.Field>
+                <Form.Label htmlFor="situacao">Situação</Form.Label>
+                <Form.Input
+                  name="situacao"
+                  defaultValue={data.situacao}
+                  disabled={true}
+                />
+                <Form.ErrorMessage field="situacao" />
+              </Form.Field>
+
+              <Form.Field>
+                <Form.Label htmlFor="postado">Postado</Form.Label>
+                <Form.Input name="postado" disabled={true} width={100} />
+                <Form.ErrorMessage field="postado" />
+              </Form.Field>
+            </div>
           </div>
 
           {/* Linha 2 */}
           <div className="flex gap-3">
             <Form.Field>
-              <Form.Label htmlFor="contrato_id">Contrato</Form.Label>
+              <Form.Label htmlFor="contrato_id">Código Contrato</Form.Label>
               <Form.Input
                 name="contrato_id"
                 placeholder="0"
                 max={5}
-                width={80}
+                width={100}
                 defaultValue={data.contrato_id}
                 disabled={true}
               />
@@ -237,25 +281,24 @@ export function OrdemServicoDialog({
             </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="cliente_id">Cliente</Form.Label>
+              <Form.Label htmlFor="cliente_id">Código Cliente</Form.Label>
               <Form.Input
                 name="cliente_id"
                 placeholder="0"
                 max={5}
-                width={80}
+                width={100}
                 defaultValue={data.cliente_id}
                 disabled={true}
               />
               <Form.ErrorMessage field="cliente_id" />
             </Form.Field>
 
-            <Form.Field>
+            <Form.Field className="flex-1">
               <Form.Label htmlFor="nome_razaoSocial">
                 Nome/Razão Social
               </Form.Label>
               <Form.Input
                 name="nome_razaoSocial"
-                width={475}
                 defaultValue={data.nome_razaoSocial}
                 disabled={true}
               />
@@ -265,12 +308,12 @@ export function OrdemServicoDialog({
 
           <div className="flex gap-3">
             <Form.Field>
-              <Form.Label htmlFor="usuario_id">Usuário *</Form.Label>
+              <Form.Label htmlFor="usuario_id">Código Usuário *</Form.Label>
               <Form.Input
                 name="usuario_id"
                 placeholder="0"
                 max={5}
-                width={80}
+                width={100}
                 defaultValue={data.usuario_id}
                 onBlur={(e) => getUsuario(Number(e.target.value))}
                 disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
@@ -288,9 +331,9 @@ export function OrdemServicoDialog({
               />
             </Form.Field>
 
-            <Form.Field>
+            <Form.Field className="flex-1">
               <Form.Label htmlFor="nome">Nome</Form.Label>
-              <Form.Input name="nome" disabled={true} width={200} />
+              <Form.Input name="nome" disabled={true} />
               <Form.ErrorMessage field="nome" />
             </Form.Field>
           </div>
@@ -309,11 +352,10 @@ export function OrdemServicoDialog({
               <Form.ErrorMessage field="servico_id" />
             </Form.Field>
 
-            <Form.Field>
+            <Form.Field className="w-full">
               <Form.Label htmlFor="servico">Descrição</Form.Label>
               <Form.Input
                 name="servico"
-                width={300}
                 defaultValue={data.servico}
                 disabled={true}
               />
@@ -321,7 +363,7 @@ export function OrdemServicoDialog({
             </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="data_prazo">Prazo</Form.Label>
+              <Form.Label htmlFor="data_prazo">Prazo *</Form.Label>
               <Datepick
                 name="data_prazo"
                 days={30}
@@ -332,48 +374,48 @@ export function OrdemServicoDialog({
 
             <Form.Field>
               <Form.Label htmlFor="data_entrega">Data de Entrega</Form.Label>
-              <Datepick
-                name="data_entrega"
-                days={0}
-                disabled={action === "Visualizar"}
-              />
+              <Datepick name="data_entrega" days={0} disabled={true} />
               <Form.ErrorMessage field="data_entrega" />
             </Form.Field>
           </div>
 
           <div className="flex gap-3">
-            <Form.Field>
-              <Form.Label htmlFor="tema">Tema</Form.Label>
+            <Form.Field className="w-full">
+              <Form.Label htmlFor="tema">Tema *</Form.Label>
               <Form.Input
                 name="tema"
-                width={475}
                 defaultValue={data.tema}
+                max={200}
+                placeholder="Tema do serviço"
                 disabled={action === "Visualizar"}
+                preenchidoChange={handlePreenchidoChange}
               />
               <Form.ErrorMessage field="tema" />
             </Form.Field>
 
-            <Form.Field>
-              <Form.Label htmlFor="postado">Postado</Form.Label>
-              <PostadoSelect
-                control={control}
-                name="postado"
+            <Form.Field className="w-full">
+              <Form.Label htmlFor="referencia">Referência</Form.Label>
+              <Form.Input
+                name="referencia"
+                defaultValue={data.referencia}
+                max={255}
+                placeholder="Referência do serviço"
                 disabled={action === "Visualizar"}
               />
-              <Form.ErrorMessage field="postado" />
+              <Form.ErrorMessage field="referencia" />
             </Form.Field>
           </div>
 
           <div className="flex gap-3">
-            <Form.Field>
-              <Form.Label htmlFor="referencia">Referência</Form.Label>
-              <Form.Input
-                name="referencia"
-                width={752}
-                defaultValue={data.referencia}
+            <Form.Field className="w-full">
+              <Form.Label htmlFor="observacoes">Observações</Form.Label>
+              <TextArea
+                {...register("observacoes")}
+                placeholder="Adicione aqui as observações"
+                className="uppercase min-h-24 max-h-24"
                 disabled={action === "Visualizar"}
               />
-              <Form.ErrorMessage field="referencia" />
+              <Form.ErrorMessage field="observacoes" />
             </Form.Field>
           </div>
 
@@ -405,7 +447,7 @@ export function OrdemServicoDialog({
           </div>
 
           <div className="flex w-full justify-end gap-3">
-            {preenchido && action === "Cadastrar" ? (
+            {preenchido ? (
               <AlertCancel />
             ) : (
               <Dialog.Close>

@@ -295,8 +295,19 @@ namespace api.Services
                         }                            
                     }
 
+                    // Atualizar o status da Proposta para "Vigente"
+                    string updatePropostaQuery = @"
+                        UPDATE propostas SET situacao = @situacao
+                        WHERE id = @id";
+
+                    SqlCommand updatePropostaCmd = new SqlCommand(updatePropostaQuery, Connection, transaction);
+                    updatePropostaCmd.Parameters.AddWithValue("@id", contratoInserido.Proposta_id);
+                    updatePropostaCmd.Parameters.AddWithValue("@situacao", "Vigente");
+
+                    updatePropostaCmd.ExecuteNonQuery();
+
                     transaction.Commit();
-                    return "Contrato, contas a receber e ordens de serviço inseridos com sucesso!";
+                    return "Inserido com sucesso!";
                 }
                 catch (SqlException ex)
                 {

@@ -4,7 +4,7 @@ export const createUsuarioSchema = z.object({
   id: z.coerce.number().readonly().default(0),
   nome: z
     .string()
-    .min(1, "Obrigatório")
+    .min(6, "Deve ter mais que 5 caracteres")
     .regex(
       new RegExp(/^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ'\s]+$/),
       "Somente letras"

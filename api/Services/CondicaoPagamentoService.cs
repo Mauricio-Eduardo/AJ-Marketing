@@ -16,64 +16,6 @@ namespace api.Services
             this.Connection = pSqlConnection;
         }
 
-        public IEnumerable<CondicaoPagamentoModel> GetAllCondicoesPagamentoAtivas()
-        {
-            List<CondicaoPagamentoModel> listaCondicaoPagamentos = new List<CondicaoPagamentoModel>();
-
-            using (Connection)
-            {
-                try
-                {
-                    Connection.Open();
-
-                    SqlCommand getAllCmd = new SqlCommand(String.Format(
-                        "SELECT * FROM condicoesPagamento WHERE ativo = @ativo"), Connection);
-
-                    getAllCmd.Parameters.Clear();
-                    getAllCmd.Parameters.Add("@ativo", SqlDbType.Bit).Value = 1;
-
-                    using (SqlDataReader reader = getAllCmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            listaCondicaoPagamentos.Add(
-                            new CondicaoPagamentoModel
-                            {
-                                Id = reader.GetInt32("id"),
-                                CondicaoPagamento = reader.GetString("condicaoPagamento"),
-                                QuantidadeParcelas = reader.GetInt32("quantidadeParcelas"),
-                                Desconto = reader.GetDecimal("desconto"),
-                                Juros = reader.GetDecimal("juros"),
-                                Multa = reader.GetDecimal("multa"),
-                                Ativo = reader.GetBoolean("ativo"),
-                                Data_cadastro = reader.GetDateTime("data_cadastro"),
-                                Data_ult_alt = reader.IsDBNull(reader.GetOrdinal("data_ult_alt"))
-                                    ? (DateTime?)null
-                                    : reader.GetDateTime(reader.GetOrdinal("data_ult_alt"))
-                            });
-                        }
-                    }
-
-                    foreach (var condicaoPagamento in listaCondicaoPagamentos)
-                    {
-                        condicaoPagamento.Parcelas = GetParcelasFromCondicaoPagamento(Connection, condicaoPagamento.Id);
-                    }
-
-                    return listaCondicaoPagamentos;
-
-                }
-                catch (SqlException ex)
-                {
-                    throw new Exception(ex.Message);
-                }
-                finally
-                {
-                    Connection.Close();
-                }
-
-            }
-        }
-
         public IEnumerable<CondicaoPagamentoModel> GetAllCondicoesPagamento() 
         {
             List<CondicaoPagamentoModel> listaCondicaoPagamentos = new List<CondicaoPagamentoModel>();
@@ -221,6 +163,51 @@ namespace api.Services
             catch (SqlException ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+
+        public CondicaoPagamentoValoresModel GetValoresCondicao(int parcela_id)
+        {
+            using (Connection)
+            {
+                try
+                {
+                    Connection.Open();
+
+                    string query = @"
+                        SELECT c.juros, c.multa, c.desconto 
+                        FROM parcelas p
+                        INNER JOIN condicoesPagamento c ON p.condPag_id = c.id
+                        WHERE p.id = @id;";
+
+                    SqlCommand getCmd = new SqlCommand(query, Connection);
+
+                    getCmd.Parameters.Clear();
+                    getCmd.Parameters.Add("@id", SqlDbType.Int).Value = parcela_id;
+
+                    SqlDataReader reader = getCmd.ExecuteReader();
+
+                    if (reader.HasRows)
+                    {
+                        reader.Read();
+                        return new CondicaoPagamentoValoresModel
+                        {
+                            Desconto = reader.GetDecimal("desconto"),
+                            Juros = reader.GetDecimal("juros"),
+                            Multa = reader.GetDecimal("multa"),
+                        };
+                    }
+                    else
+                        return null;
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception(ex.Message);
+                }
+                finally
+                {
+                    Connection.Close();
+                }
             }
         }
 

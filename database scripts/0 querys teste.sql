@@ -188,4 +188,22 @@ WHERE cliente_id = 9
 SELECT * FROM recebimentos
 
 
-DELETE FROM contratos
+DELETE FROM recebimentos
+
+UPDATE contasReceber SET situacao = 'Pendente' WHERE id = 7
+
+SELECT * FROM contasReceber
+
+SELECT c.juros, c.multa, c.desconto
+FROM parcelas p
+INNER JOIN condicoesPagamento c ON p.condPag_id = c.id
+WHERE p.id = 2
+
+SELECT * FROM condicoesPagamento
+
+SELECT * from parcelas
+
+UPDATE condicoesPagamento SET juros = 2.51, multa = 3.42, desconto = 1.32
+WHERE id = 10
+
+SELEC8

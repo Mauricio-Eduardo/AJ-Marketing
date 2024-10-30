@@ -16,35 +16,31 @@ export const createContaReceberSchema = z.object({
   numeroParcela: z.coerce.number().readonly(),
   quantidadeParcelas: z.coerce.number().readonly(),
 
-  total: z.string().min(1, "Obrigatório"),
-  juros: z
+  data_vencimento: z.string().readonly(),
+  total: z
     .string()
-    .transform((val) => val.replace(",", "."))
-    .readonly(),
-  multa: z
+    .min(1, "Obrigatório")
+    .transform((val) => val.replace(",", ".")),
+
+  percentJuros: z.string().readonly(),
+  jurosRecebido: z.string().transform((val) => val.replace(",", ".")),
+  percentMulta: z.string().readonly(),
+  multaRecebida: z.string().transform((val) => val.replace(",", ".")),
+  percentDesconto: z.string().readonly(),
+  descontoConcedido: z.string().transform((val) => val.replace(",", ".")),
+
+  totalRecebido: z
     .string()
-    .transform((val) => val.replace(",", "."))
-    .readonly(),
-  desconto: z
-    .string()
-    .transform((val) => val.replace(",", "."))
-    .readonly(),
-  data_vencimento: z.string().min(1, "Obrigatório"),
+    .transform((val) => {
+      return parseFloat(val.replace(",", "."));
+    })
+    .refine((val) => val >= 0.01, {
+      message: "Valor inválido",
+    })
+    .transform((val) => String(val)),
+  data_recebimento: z.string().min(1, "Obrigatório"),
 
   situacao: z.string().min(1, "Obrigatório"),
-
-  recebimentos: z.array(
-    z.object({
-      formaPag_id: z.coerce.number().min(1, "Obrigatório"),
-      formaPagamento: z.string().readonly(),
-      recebido: z.string().transform((val) => val.replace(",", ".")),
-      juros: z.string().transform((val) => val.replace(",", ".")),
-      multa: z.string().transform((val) => val.replace(",", ".")),
-      desconto: z.string().transform((val) => val.replace(",", ".")),
-      total: z.string().transform((val) => val.replace(",", ".")),
-      data_recebimento: z.string().min(1, "Obrigatório"),
-    })
-  ),
 });
 
 export type ContaReceberSchema = z.infer<typeof createContaReceberSchema>;

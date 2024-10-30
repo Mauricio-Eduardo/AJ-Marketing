@@ -8,8 +8,12 @@ export class OrdensServicoController {
     this.service = new OrdensServicoService();
   }
 
-  async getAll() {
-    return await this.service.getAll();
+  async getAll(situacao: string) {
+    return await this.service.getAll(situacao);
+  }
+
+  async getAllPostados() {
+    return await this.service.getAllPostados();
   }
 
   async getOne(pId: number) {
@@ -18,5 +22,17 @@ export class OrdensServicoController {
 
   async update(updateOrdemServicoDto: UpdateOrdemServicoDto) {
     return await this.service.update(updateOrdemServicoDto);
+  }
+
+  async iniciarPausar(id: number, situacao: string) {
+    return await this.service.iniciarPausar(id, situacao);
+  }
+
+  async entregar(id: number) {
+    return await this.service.entregar(id);
+  }
+
+  async postar(id: number) {
+    return await this.service.postar(id);
   }
 }

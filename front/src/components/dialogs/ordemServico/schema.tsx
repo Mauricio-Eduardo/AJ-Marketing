@@ -10,13 +10,14 @@ export const createOrdensServicoSchema = z.object({
   servico_id: z.coerce.number().readonly(),
   servico: z.string().readonly(),
 
-  data_prazo: z.string(),
+  data_prazo: z.string().min(1, "Obrigatório"),
   data_entrega: z.string().nullable(),
   tema: z.string(),
 
   situacao: z.string(),
   postado: z.string(),
   referencia: z.string(),
+  observacoes: z.string(),
 
   data_cadastro: z.string(),
   data_ult_alt: z.string(),

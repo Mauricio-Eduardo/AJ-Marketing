@@ -1,29 +1,23 @@
 import { ContaReceber } from "../entity/ContaReceber";
 
-export interface ReceberContaReceberDto {
-  contaReceber_id: number;
-  formaPag_id: number;
-  recebido: string;
-  juros: string;
-  multa: string;
-  desconto: string;
-  total: string;
-  receber: string;
+export interface UpdateContaReceberDto {
+  id: number;
+  jurosRecebido: string;
+  multaRecebida: string;
+  descontoConcedido: string;
+  totalRecebido: string;
   data_recebimento: string;
 }
 
-export function transformarParaReceberContaReceber(
-  id: number,
-  pReceber: string,
+export function transformarParaPutContaReceber(
   data: ContaReceber
-): ReceberContaReceberDto {
-  const { formaPagamento, ...ultimoRecebimento } =
-    data.recebimentos[data.recebimentos.length - 1];
-
-  const recebimento = {
-    contaReceber_id: id,
-    receber: pReceber,
-    ...ultimoRecebimento,
+): UpdateContaReceberDto {
+  return {
+    id: data.id,
+    jurosRecebido: data.jurosRecebido,
+    multaRecebida: data.multaRecebida,
+    descontoConcedido: data.descontoConcedido,
+    totalRecebido: data.totalRecebido,
+    data_recebimento: data.data_recebimento,
   };
-  return recebimento;
 }

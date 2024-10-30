@@ -84,12 +84,14 @@ export function PropostaDialog({
   const onClienteSubViewClose = (cliente?: Cliente) => {
     if (cliente) {
       setCliente(cliente);
+      setPreenchido(true);
     }
   };
 
   const onCondicaoSubViewClose = (condicao?: CondicaoPagamento) => {
     if (condicao) {
       setCondicaoPagamento(condicao);
+      setPreenchido(true);
     }
   };
 
@@ -99,12 +101,14 @@ export function PropostaDialog({
   ) => {
     if (peridiocidade) {
       setPeridiocidade(index, peridiocidade);
+      setPreenchido(true);
     }
   };
 
   const onServicoSubViewClose = (index: number, servico?: ServicoProposta) => {
     if (servico) {
       setServico(index, servico);
+      setPreenchido(true);
     }
   };
 
@@ -905,7 +909,7 @@ export function PropostaDialog({
           </div>
 
           <div className="flex w-full justify-end gap-3">
-            {preenchido && action === "Cadastrar" ? (
+            {preenchido ? (
               <AlertCancel />
             ) : (
               <Dialog.Close>

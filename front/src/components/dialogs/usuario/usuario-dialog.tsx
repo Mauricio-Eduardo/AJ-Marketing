@@ -11,6 +11,7 @@ import { Usuario } from "../../../models/usuario/entity/Usuario";
 import { transformarParaPostUsuario } from "../../../models/usuario/dto/createUsuario.dto";
 import { transformarParaPutUsuario } from "../../../models/usuario/dto/updateUsuario.dto";
 import { toast } from "react-toastify";
+import { AlertCancel, AlertCancelX, AlertSubmit } from "../../form/Alerts";
 
 export function UsuarioDialog({
   data,
@@ -27,6 +28,15 @@ export function UsuarioDialog({
   const { control, handleSubmit, reset } = usuarioForm;
 
   const [showPassword, setShowPassword] = useState(false);
+
+  const [preenchido, setPreenchido] = useState<boolean>(false);
+
+  const handlePreenchidoChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value;
+    setPreenchido(value.length > 0); // Define como true se houver texto, caso contrário, false
+  };
 
   const onSubmit = async (pData: Usuario) => {
     let toastId = toast.loading("Processando...");
@@ -128,10 +138,13 @@ export function UsuarioDialog({
       >
         <div className="flex justify-between">
           <Dialog.Title>{action} Usuário</Dialog.Title>
-
-          <Dialog.Close>
-            <X />
-          </Dialog.Close>
+          {preenchido ? (
+            <AlertCancelX />
+          ) : (
+            <Dialog.Close>
+              <X />
+            </Dialog.Close>
+          )}
         </div>
 
         <FormProvider {...usuarioForm}>
@@ -166,15 +179,15 @@ export function UsuarioDialog({
 
             {/* Linha 2 */}
             <div className="flex gap-3">
-              <Form.Field>
+              <Form.Field className="flex-1">
                 <Form.Label htmlFor="nome">Nome *</Form.Label>
                 <Form.Input
                   name="nome"
                   placeholder="Nome completo"
                   max={50}
-                  width={370}
                   defaultValue={data.nome}
-                  disabled={action === "Excluir"}
+                  disabled={action === "Excluir" || action === "Visualizar"}
+                  preenchidoChange={handlePreenchidoChange}
                 />
                 <Form.ErrorMessage field="nome" />
               </Form.Field>
@@ -190,7 +203,8 @@ export function UsuarioDialog({
                   max={50}
                   width={300}
                   defaultValue={data.email}
-                  disabled={action === "Excluir"}
+                  disabled={action === "Excluir" || action === "Visualizar"}
+                  preenchidoChange={handlePreenchidoChange}
                 />
                 <Form.ErrorMessage field="email" />
               </Form.Field>
@@ -201,16 +215,21 @@ export function UsuarioDialog({
                   <Form.Input
                     name="senha"
                     placeholder="*******"
+                    type={showPassword ? "text" : "password"}
                     max={30}
                     width={200}
                     defaultValue={data.senha}
-                    disabled={action === "Excluir"}
+                    disabled={action === "Excluir" || action === "Visualizar"}
+                    preenchidoChange={handlePreenchidoChange}
                   />
-                  {!showPassword ? (
-                    <EyeSlash onClick={() => setShowPassword(!showPassword)} />
-                  ) : (
-                    <Eye onClick={() => setShowPassword(!showPassword)} />
-                  )}
+
+                  <Button
+                    type="button"
+                    variant="soft"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {!showPassword ? <EyeSlash /> : <Eye />}
+                  </Button>
                 </div>
 
                 <Form.ErrorMessage field="senha" />
@@ -246,13 +265,21 @@ export function UsuarioDialog({
 
             {/* Submit Buttons */}
             <div className="flex w-full justify-end gap-3">
-              <Dialog.Close>
-                <Button type="button" variant="outline">
-                  Cancelar
-                </Button>
-              </Dialog.Close>
-              {action === "Excluir" && <Button color="red">{action}</Button>}
-              {action != "Excluir" && <Button>{action}</Button>}
+              {preenchido ? (
+                <AlertCancel />
+              ) : (
+                <Dialog.Close>
+                  <Button variant="outline">Cancelar</Button>
+                </Dialog.Close>
+              )}
+
+              {action != "Visualizar" && (
+                <AlertSubmit
+                  title={action as string}
+                  type="Usuário"
+                  onSubmit={onSubmit}
+                />
+              )}
             </div>
           </form>
         </FormProvider>

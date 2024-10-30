@@ -171,7 +171,7 @@ export const PropostasView = () => {
 
         <DataTable
           type="propostas"
-          columns={PropostasColumns(false)}
+          columns={PropostasColumns}
           onRowSelectionChange={handleRowSelectionChange}
           controller={propostasController}
           refreshKey={refreshKey}
