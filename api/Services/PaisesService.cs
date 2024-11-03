@@ -15,58 +15,6 @@ namespace api.Services
             this.Connection = pSqlConnection;
         }
 
-        public IEnumerable<PaisModel> GetAllPaisesAtivos()
-        {
-            List<PaisModel> listaPaises = new List<PaisModel>();
-
-            using (Connection)
-            {
-                try
-                {
-                    Connection.Open();
-
-                    SqlCommand getAllCmd = new SqlCommand(String.Format(
-                        "SELECT * FROM paises WHERE ativo = @ativo"), Connection);
-
-                    getAllCmd.Parameters.Clear();
-                    getAllCmd.Parameters.Add("@ativo", SqlDbType.Bit).Value = 1;
-
-
-                    SqlDataReader reader = getAllCmd.ExecuteReader();
-
-                    while (reader.Read())
-                    {
-                        // Para cada registro encontrado, cria um objeto e adiciona à lista
-                        listaPaises.Add(
-                            new PaisModel
-                            {
-                                Id = reader.GetInt32("id"),
-                                Pais = reader.GetString("pais"),
-                                Sigla = reader.GetString("sigla"),
-                                Ddi = reader.GetString("ddi"),
-                                Ativo = reader.GetBoolean("ativo"),
-                                Data_cadastro = reader.GetDateTime("data_cadastro"),
-                                Data_ult_alt = reader.IsDBNull(reader.GetOrdinal("data_ult_alt"))
-                                    ? (DateTime?)null
-                                    : reader.GetDateTime(reader.GetOrdinal("data_ult_alt"))
-                            }
-                        );
-                    }
-                    return listaPaises;
-
-                }
-                catch (SqlException ex)
-                {
-                    throw new Exception(ex.Message);
-                }
-                finally
-                {
-                    Connection.Close();
-                }
-
-            }
-        }
-
         public IEnumerable<PaisModel> GetAllPaises() 
         {
             List<PaisModel> listaPaises = new List<PaisModel>();
@@ -179,13 +127,13 @@ namespace api.Services
                     postCmd.Parameters.Add("@ddi", SqlDbType.VarChar).Value = paisInserido.Ddi;
 
                     postCmd.ExecuteNonQuery();
-                    return "Inserido com Sucesso!";
+                    return "País inserido com Sucesso!";
 
                 }
                 catch (SqlException ex)
                 {
-                    throw new Exception(ex.Message);
-                }
+                    throw;
+                }   
                 finally
                 {
                     Connection.Close();
@@ -214,12 +162,12 @@ namespace api.Services
                     putCmd.Parameters.Add("@data_ult_alt", SqlDbType.DateTime).Value = new SqlDateTime(DateTime.Now).ToString();
 
                     putCmd.ExecuteNonQuery();
-                    return "Alterado com Sucesso!";
+                    return "País alterado com Sucesso!";
 
                 }
                 catch (SqlException ex)
                 {
-                    throw new Exception(ex.Message);
+                    throw;
                 }
                 finally
                 {
@@ -243,12 +191,12 @@ namespace api.Services
                     deleteCmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
 
                     deleteCmd.ExecuteNonQuery();
-                    return "Deletado com Sucesso!";
+                    return "País deletado com Sucesso!";
 
                 }
                 catch (SqlException ex)
                 {
-                    throw new Exception(ex.Message);
+                    throw;
                 }
                 finally
                 {

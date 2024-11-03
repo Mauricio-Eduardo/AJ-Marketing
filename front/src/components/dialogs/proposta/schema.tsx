@@ -22,7 +22,7 @@ export const createPropostasSchema = z.object({
     .array(
       z.object({
         servico_id: z.coerce.number().min(1, "Obrigatório"),
-        servico: z.string().min(1, "Obrigatório"),
+        servico: z.string().readonly(),
         quantidade: z.coerce.number().min(1, "Obrigatório"),
         valor_unitario: z.string().refine((val) => val != "0,00", {
           message: "Obrigatório",
@@ -30,16 +30,13 @@ export const createPropostasSchema = z.object({
         desconto: z.string(),
         valor_total: z
           .string()
-          .transform((val) => {
-            return parseFloat(val.replace(",", "."));
-          })
-          .refine((val) => val >= 0.01, {
+          .refine((val) => parseFloat(val) >= 0.01, {
             message: "Valor inválido",
           })
           .transform((val) => String(val)),
         peridiocidade_id: z.coerce.number().min(1, "Obrigatório"),
-        descricao: z.string().min(1, "Obrigatório"),
-        dias: z.coerce.number().min(1, "Obrigatório"),
+        descricao: z.string().readonly(),
+        dias: z.coerce.number().readonly(),
       })
     )
     .min(1, "Deve haver pelo menos um serviço")

@@ -15,64 +15,6 @@ namespace api.Services
             this.Connection = pSqlConnection;
         }
 
-        public IEnumerable<CidadeModel> GetAllCidadesAtivas()
-        {
-            List<CidadeModel> listaCidades = new List<CidadeModel>();
-
-            using (Connection)
-            {
-                try
-                {
-                    Connection.Open();
-
-                    SqlCommand getAllCmd = new SqlCommand(String.Format(
-                    "SELECT c.id, c.cidade, c.ddd, c.estado_id, e.estado, p.pais, c.ativo, c.data_cadastro, c.data_ult_alt " +
-                    "FROM cidades c " +
-                    "INNER JOIN estados e ON c.estado_id = e.id " +
-                    "INNER JOIN paises p ON e.pais_id = p.id " +
-                    "WHERE c.ativo = @ativo"), Connection);
-
-                    getAllCmd.Parameters.Clear();
-                    getAllCmd.Parameters.Add("@ativo", SqlDbType.Bit).Value = 1;
-
-
-                    SqlDataReader reader = getAllCmd.ExecuteReader();
-
-                    while (reader.Read())
-                    {
-                        // Para cada registro encontrado, cria um objeto e adiciona à lista
-                        listaCidades.Add(
-                            new CidadeModel
-                            {
-                                Id = reader.GetInt32("id"),
-                                Cidade = reader.GetString("cidade"),
-                                Ddd = reader.GetString("ddd"),
-                                Estado_id = reader.GetInt32("estado_id"),
-                                Estado = reader.GetString("estado"),
-                                Pais = reader.GetString("pais"),
-                                Ativo = reader.GetBoolean("ativo"),
-                                Data_cadastro = reader.GetDateTime("data_cadastro"),
-                                Data_ult_alt = reader.IsDBNull(reader.GetOrdinal("data_ult_alt"))
-                                    ? (DateTime?)null
-                                    : reader.GetDateTime(reader.GetOrdinal("data_ult_alt"))
-                            }
-                        );
-                    }
-                    return listaCidades;
-
-                }
-                catch (SqlException ex)
-                {
-                    throw new Exception(ex.Message);
-                }
-                finally
-                {
-                    Connection.Close();
-                }
-
-            }
-        }
-
         public IEnumerable<CidadeModel> GetAllCidades() 
         {
             List<CidadeModel> listaCidades = new List<CidadeModel>();
@@ -196,12 +138,12 @@ namespace api.Services
                     postCmd.Parameters.Add("@estado_id", SqlDbType.Int).Value = cidadeInserida.Estado_id;
 
                     postCmd.ExecuteNonQuery();
-                    return "Inserido com Sucesso!";
+                    return "Cidade inserida com Sucesso!";
 
                 }
                 catch (SqlException ex)
                 {
-                    throw new Exception(ex.Message);
+                    throw;
                 }
                 finally
                 {
@@ -232,12 +174,12 @@ namespace api.Services
                     putCmd.Parameters.Add("@data_ult_alt", SqlDbType.DateTime).Value = new SqlDateTime(DateTime.Now).ToString();
 
                     putCmd.ExecuteNonQuery();
-                    return "Alterado com Sucesso!";
+                    return "Cidade alterada com Sucesso!";
 
                 }
                 catch (SqlException ex)
                 {
-                    throw new Exception(ex.Message);
+                    throw;
                 }
                 finally
                 {
@@ -261,12 +203,12 @@ namespace api.Services
                     deleteCmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
 
                     deleteCmd.ExecuteNonQuery();
-                    return "Deletado com Sucesso!";
+                    return "Cidade deletada com Sucesso!";
 
                 }
                 catch (SqlException ex)
                 {
-                    throw new Exception(ex.Message);
+                    throw;
                 }
                 finally
                 {

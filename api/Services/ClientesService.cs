@@ -2,7 +2,6 @@
 using api.Models.Cliente;
 using api.Models.Clientes_interesses;
 using api.Models.Clientes_ramos;
-using api.Models.Clientes_usuarios;
 using api.Models.Contratos;
 using api.Models.Interesse;
 using api.Models.Parcelas;
@@ -279,7 +278,7 @@ namespace api.Services
             return listaRamos;
         }
 
-        public string PostCliente(ClientePostModel clienteInserido, Nullable<int> proposta_id)
+        public string PostCliente(ClientePostModel clienteInserido)
         {
             SqlTransaction transaction = null;
 
@@ -321,20 +320,6 @@ namespace api.Services
 
                     int clienteID = Convert.ToInt32(postCmd.ExecuteScalar());
 
-                    // Inserir os IDs na associativa de usuarios
-                    foreach (var usuario in clienteInserido.Usuarios)
-                    {
-                        string query = @"
-                        INSERT INTO clientes_usuarios (cliente_id, usuario_id)
-                        VALUES (@cliente_id, @usuario_id);";
-
-                        SqlCommand cmd = new SqlCommand(query, Connection, transaction);
-                        cmd.Parameters.AddWithValue("@cliente_id", clienteID);
-                        cmd.Parameters.AddWithValue("@usuario_id", usuario.Usuario_id);
-
-                        cmd.ExecuteNonQuery();
-                    }
-
                     // Inserir os IDs na associativa de interesses
                     foreach (var interesse in clienteInserido.Interesses)
                     {
@@ -363,24 +348,8 @@ namespace api.Services
                         cmd.ExecuteNonQuery();
                     }
 
-                    if (proposta_id != null) 
-                    {
-                        string query = @"UPDATE propostas SET cliente_id = @cliente_id, tipo_pessoa = @tipo_pessoa,
-                                        cpf_cnpj = @cpf_cnpj, nome_razaoSocial = @nome_razaoSocial 
-                                        WHERE id = @id";
-
-                        SqlCommand putCmd = new SqlCommand(query, Connection, transaction);
-                        putCmd.Parameters.AddWithValue("@cliente_id", clienteID);
-                        putCmd.Parameters.AddWithValue("@tipo_pessoa", clienteInserido.Tipo_pessoa);
-                        putCmd.Parameters.AddWithValue("@cpf_cnpj", clienteInserido.Cpf_cnpj);
-                        putCmd.Parameters.AddWithValue("@nome_razaoSocial", clienteInserido.Nome_razaoSocial);
-                        putCmd.Parameters.AddWithValue("@id", proposta_id);
-
-                        putCmd.ExecuteNonQuery();
-                    }
-
                     transaction.Commit();
-                    return "Inserido com Sucesso!";
+                    return "Cliente inserido com Sucesso!";
 
                 }
                 catch (SqlException ex)
@@ -389,7 +358,7 @@ namespace api.Services
                     {
                         transaction.Rollback();
                     }
-                    throw new Exception(ex.Message);
+                    throw;
                 }
                 finally
                 {
@@ -441,15 +410,9 @@ namespace api.Services
 
                     putCmd.ExecuteNonQuery();
 
-                    // Deletar as ligações da associativa de usuarios
-                    string delete = "DELETE FROM clientes_usuarios WHERE cliente_id = @id";
-                    SqlCommand deleteCmd = new SqlCommand(delete, Connection, transaction);
-                    deleteCmd.Parameters.AddWithValue("@id", clienteAlterado.Id);
-
-                    deleteCmd.ExecuteNonQuery();
-
                     // Deletar as ligações da associativa de interesses
-                    delete = "DELETE FROM clientes_interesses WHERE cliente_id = @id";
+                    string delete = "DELETE FROM clientes_interesses WHERE cliente_id = @id";
+                    SqlCommand deleteCmd = new SqlCommand(delete, Connection, transaction);
                     deleteCmd = new SqlCommand(delete, Connection, transaction);
                     deleteCmd.Parameters.AddWithValue("@id", clienteAlterado.Id);
 
@@ -461,20 +424,6 @@ namespace api.Services
                     deleteCmd.Parameters.AddWithValue("@id", clienteAlterado.Id);
 
                     deleteCmd.ExecuteNonQuery();
-
-                    // Inserir os IDs na associativa de usuarios
-                    foreach (var usuario in clienteAlterado.Usuarios)
-                    {
-                        string query = @"
-                        INSERT INTO clientes_usuarios (cliente_id, usuario_id)
-                        VALUES (@cliente_id, @usuario_id);";
-
-                        SqlCommand cmd = new SqlCommand(query, Connection, transaction);
-                        cmd.Parameters.AddWithValue("@cliente_id", clienteAlterado.Id);
-                        cmd.Parameters.AddWithValue("@usuario_id", usuario.Usuario_id);
-
-                        cmd.ExecuteNonQuery();
-                    }
 
                     // Inserir os IDs na associativa de interesses
                     foreach (var interesse in clienteAlterado.Interesses)
@@ -505,7 +454,7 @@ namespace api.Services
                     }
 
                     transaction.Commit();
-                    return "Alterado com sucesso!";
+                    return "Cliente alterado com sucesso!";
 
                 }
                 catch (SqlException ex)
@@ -514,7 +463,7 @@ namespace api.Services
                     {
                         transaction.Rollback();
                     }
-                    throw new Exception(ex.Message);
+                    throw;
                 }
                 finally
                 {
@@ -535,15 +484,9 @@ namespace api.Services
                     Connection.Open();
                     transaction = Connection.BeginTransaction();
 
-                    // Deletar as ligações da associativa de usuarios
-                    string delete = "DELETE FROM clientes_usuarios WHERE cliente_id = @id";
-                    SqlCommand deleteCmd = new SqlCommand(delete, Connection, transaction);
-                    deleteCmd.Parameters.AddWithValue("@id", id);
-                    deleteCmd.ExecuteNonQuery();
-
                     // Deletar as ligações da associativa de interesses
-                    delete = "DELETE FROM clientes_interesses WHERE cliente_id = @id";
-                    deleteCmd = new SqlCommand(delete, Connection, transaction);
+                    string delete = "DELETE FROM clientes_interesses WHERE cliente_id = @id";
+                    SqlCommand deleteCmd = new SqlCommand(delete, Connection, transaction);
                     deleteCmd.Parameters.AddWithValue("@id", id);
                     deleteCmd.ExecuteNonQuery();
 
@@ -568,7 +511,7 @@ namespace api.Services
                     deleteCmd.ExecuteNonQuery();
 
                     transaction.Commit();
-                    return "Excluído com Sucesso!";   
+                    return "Cliente deletado com Sucesso!";
                 }
                 catch (SqlException ex)
                 {
@@ -576,7 +519,8 @@ namespace api.Services
                     {
                         transaction.Rollback();
                     }
-                    throw new Exception(ex.Message);
+                    throw;
+
                 }
                 finally
                 {

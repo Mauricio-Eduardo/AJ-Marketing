@@ -41,16 +41,11 @@ VALUES
 
 INSERT INTO servicos (servico, valor, descricao)
 VALUES 
-('SEO', 1500.00, 'Otimização para motores de busca, melhora da visibilidade nos resultados orgânicos.'),
-('Google Ads', 2500.50, 'Campanhas pagas no Google, aumento de tráfego e conversões.'),
-('Social Media', 1200.75, 'Gestão de redes sociais, criação de conteúdo e interação com seguidores.'),
-('Email Marketing', 800.00, 'Campanhas de email para engajamento e retenção de clientes.'),
-('Content Marketing', 2200.25, 'Criação de conteúdo relevante e de qualidade para atrair e engajar o público.'),
-('Branding', 3500.00, 'Desenvolvimento de identidade de marca e estratégias de posicionamento.'),
-('PPC Advertising', 3000.50, 'Anúncios pagos em diversas plataformas, como Google e redes sociais.'),
-('Analytics', 1800.75, 'Análise de dados e métricas para otimização de campanhas e estratégias.'),
-('Video Marketing', 4000.00, 'Criação e promoção de vídeos para aumentar o engajamento e alcance.'),
-('Influencer Marketing', 5000.25, 'Parcerias com influenciadores para promover produtos e serviços.');
+('Campanha', 1000.00, ''),
+('Post Instagram', 100.00, ''),
+('Reels Instagram', 150.00, ''),
+('Tráfego Pago', 2000.00, ''),
+('Video Youtube', 200.00, '');
 
 INSERT INTO formasPagamento (formaPagamento) 
 VALUES
@@ -67,25 +62,16 @@ VALUES
 
 INSERT INTO condicoesPagamento (condicaoPagamento, quantidadeParcelas, desconto, juros, multa) 
 VALUES
-('00', 1, 5.00, 0.00, 0.00),
-('15/30', 2, 0.00, 1.00, 0.00),
-('30/60/90', 3, 0.00, 1.50, 0.00),
-('15/30/45/60', 4, 0.00, 2.00, 0.00),
-('15/30/45', 0, 0.00, 2.50, 0.00),
-('30/60', 0, 0.00, 3.00, 0.00),
-('30/60/90', 0, 0.00, 3.50, 0.00),
-('30/60/90/120', 0, 0.00, 4.00, 0.00),
-('30/60/90/120/150', 0, 0.00, 4.50, 0.00),
 ('30/60/90/120/150/180', 6, 1.00, 2.00, 5.00);
 
 INSERT INTO parcelas (numeroParcela, dias, porcentagem, condPag_ID, formaPag_ID)
 VALUES
-(1, 30, 16.70, 10, 4),
-(2, 60, 16.66, 10, 4),
-(3, 90, 16.66, 10, 4),
-(4, 120, 16.66, 10, 4),
-(5, 150, 16.66, 10, 4),
-(6, 180, 16.66, 10, 4);
+(1, 30, 16.70, 1, 4),
+(2, 60, 16.66, 1, 4),
+(3, 90, 16.66, 1, 4),
+(4, 120, 16.66, 1, 4),
+(5, 150, 16.66, 1, 4),
+(6, 180, 16.66, 1, 4);
 
 INSERT INTO peridiocidades (descricao, dias)
 VALUES 
@@ -99,39 +85,22 @@ VALUES
 ('João Silva', 'joao.silva@email.com', 'senha123'),
 ('Maria Oliveira', 'maria.oliveira@email.com', 'senha123'),
 ('Carlos Souza', 'carlos.souza@email.com', 'senha123'),
-('Ana Costa', 'ana.costa@email.com', 'senha123'),
-('Pedro Santos', 'pedro.santos@email.com', 'senha123'),
-('Fernanda Rocha', 'fernanda.rocha@email.com', 'senha123'),
-('Lucas Mendes', 'lucas.mendes@email.com', 'senha123'),
-('Patricia Lima', 'patricia.lima@email.com', 'senha123'),
-('Rafael Dias', 'rafael.dias@email.com', 'senha123'),
-('Juliana Martins', 'juliana.martins@email.com', 'senha123');
+('Ana Costa', 'ana.costa@email.com', 'senha123');
 
 INSERT INTO origens (origem)
 VALUES 
 ('Instagram'),
 ('Facebook'),
-('LinkedIn'),
-('Twitter'),
 ('WhatsApp'),
 ('Google Ads'),
 ('YouTube'),
-('Website'),
-('Referência de Cliente'),
-('Evento');
+('Site');
 
 INSERT INTO interesses (interesse)
 VALUES 
-('Tecnologia'),
-('Saúde'),
-('Educação'),
-('Automóveis'),
-('Moda'),
-('Alimentação'),
-('Viagens'),
-('Imóveis'),
-('Esportes'),
-('Financeiro');
+('Tráfego Pago'),
+('Meta Business'),
+('Campanhas');
 
 INSERT INTO ramosAtividade (ramo)
 VALUES 
@@ -171,15 +140,7 @@ OUTPUT INSERTED.id INTO @Clientes(ClienteID)  -- Captura o ID das propostas inse
 VALUES 
 ('Física', '12345678901', 'João Silva', 'João', 'MG1234567', 'Masculino', 'joao.silva@example.com', '11987654321', 1, 'Rua A', '100', 'Centro', '', '12345678', 1),
 ('Jurídica', '12345678000195', 'Empresa ABC', 'ABC Ltda', 'SP12345678', '', 'contato@empresaabc.com', '11987654322', 2, 'Rua B', '200', 'Centro', '', '12345679', 2),
-('Física', '12345678902', 'Maria Souza', 'Maria', 'RJ1234567', 'Feminino', 'maria.souza@example.com', '11987654323', 3, 'Rua C', '300', 'Bairro A', '', '12345680', 3),
-('Jurídica', '12345678000295', 'Empresa XYZ', 'XYZ Ltda', 'SP12345679', '', 'contato@empresaxyz.com', '11987654324', 4, 'Rua D', '400', 'Bairro B', '', '12345681', 4),
-('Física', '12345678903', 'Carlos Lima', 'Carlos', 'MG1234568', 'Masculino', 'carlos.lima@example.com', '11987654325', 5, 'Rua E', '500', 'Bairro C', '', '12345682', 5),
-('Jurídica', '12345678000395', 'Empresa DEF', 'DEF Ltda', 'SP12345680', '', 'contato@empresadef.com', '11987654326', 6, 'Rua F', '600', 'Bairro D', '', '12345683', 6),
-('Física', '12345678904', 'Ana Pereira', 'Ana', 'RJ1234568', 'Feminino', 'ana.pereira@example.com', '11987654327', 7, 'Rua G', '700', 'Bairro E', '', '12345684', 7),
-('Jurídica', '12345678000495', 'Empresa GHI', 'GHI Ltda', 'SP12345681', '', 'contato@empresaghi.com', '11987654328', 8, 'Rua H', '800', 'Bairro F', '', '12345685', 8),
-('Física', '12345678905', 'Fernanda Oliveira', 'Fernanda', 'MG1234569', 'Feminino', 'fernanda.oliveira@example.com', '11987654329', 9, 'Rua I', '900', 'Bairro G', '', '12345686', 9),
-('Jurídica', '12345678000595', 'Empresa JKL', 'JKL Ltda', 'SP12345682', '', 'contato@empresajkl.com', '11987654330', 10, 'Rua J', '1000', 'Bairro H', '', '12345687', 10);
-
+('Física', '12345678902', 'Maria Souza', 'Maria', 'RJ1234567', 'Feminino', 'maria.souza@example.com', '11987654323', 3, 'Rua C', '300', 'Bairro A', '', '12345680', 3);
 -- Inserindo os usuarios para cada cliente inserido
 INSERT INTO clientes_interesses(cliente_id, interesse_id)
 SELECT 
@@ -213,53 +174,3 @@ SELECT
     c.ClienteID, 
     3
 FROM @Clientes c;
-
--- Tabela temporária para armazenar os IDs das propostas inseridas
-DECLARE @Propostas TABLE (PropostaID INT);
-
--- Inserindo as propostas e capturando os IDs gerados
-INSERT INTO propostas (cliente_id, condPag_id, prazo_final, total)
-OUTPUT INSERTED.id INTO @Propostas(PropostaID)  -- Captura o ID das propostas inseridas
-VALUES 
-(1, 1, GETDATE(), 100.00),
-(2, 2, GETDATE(), 200.00),
-(3, 3, GETDATE(), 300.00),
-(4, 4, GETDATE(), 400.00),
-(5, 5, GETDATE(), 500.00),
-(6, 6, GETDATE(), 600.00),
-(7, 7, GETDATE(), 700.00),
-(8, 8, GETDATE(), 800.00),
-(9, 9, GETDATE(), 900.00),
-(10, 10, GETDATE(), 1000.00);
-
--- Inserindo os serviços para cada proposta inserida
-INSERT INTO propostas_servicos(proposta_id, servico_id, peridiocidade_id, quantidade, valor_unitario, desconto, valor_total)
-SELECT 
-    p.PropostaID, 
-    1,
-	1,
-    1, -- Quantidade
-    10.00, -- Valor Unitário
-    0.00, -- Desconto
-    10.00  -- Valor Total
-FROM @Propostas p
-UNION ALL
-SELECT 
-    p.PropostaID, 
-    2,
-    2, 
-	2,
-    20.00, 
-    5.00, 
-    30.00
-FROM @Propostas p
-UNION ALL
-SELECT 
-    p.PropostaID, 
-    3,
-    3, 
-	3,
-    30.00, 
-    10.00, 
-    60.00
-FROM @Propostas p;

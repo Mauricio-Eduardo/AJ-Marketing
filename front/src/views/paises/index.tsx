@@ -1,5 +1,5 @@
 import { Button, Dialog, Flex } from "@radix-ui/themes";
-import { Pencil, Plus, Trash } from "@phosphor-icons/react";
+import { Eye, Pencil, Plus, Trash } from "@phosphor-icons/react";
 import { useState } from "react";
 import { DataTable } from "../../components/datatable";
 import { PaisDialog } from "../../components/dialogs/pais/pais-dialog";
@@ -12,7 +12,7 @@ export const PaisesView = () => {
 
   const [isDialogOpen, setDialogOpen] = useState<boolean>(false);
   const [dialogAction, setDialogAction] = useState<
-    "Cadastrar" | "Editar" | "Excluir" | null
+    "Cadastrar" | "Editar" | "Excluir" | "Visualizar" | null
   >(null);
 
   const [refreshKey, setRefreshKey] = useState(0);
@@ -28,7 +28,9 @@ export const PaisesView = () => {
     handleOpenDialog();
   };
 
-  const handleActionChange = (action: "Cadastrar" | "Editar" | "Excluir") => {
+  const handleActionChange = (
+    action: "Cadastrar" | "Editar" | "Excluir" | "Visualizar"
+  ) => {
     setDialogAction(action);
   };
 
@@ -40,46 +42,63 @@ export const PaisesView = () => {
     <div className="flex flex-col">
       <Dialog.Root open={isDialogOpen} onOpenChange={handleOpenDialog}>
         <Flex
-          justify={"start"}
+          justify={"between"}
           direction={"row"}
           gap={"3"}
           className="pb-2 border-b-2 border-b-gray-200"
         >
-          <Dialog.Trigger>
-            <Button
-              onClick={() => {
-                handleActionChange("Cadastrar");
-              }}
-            >
-              <Plus />
-              Cadastrar
-            </Button>
-          </Dialog.Trigger>
+          <div className="space-x-3">
+            <Dialog.Trigger>
+              <Button
+                onClick={() => {
+                  handleActionChange("Cadastrar");
+                }}
+              >
+                <Plus />
+                Cadastrar
+              </Button>
+            </Dialog.Trigger>
 
-          <Dialog.Trigger>
-            <Button
-              onClick={() => {
-                handleActionChange("Editar");
-              }}
-              disabled={!selectedRowData?.id}
-            >
-              <Pencil />
-              Editar
-            </Button>
-          </Dialog.Trigger>
+            <Dialog.Trigger>
+              <Button
+                onClick={() => {
+                  handleActionChange("Editar");
+                }}
+                disabled={!selectedRowData?.id}
+              >
+                <Pencil />
+                Editar
+              </Button>
+            </Dialog.Trigger>
 
-          <Dialog.Trigger>
-            <Button
-              onClick={() => {
-                handleActionChange("Excluir");
-              }}
-              disabled={!selectedRowData?.id}
-              color="red"
-            >
-              <Trash />
-              Excluir
-            </Button>
-          </Dialog.Trigger>
+            <Dialog.Trigger>
+              <Button
+                onClick={() => {
+                  handleActionChange("Visualizar");
+                }}
+                disabled={!selectedRowData?.id}
+                variant="outline"
+              >
+                <Eye />
+                Visualizar
+              </Button>
+            </Dialog.Trigger>
+          </div>
+
+          <div className="space-x-3">
+            <Dialog.Trigger>
+              <Button
+                onClick={() => {
+                  handleActionChange("Excluir");
+                }}
+                disabled={!selectedRowData?.id}
+                color="red"
+              >
+                <Trash />
+                Excluir
+              </Button>
+            </Dialog.Trigger>
+          </div>
         </Flex>
 
         {isDialogOpen && (

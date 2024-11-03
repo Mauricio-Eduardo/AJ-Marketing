@@ -1,3 +1,4 @@
+import { AxiosResponse } from "axios";
 import { api } from "../config/api";
 import { CreateServicoDto } from "../models/servico/dto/createServico.dto";
 import { UpdateServicoDto } from "../models/servico/dto/updateServico.dto";
@@ -13,20 +14,24 @@ export class ServicosService {
     return response.data;
   }
 
-  async create(createServicoDto: CreateServicoDto) {
-    const response = await api.post("PostServico", createServicoDto);
-    return String(response.data);
+  async create(
+    createServicoDto: CreateServicoDto
+  ): Promise<AxiosResponse<string>> {
+    const response = await api.post<string>("PostServico", createServicoDto);
+    return response;
   }
 
-  async update(updateServicoDto: UpdateServicoDto) {
+  async update(
+    updateServicoDto: UpdateServicoDto
+  ): Promise<AxiosResponse<string>> {
     const response = await api.put("PutServico", updateServicoDto);
-    return String(response.data);
+    return response;
   }
 
-  async delete(id: number) {
+  async delete(id: number): Promise<AxiosResponse<string>> {
     const response = await api.delete("DeleteServico", {
       params: { id: id },
     });
-    return String(response.data);
+    return response;
   }
 }

@@ -1,6 +1,8 @@
 ﻿using api.Interfaces;
 using api.Models.Usuario;
+using api.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Data.SqlClient;
 
 
 namespace api.Controllers
@@ -16,16 +18,6 @@ namespace api.Controllers
             this.usuariosService = pIUsuariosService;
         }
 
-        [HttpGet]
-        [Route("/GetAllUsuariosAtivos")]
-        public ActionResult<IEnumerable<UsuarioModel>> GetAllUsuariosAtivos()
-        {
-            IEnumerable<UsuarioModel> result = usuariosService.GetAllUsuariosAtivos();
-            if (result != null)
-                return Ok(result);
-            else
-                return BadRequest();
-        }
 
         [HttpGet]
         [Route("/GetAllUsuarios")]
@@ -53,33 +45,57 @@ namespace api.Controllers
         [Route("/PostUsuario")]
         public IActionResult PostUsuario([FromBody] UsuarioPostModel usuarioInserido)
         {
-            string result = usuariosService.PostUsuario(usuarioInserido);
-            if (result != null)
-                return Ok(result);
-            else
-                return BadRequest();
+            try
+            {
+                string result = usuariosService.PostUsuario(usuarioInserido);
+                return StatusCode(200, result);
+            }
+            catch (SqlException ex) when (ex.Number == 2627)
+            {
+                return Conflict("O usuário já está cadastrado."); // 409 Conflict
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocorreu um erro inesperado: " + ex.Message);
+            }
         }
 
         [HttpPut]
         [Route("/PutUsuario")]
         public IActionResult PutUsuario([FromBody] UsuarioPutModel usuarioAlterado)
         {
-            string result = usuariosService.PutUsuario(usuarioAlterado);
-            if (result != null)
-                return Ok(result);
-            else
-                return BadRequest();
+            try
+            {
+                string result = usuariosService.PutUsuario(usuarioAlterado);
+                return StatusCode(200, result);
+            }
+            catch (SqlException ex) when (ex.Number == 2627)
+            {
+                return Conflict("O usuário já está cadastrado."); // 409 Conflict
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocorreu um erro inesperado: " + ex.Message);
+            }
         }
 
         [HttpDelete]
         [Route("/DeleteUsuario")]
-        public IActionResult DeleteUsuario(int id)
+        public IActionResult DeleteUsuario(int id, int novoUsuario_id   )
         {
-            string result = usuariosService.DeleteUsuario(id);
-            if (result != null)
-                return Ok(result);
-            else
-                return BadRequest();
+            try
+            {
+                string result = usuariosService.DeleteUsuario(id, novoUsuario_id);
+                return StatusCode(200, result);
+            }
+            catch (SqlException ex) when (ex.Number == 547)
+            {
+                return Conflict("Não é possível excluir o usuário pois ele tem relações com outros registros.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
     }
 }

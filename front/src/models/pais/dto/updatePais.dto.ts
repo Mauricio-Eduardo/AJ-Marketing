@@ -12,7 +12,7 @@ export function transformarParaPutPais(data: Pais): UpdatePaisDto {
   return {
     id: data.id,
     pais: data.pais,
-    sigla: data.sigla,
+    sigla: data.sigla.toUpperCase(),
     ddi: data.ddi,
     ativo: data.ativo,
   };

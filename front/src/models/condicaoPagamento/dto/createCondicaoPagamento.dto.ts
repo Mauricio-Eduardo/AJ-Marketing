@@ -22,9 +22,9 @@ export function transformarParaPostCondicaoPagamento(
   return {
     condicaoPagamento: data.condicaoPagamento,
     quantidadeParcelas: data.quantidadeParcelas,
-    juros: data.juros,
-    multa: data.multa,
-    desconto: data.desconto,
+    juros: data.juros != "" ? data.juros : "0.00",
+    multa: data.multa != "" ? data.multa : "0.00",
+    desconto: data.desconto != "" ? data.desconto : "0.00",
     parcelas: data.parcelas,
   };
 }

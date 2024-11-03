@@ -1,5 +1,5 @@
 import { Button, Dialog, Flex } from "@radix-ui/themes";
-import { Pencil, Plus, Trash } from "@phosphor-icons/react";
+import { Eye, Pencil, Plus, Trash } from "@phosphor-icons/react";
 import { useState } from "react";
 import { DataTable } from "../../components/datatable";
 import { CidadesColumns } from "../../components/datatable/columns/cidades-columns";
@@ -14,7 +14,7 @@ export const CidadesView = () => {
 
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [dialogAction, setDialogAction] = useState<
-    "Cadastrar" | "Editar" | "Excluir" | null
+    "Cadastrar" | "Editar" | "Visualizar" | "Excluir" | null
   >(null);
 
   const [refreshKey, setRefreshKey] = useState(0);
@@ -30,7 +30,9 @@ export const CidadesView = () => {
     handleOpenDialog();
   };
 
-  const handleActionChange = (action: "Cadastrar" | "Editar" | "Excluir") => {
+  const handleActionChange = (
+    action: "Cadastrar" | "Editar" | "Visualizar" | "Excluir"
+  ) => {
     setDialogAction(action);
   };
 
@@ -42,59 +44,76 @@ export const CidadesView = () => {
     <div className="flex flex-col">
       <Dialog.Root open={isDialogOpen} onOpenChange={handleOpenDialog}>
         <Flex
-          justify={"start"}
+          justify={"between"}
           direction={"row"}
           gap={"3"}
           className="pb-2 border-b-2 border-b-gray-200"
         >
-          <Dialog.Trigger>
-            <Button
-              onClick={() => {
-                handleActionChange("Cadastrar");
-              }}
-            >
-              <Plus />
-              Cadastrar
-            </Button>
-          </Dialog.Trigger>
+          <div className="space-x-3">
+            <Dialog.Trigger>
+              <Button
+                onClick={() => {
+                  handleActionChange("Cadastrar");
+                }}
+              >
+                <Plus />
+                Cadastrar
+              </Button>
+            </Dialog.Trigger>
 
-          <Dialog.Trigger>
-            <Button
-              onClick={() => {
-                handleActionChange("Editar");
-              }}
-              disabled={!selectedRowData?.id}
-            >
-              <Pencil />
-              Editar
-            </Button>
-          </Dialog.Trigger>
+            <Dialog.Trigger>
+              <Button
+                onClick={() => {
+                  handleActionChange("Editar");
+                }}
+                disabled={!selectedRowData?.id}
+              >
+                <Pencil />
+                Editar
+              </Button>
+            </Dialog.Trigger>
 
-          <Dialog.Trigger>
-            <Button
-              onClick={() => {
-                handleActionChange("Excluir");
-              }}
-              disabled={!selectedRowData?.id}
-              color="red"
-            >
-              <Trash />
-              Excluir
-            </Button>
-          </Dialog.Trigger>
+            <Dialog.Trigger>
+              <Button
+                onClick={() => {
+                  handleActionChange("Visualizar");
+                }}
+                disabled={!selectedRowData?.id}
+                variant="outline"
+              >
+                <Eye />
+                Visualizar
+              </Button>
+            </Dialog.Trigger>
+          </div>
 
-          {isDialogOpen && (
-            <CidadeDialog
-              key={selectedRowData?.id}
-              data={selectedRowData as Cidade}
-              action={dialogAction}
-              controller={cidadesController}
-              subController={estadosController}
-              isOpenModal={isDialogOpen}
-              onSuccess={handleSuccess}
-            />
-          )}
+          <div className="space-x-3">
+            <Dialog.Trigger>
+              <Button
+                onClick={() => {
+                  handleActionChange("Excluir");
+                }}
+                disabled={!selectedRowData?.id}
+                color="red"
+              >
+                <Trash />
+                Excluir
+              </Button>
+            </Dialog.Trigger>
+          </div>
         </Flex>
+
+        {isDialogOpen && (
+          <CidadeDialog
+            key={selectedRowData?.id}
+            data={selectedRowData as Cidade}
+            action={dialogAction}
+            controller={cidadesController}
+            subController={estadosController}
+            isOpenModal={isDialogOpen}
+            onSuccess={handleSuccess}
+          />
+        )}
 
         <DataTable
           columns={CidadesColumns}

@@ -1,3 +1,4 @@
+import { AxiosResponse } from "axios";
 import { api } from "../config/api";
 import { CreateCidadeDto } from "../models/cidade/dto/createCidade.dto";
 import { UpdateCidadeDto } from "../models/cidade/dto/updateCidade.dto";
@@ -13,20 +14,24 @@ export class CidadesService {
     return response.data;
   }
 
-  async create(createCidadeDto: CreateCidadeDto) {
-    const response = await api.post("PostCidade", createCidadeDto);
-    return String(response.data);
+  async create(
+    createCidadeDto: CreateCidadeDto
+  ): Promise<AxiosResponse<string>> {
+    const response = await api.post<string>("PostCidade", createCidadeDto);
+    return response;
   }
 
-  async update(updateCidadeDto: UpdateCidadeDto) {
+  async update(
+    updateCidadeDto: UpdateCidadeDto
+  ): Promise<AxiosResponse<string>> {
     const response = await api.put("PutCidade", updateCidadeDto);
-    return String(response.data);
+    return response;
   }
 
-  async delete(id: number) {
+  async delete(id: number): Promise<AxiosResponse<string>> {
     const response = await api.delete("DeleteCidade", {
       params: { id: id },
     });
-    return String(response.data);
+    return response;
   }
 }

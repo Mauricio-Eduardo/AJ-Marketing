@@ -12,6 +12,8 @@ import { transformarParaPostUsuario } from "../../../models/usuario/dto/createUs
 import { transformarParaPutUsuario } from "../../../models/usuario/dto/updateUsuario.dto";
 import { toast } from "react-toastify";
 import { AlertCancel, AlertCancelX, AlertSubmit } from "../../form/Alerts";
+import { UsuariosSubView } from "../../../views/usuarios/subView";
+import { AxiosError, AxiosResponse } from "axios";
 
 export function UsuarioDialog({
   data,
@@ -23,9 +25,9 @@ export function UsuarioDialog({
   //
   // Configuração do Zod para validação dos formulários
   const usuarioForm = useForm<UsuarioSchema>({
-    resolver: zodResolver(createUsuarioSchema),
+    resolver: zodResolver(createUsuarioSchema(action)),
   });
-  const { control, handleSubmit, reset } = usuarioForm;
+  const { control, handleSubmit, reset, setValue } = usuarioForm;
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -38,57 +40,84 @@ export function UsuarioDialog({
     setPreenchido(value.length > 0); // Define como true se houver texto, caso contrário, false
   };
 
+  const onUsuarioSubViewClose = (usuario?: Usuario) => {
+    if (usuario?.ativo) {
+      setUsuario(usuario);
+      setPreenchido(true);
+    } else {
+      setUsuarioNull("inativo");
+    }
+  };
+
+  const setUsuario = (usuario: Usuario) => {
+    setValue("novoUsuario_id", usuario.id);
+    setValue("novoUsuario_nome", usuario.nome);
+  };
+
+  const setUsuarioNull = (str: string) => {
+    setValue("novoUsuario_id", 0);
+    setValue("novoUsuario_nome", "");
+
+    toast(`Usuário ${str}!`, {
+      type: "error",
+      isLoading: false,
+      autoClose: 3000,
+    });
+  };
+
+  const getUsuario = async (pId: number) => {
+    if (pId != 0) {
+      if (controller) {
+        try {
+          const response = await controller.getOne(pId);
+          if (response.ativo) {
+            setUsuario(response);
+          } else {
+            setUsuarioNull("inativo");
+          }
+        } catch (error) {
+          setUsuarioNull("inexistente");
+        }
+      }
+    } else {
+      setUsuarioNull("inexistente");
+    }
+  };
+
   const onSubmit = async (pData: Usuario) => {
     let toastId = toast.loading("Processando...");
+    let response: AxiosResponse<string> | undefined;
 
     try {
       if (action === "Cadastrar") {
         const payload = transformarParaPostUsuario(pData);
-        await controller.create(payload);
-        toast.update(toastId, {
-          render: "Usuario cadastrado com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
+        response = await controller.create(payload);
       } else if (action === "Editar") {
         const payload = transformarParaPutUsuario(pData);
-        await controller.update(payload);
-        toast.update(toastId, {
-          render: "Usuario atualizado com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
+        response = await controller.update(payload);
       } else if (action === "Excluir") {
         const id = pData.id;
-        await controller.delete(id);
-        toast.update(toastId, {
-          render: "Usuario excluído com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
+        response = await controller.delete(id, pData.novoUsuario_id);
       }
-    } catch (error) {
       toast.update(toastId, {
-        render: "Ocorreu um erro. Tente novamente!",
+        render: response?.data,
+        type: "success",
+        isLoading: false,
+        draggable: true,
+        draggableDirection: "x",
+        autoClose: 1000,
+        onClose: onSuccess,
+      });
+    } catch (error) {
+      const errorMessage = (error as AxiosError).response?.data;
+      toast.update(toastId, {
+        render: String(errorMessage),
         type: "error",
         isLoading: false,
         draggable: true,
         draggableDirection: "x",
         autoClose: 3000,
       });
-      console.log(error);
     }
   };
 
@@ -101,12 +130,15 @@ export function UsuarioDialog({
       ativo: true,
       data_cadastro: "",
       data_ult_alt: "",
+      novoUsuario_id: null,
     });
   };
 
   const loadData = () => {
     reset({
       ...data,
+      senha: "",
+      novoUsuario_id: null,
       data_cadastro: data.data_cadastro
         ? format(new Date(data.data_cadastro), "dd/MM/yyyy HH:mm")
         : "",
@@ -129,6 +161,7 @@ export function UsuarioDialog({
   return (
     <div>
       <Dialog.Content
+        autoFocus
         onInteractOutside={(e) => {
           e.preventDefault();
         }}
@@ -210,7 +243,9 @@ export function UsuarioDialog({
               </Form.Field>
 
               <Form.Field>
-                <Form.Label htmlFor="senha">Senha</Form.Label>
+                <Form.Label htmlFor="senha">
+                  {action === "Editar" ? "Nova Senha" : "Senha *"}
+                </Form.Label>
                 <div className="flex gap-2 items-center">
                   <Form.Input
                     name="senha"
@@ -218,7 +253,6 @@ export function UsuarioDialog({
                     type={showPassword ? "text" : "password"}
                     max={30}
                     width={200}
-                    defaultValue={data.senha}
                     disabled={action === "Excluir" || action === "Visualizar"}
                     preenchidoChange={handlePreenchidoChange}
                   />
@@ -226,15 +260,88 @@ export function UsuarioDialog({
                   <Button
                     type="button"
                     variant="soft"
+                    disabled={action === "Visualizar" || action === "Excluir"}
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {!showPassword ? <EyeSlash /> : <Eye />}
                   </Button>
                 </div>
-
                 <Form.ErrorMessage field="senha" />
               </Form.Field>
             </div>
+
+            {/* Linha 4 */}
+            <div className="flex flex-col gap-1 border-t-2 pt-4 border-gray-200">
+              <div className="flex flex-col gap-3 justify-between">
+                <span className="text-sm font-medium">
+                  Transferir responsabilidades para um outro Usuário
+                </span>
+                <div className="flex gap-3 items-end border-2 border-gray-200 rounded p-2 justify-start">
+                  <Form.Field>
+                    <Form.Label htmlFor="novoUsuario_id">
+                      Código Usuário *
+                    </Form.Label>
+                    <Form.Input
+                      name="novoUsuario_id"
+                      placeholder="0"
+                      max={5}
+                      width={100}
+                      defaultValue={data.usuario_id}
+                      disabled={
+                        action === "Cadastrar" || action === "Visualizar"
+                      }
+                      onBlur={(e) => getUsuario(Number(e.target.value))}
+                      preenchidoChange={handlePreenchidoChange}
+                    />
+                    <Form.ErrorMessage field="novoUsuario_id" />
+                  </Form.Field>
+
+                  <Form.Field>
+                    <br />
+                    <UsuariosSubView
+                      onClose={onUsuarioSubViewClose}
+                      controller={controller}
+                      disabled={
+                        action === "Cadastrar" || action === "Visualizar"
+                      }
+                    />
+                  </Form.Field>
+
+                  <Form.Field className="flex-1">
+                    <Form.Label htmlFor="novoUsuario_nome">Nome</Form.Label>
+                    <Form.Input name="novoUsuario_nome" disabled={true} />
+                    <Form.ErrorMessage field="novoUsuario_nome" />
+                  </Form.Field>
+                </div>
+              </div>
+            </div>
+
+            {/* <div className="flex gap-3 items-center">
+              <Form.Field>
+                <Form.Label htmlFor="senhaAtual">Senha Atual</Form.Label>
+                <div className="flex gap-2 items-center">
+                  <Form.Input
+                    name="senhaAtual"
+                    placeholder="*******"
+                    type={showPassword ? "text" : "password"}
+                    max={30}
+                    width={200}
+                    disabled={action === "Cadastrar" || action === "Visualizar"}
+                    preenchidoChange={handlePreenchidoChange}
+                  />
+
+                  <Button
+                    type="button"
+                    variant="soft"
+                    disabled={action === "Cadastrar" || action === "Visualizar"}
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {!showPassword ? <EyeSlash /> : <Eye />}
+                  </Button>
+                </div>
+                <Form.ErrorMessage field="senhaAtual" />
+              </Form.Field>
+            </div> */}
 
             {/* Linha 4 */}
             <div className="flex gap-3">
@@ -269,7 +376,7 @@ export function UsuarioDialog({
                 <AlertCancel />
               ) : (
                 <Dialog.Close>
-                  <Button variant="outline">Cancelar</Button>
+                  <Button variant="outline">Voltar</Button>
                 </Dialog.Close>
               )}
 

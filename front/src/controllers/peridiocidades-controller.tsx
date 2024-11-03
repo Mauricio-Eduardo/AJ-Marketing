@@ -1,3 +1,4 @@
+import { AxiosResponse } from "axios";
 import { CreatePeridiocidadeDto } from "../models/peridiocidade/dto/createPeridiocidade.dto";
 import { UpdatePeridiocidadeDto } from "../models/peridiocidade/dto/updatePeridiocidade.dto";
 import { PeridiocidadesService } from "../services/peridiocidades-service";
@@ -13,19 +14,19 @@ export class PeridiocidadesController {
     return await this.service.getAll();
   }
 
-  async getAllAtivos() {
-    return await this.service.getAllAtivos();
-  }
-
   async getOne(pId: number) {
     return await this.service.getOne(pId);
   }
 
-  async create(createPeridiocidadeDto: CreatePeridiocidadeDto) {
+  async create(
+    createPeridiocidadeDto: CreatePeridiocidadeDto
+  ): Promise<AxiosResponse<string>> {
     return await this.service.create(createPeridiocidadeDto);
   }
 
-  async update(updatePeridiocidadeDto: UpdatePeridiocidadeDto) {
+  async update(
+    updatePeridiocidadeDto: UpdatePeridiocidadeDto
+  ): Promise<AxiosResponse<string>> {
     return await this.service.update(updatePeridiocidadeDto);
   }
 

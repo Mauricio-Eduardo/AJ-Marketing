@@ -624,7 +624,7 @@ export function ContratoDialog({
               <AlertCancel />
             ) : (
               <Dialog.Close>
-                <Button variant="outline">Cancelar</Button>
+                <Button variant="outline">Voltar</Button>
               </Dialog.Close>
             )}
 

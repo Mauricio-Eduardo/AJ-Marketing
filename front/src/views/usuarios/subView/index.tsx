@@ -20,7 +20,7 @@ export const UsuariosSubView = ({
 }: SubDialogProps) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [dialogAction, setDialogAction] = useState<
-    "Cadastrar" | "Editar" | "Visualizar" | "Excluir" | null
+    "Cadastrar" | "Editar" | "Visualizar" | null
   >(null);
 
   const [refreshKey, setRefreshKey] = useState(0);
@@ -37,7 +37,7 @@ export const UsuariosSubView = ({
   };
 
   const handleActionChange = (
-    action: "Cadastrar" | "Editar" | "Visualizar" | "Excluir"
+    action: "Cadastrar" | "Editar" | "Visualizar"
   ) => {
     setDialogAction(action);
   };
@@ -105,21 +105,6 @@ export const UsuariosSubView = ({
                   >
                     <Eye />
                     Visualizar
-                  </Button>
-                </Dialog.Trigger>
-              </div>
-
-              <div className="space-x-3">
-                <Dialog.Trigger>
-                  <Button
-                    onClick={() => {
-                      handleActionChange("Excluir");
-                    }}
-                    disabled={!selectedRowData?.id}
-                    color="red"
-                  >
-                    <Trash />
-                    Excluir
                   </Button>
                 </Dialog.Trigger>
               </div>

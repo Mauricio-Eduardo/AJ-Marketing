@@ -1,3 +1,4 @@
+import { AxiosResponse } from "axios";
 import { CreateClienteDto } from "../models/cliente/dto/createCliente.dto";
 import { UpdateClienteDto } from "../models/cliente/dto/updateCliente.dto";
 import { ClientesService } from "../services/clientes-service";
@@ -18,17 +19,18 @@ export class ClientesController {
   }
 
   async create(
-    createClienteDto: CreateClienteDto,
-    proposta_id: number | null | undefined
-  ) {
-    return await this.service.create(createClienteDto, proposta_id);
+    createClienteDto: CreateClienteDto
+  ): Promise<AxiosResponse<string>> {
+    return await this.service.create(createClienteDto);
   }
 
-  async update(updateClienteDto: UpdateClienteDto) {
+  async update(
+    updateClienteDto: UpdateClienteDto
+  ): Promise<AxiosResponse<string>> {
     return await this.service.update(updateClienteDto);
   }
 
-  async delete(id: number) {
+  async delete(id: number): Promise<AxiosResponse<string>> {
     return await this.service.delete(id);
   }
 }

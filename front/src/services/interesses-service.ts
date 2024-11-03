@@ -1,3 +1,4 @@
+import { AxiosResponse } from "axios";
 import { api } from "../config/api";
 import { CreateInteresseDto } from "../models/interesse/dto/createInteresse.dto";
 import { UpdateInteresseDto } from "../models/interesse/dto/updateInteresse.dto";
@@ -13,20 +14,27 @@ export class InteressesService {
     return response.data;
   }
 
-  async create(createInteresseDto: CreateInteresseDto) {
-    const response = await api.post("PostInteresse", createInteresseDto);
-    return String(response.data);
+  async create(
+    createInteresseDto: CreateInteresseDto
+  ): Promise<AxiosResponse<string>> {
+    const response = await api.post<string>(
+      "PostInteresse",
+      createInteresseDto
+    );
+    return response;
   }
 
-  async update(updateInteresseDto: UpdateInteresseDto) {
+  async update(
+    updateInteresseDto: UpdateInteresseDto
+  ): Promise<AxiosResponse<string>> {
     const response = await api.put("PutInteresse", updateInteresseDto);
-    return String(response.data);
+    return response;
   }
 
-  async delete(id: number) {
+  async delete(id: number): Promise<AxiosResponse<string>> {
     const response = await api.delete("DeleteInteresse", {
       params: { id: id },
     });
-    return String(response.data);
+    return response;
   }
 }

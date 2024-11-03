@@ -55,7 +55,8 @@ export const ContasReceberView = () => {
                 }}
                 disabled={
                   !selectedRowData?.id ||
-                  selectedRowData?.situacao === "Recebida"
+                  selectedRowData?.situacao === "Recebida" ||
+                  selectedRowData?.situacao === "Cancelada"
                 }
                 color="green"
               >

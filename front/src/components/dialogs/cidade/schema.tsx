@@ -15,7 +15,8 @@ export const createCidadeSchema = z.object({
     .min(1, "Obrigatório")
     .regex(new RegExp(/^\d+$/), "Somente números"),
   estado_id: z.coerce.number().min(1, "Obrigatório"),
-  estado: z.string(),
+  estado: z.string().default(""),
+  pais: z.string().default(""),
   ativo: z.boolean({
     required_error: "Obrigatório",
   }),

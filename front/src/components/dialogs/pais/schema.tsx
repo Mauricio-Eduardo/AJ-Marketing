@@ -5,6 +5,7 @@ export const createPaisSchema = z.object({
   pais: z
     .string()
     .min(1, "Obrigatório")
+    .min(3, "Deve ter 3 ou mais caracteres")
     .regex(
       new RegExp(/^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ'\s]+$/),
       "Somente letras"
@@ -19,7 +20,7 @@ export const createPaisSchema = z.object({
     ),
   ddi: z
     .string()
-    .min(1, "Obrigatório")
+    .min(2, "Obrigatório")
     .regex(new RegExp(/^\d+$/), "Somente números"),
   ativo: z.boolean({
     required_error: "Obrigatório",

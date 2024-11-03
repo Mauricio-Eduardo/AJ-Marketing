@@ -1,6 +1,7 @@
 ﻿using api.Interfaces;
 using api.Models.País;
 using Microsoft.AspNetCore.Mvc;
+using System.Data.SqlClient;
 
 
 namespace api.Controllers
@@ -14,17 +15,6 @@ namespace api.Controllers
         public PaisesController(IPaisesService pIPaisesService)
         {
             this.paisesService = pIPaisesService;
-        }
-
-        [HttpGet]
-        [Route("/GetAllPaisesAtivos")]
-        public ActionResult<IEnumerable<PaisModel>> GetAllPaisesAtivos()
-        {
-            IEnumerable<PaisModel> result = paisesService.GetAllPaisesAtivos();
-            if (result != null)
-                return Ok(result);
-            else
-                return BadRequest();
         }
 
         [HttpGet]
@@ -53,33 +43,57 @@ namespace api.Controllers
         [Route("/PostPais")]
         public IActionResult PostPais([FromBody] PaisPostModel paisInserido)
         {
-            string result = paisesService.PostPais(paisInserido);
-            if (result != null)
-                return Ok(result);
-            else
-                return BadRequest();
+            try
+            {
+                string result = paisesService.PostPais(paisInserido);
+                return StatusCode(200, result);
+            }
+            catch (SqlException ex) when (ex.Number == 2627)
+            {
+                return Conflict("O país já está cadastrado."); // 409 Conflict
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocorreu um erro inesperado: " + ex.Message);
+            }
         }
 
         [HttpPut]
         [Route("/PutPais")]
         public IActionResult PutPais([FromBody] PaisPutModel paisAlterado)
         {
-            string result = paisesService.PutPais(paisAlterado);
-            if (result != null)
-                return Ok(result);
-            else
-                return BadRequest();
+            try
+            {
+                string result = paisesService.PutPais(paisAlterado);
+                return StatusCode(200, result);
+            }
+            catch (SqlException ex) when (ex.Number == 2627)
+            {
+                return Conflict("O país já está cadastrado."); // 409 Conflict
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocorreu um erro inesperado: " + ex.Message);
+            }
         }
 
         [HttpDelete]
         [Route("/DeletePais")]
         public IActionResult DeletePais(int id)
         {
-            string result = paisesService.DeletePais(id);
-            if (result != null)
-                return Ok(result);
-            else
-                return BadRequest();
+            try
+            {
+                string result = paisesService.DeletePais(id);
+                return StatusCode(200, result);
+            }
+            catch (SqlException ex) when (ex.Number == 547)
+            {
+                return Conflict("Não é possível excluir o país pois ele tem relações com outros registros.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocorreu um erro inesperado: " + ex.Message);
+            }
         }
     }
 }

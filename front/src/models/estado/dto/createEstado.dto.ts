@@ -9,7 +9,7 @@ export interface CreateEstadoDto {
 export function transformarParaPostEstado(data: Estado): CreateEstadoDto {
   return {
     estado: data.estado,
-    uf: data.uf,
+    uf: data.uf.toUpperCase(),
     pais_id: data.pais_id,
   };
 }

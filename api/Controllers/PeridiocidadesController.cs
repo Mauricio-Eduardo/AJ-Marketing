@@ -1,6 +1,8 @@
 ﻿using api.Interfaces;
 using api.Models.Peridiocidade;
+using api.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Data.SqlClient;
 
 
 namespace api.Controllers
@@ -28,17 +30,6 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("/GetAllPeridiocidadesAtivas")]
-        public ActionResult<IEnumerable<PeridiocidadeModel>> GetAllPeridiocidadesAtivas()
-        {
-            IEnumerable<PeridiocidadeModel> result = peridiocidadesService.GetAllPeridiocidadesAtivas();
-            if (result != null)
-                return Ok(result);
-            else
-                return BadRequest();
-        }
-
-        [HttpGet]
         [Route("/GetPeridiocidade")]
         public IActionResult GetPeridiocidade(int id)
         {
@@ -53,33 +44,57 @@ namespace api.Controllers
         [Route("/PostPeridiocidade")]
         public IActionResult PostPeridiocidade([FromBody] PeridiocidadePostModel peridiocidadeInserida)
         {
-            string result = peridiocidadesService.PostPeridiocidade(peridiocidadeInserida);
-            if (result != null)
-                return Ok(result);
-            else
-                return BadRequest();
+            try
+            {
+                string result = peridiocidadesService.PostPeridiocidade(peridiocidadeInserida);
+                return StatusCode(200, result);
+            }
+            catch (SqlException ex) when (ex.Number == 2627)
+            {
+                return Conflict("A peridiocidade já está cadastrada."); // 409 Conflict
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocorreu um erro inesperado: " + ex.Message);
+            }
         }
 
         [HttpPut]
         [Route("/PutPeridiocidade")]
         public IActionResult PutPeridiocidade([FromBody] PeridiocidadePutModel peridiocidadeAlterada)
         {
-            string result = peridiocidadesService.PutPeridiocidade(peridiocidadeAlterada);
-            if (result != null)
-                return Ok(result);
-            else
-                return BadRequest();
+            try
+            {
+                string result = peridiocidadesService.PutPeridiocidade(peridiocidadeAlterada);
+                return StatusCode(200, result);
+            }
+            catch (SqlException ex) when (ex.Number == 2627)
+            {
+                return Conflict("A peridiocidade já está cadastrada."); // 409 Conflict
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocorreu um erro inesperado: " + ex.Message);
+            }
         }
 
         [HttpDelete]
         [Route("/DeletePeridiocidade")]
         public IActionResult DeletePeridiocidade(int id)
         {
-            string result = peridiocidadesService.DeletePeridiocidade(id);
-            if (result != null)
-                return Ok(result);
-            else
-                return BadRequest();
+            try
+            {
+                string result = peridiocidadesService.DeletePeridiocidade(id);
+                return StatusCode(200, result);
+            }
+            catch (SqlException ex) when (ex.Number == 547)
+            {
+                return Conflict("Não é possível excluir a peridiocidade pois ela tem relações com outros registros.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocorreu um erro inesperado: " + ex.Message);
+            }
         }
     }
 }

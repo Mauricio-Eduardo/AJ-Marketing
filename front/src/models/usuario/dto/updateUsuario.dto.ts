@@ -5,6 +5,7 @@ export interface UpdateUsuarioDto {
   nome: string;
   email: string;
   senha: string;
+  novoUsuario_id: number | null;
   ativo: boolean;
 }
 
@@ -14,6 +15,7 @@ export function transformarParaPutUsuario(data: Usuario): UpdateUsuarioDto {
     nome: data.nome,
     email: data.email,
     senha: data.senha,
+    novoUsuario_id: data.novoUsuario_id,
     ativo: data.ativo,
   };
 }

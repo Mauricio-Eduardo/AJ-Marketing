@@ -112,7 +112,7 @@ export const AlertCancel = () => {
   return (
     <AlertDialog.Root>
       <AlertDialog.Trigger>
-        <Button variant="outline">Cancelar</Button>
+        <Button variant="outline">Voltar</Button>
       </AlertDialog.Trigger>
       <AlertDialog.Content maxWidth="450px">
         <AlertDialog.Title>Sair</AlertDialog.Title>

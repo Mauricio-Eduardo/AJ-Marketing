@@ -1,6 +1,8 @@
 ﻿using api.Interfaces;
 using api.Models.Estado;
+using api.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Data.SqlClient;
 
 
 namespace api.Controllers
@@ -14,17 +16,6 @@ namespace api.Controllers
         public EstadosController(IEstadosService pIEstadosService)
         {
             this.estadosService = pIEstadosService;
-        }
-
-        [HttpGet]
-        [Route("/GetAllEstadosAtivos")]
-        public ActionResult<IEnumerable<EstadoModel>> GetAllEstadosAtivos()
-        {
-            IEnumerable<EstadoModel> result = estadosService.GetAllEstadosAtivos();
-            if (result != null)
-                return Ok(result);
-            else
-                return BadRequest();
         }
 
         [HttpGet]
@@ -53,33 +44,57 @@ namespace api.Controllers
         [Route("/PostEstado")]
         public IActionResult PostEstado([FromBody] EstadoPostModel estadoInserido)
         {
-            string result = estadosService.PostEstado(estadoInserido);
-            if (result != null)
-                return Ok(result);
-            else
-                return BadRequest();
+            try
+            {
+                string result = estadosService.PostEstado(estadoInserido);
+                return StatusCode(200, result);
+            }
+            catch (SqlException ex) when (ex.Number == 2627)
+            {
+                return Conflict("O estado já está cadastrado."); // 409 Conflict
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocorreu um erro inesperado: " + ex.Message);
+            }
         }
 
         [HttpPut]
         [Route("/PutEstado")]
         public IActionResult PutEstado([FromBody] EstadoPutModel estadoAlterado)
         {
-            string result = estadosService.PutEstado(estadoAlterado);
-            if (result != null)
-                return Ok(result);
-            else
-                return BadRequest();
+            try
+            {
+                string result = estadosService.PutEstado(estadoAlterado);
+                return StatusCode(200, result);
+            }
+            catch (SqlException ex) when (ex.Number == 2627)
+            {
+                return Conflict("O estado já está cadastrado."); // 409 Conflict
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocorreu um erro inesperado: " + ex.Message);
+            }
         }
 
         [HttpDelete]
         [Route("/DeleteEstado")]
         public IActionResult DeleteEstado(int id)
         {
-            string result = estadosService.DeleteEstado(id);
-            if (result != null)
-                return Ok(result);
-            else
-                return BadRequest();
+            try
+            {
+                string result = estadosService.DeleteEstado(id);
+                return StatusCode(200, result);
+            }
+            catch (SqlException ex) when (ex.Number == 547)
+            {
+                return Conflict("Não é possível excluir o estado pois ele tem relações com outros registros.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocorreu um erro inesperado: " + ex.Message);
+            }
         }
     }
 }

@@ -4,7 +4,7 @@ import { Button, Dialog } from "@radix-ui/themes";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { Form } from "../../form";
 import { format } from "date-fns";
-import { Trash } from "@phosphor-icons/react";
+import { Trash, X } from "@phosphor-icons/react";
 import { DialogProps } from "../DialogProps";
 import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
@@ -27,7 +27,8 @@ import { InteressesSubView } from "../../../views/interesses/subView";
 import { RamosAtividadeSubView } from "../../../views/ramosAtividade/subView";
 import { ClientesController } from "../../../controllers/clientes-controller";
 import { formatCpfCnpj, formatPhone } from "../../form/Formats";
-import { AlertCancelX } from "../../form/Alerts";
+import { AlertCancel, AlertCancelX, AlertSubmit } from "../../form/Alerts";
+import { AxiosError, AxiosResponse } from "axios";
 
 interface ClienteDialogProps extends DialogProps {
   controller: ClientesController;
@@ -56,7 +57,22 @@ export function ClienteDialog({
   const clientesForm = useForm<ClienteSchema>({
     resolver: zodResolver(createClienteSchema),
   });
-  const { control, handleSubmit, reset, setValue } = clientesForm;
+  const { control, handleSubmit, reset, setValue, watch } = clientesForm;
+
+  // Acompanhe os contratos
+  const contratos = watch("contratos", []);
+
+  // Estado para habilitar/desabilitar o campo "Ativo"
+  const [isAtivoDisabled, setIsAtivoDisabled] = useState(false);
+
+  // Use useEffect para monitorar alterações em contratos
+  useEffect(() => {
+    const possuiContratoVigente = contratos.some(
+      (contrato) => contrato.situacao === "Vigente"
+    );
+
+    setIsAtivoDisabled(possuiContratoVigente);
+  }, [contratos]);
 
   const { fields: contratosFields } = useFieldArray({
     control,
@@ -82,80 +98,80 @@ export function ClienteDialog({
   });
 
   const onCidadeSubViewClose = (cidade?: Cidade) => {
-    if (cidade) {
+    if (cidade?.ativo) {
       setCidade(cidade);
+    } else {
+      setCidadeNull("inativa");
     }
   };
 
   const onOrigemSubViewClose = (origem?: Origem) => {
-    if (origem) {
+    if (origem?.ativo) {
       setOrigem(origem);
+    } else {
+      setOrigemNull("inativa");
     }
   };
 
   const onInteresseSubViewClose = (index: number, interesse?: Interesse) => {
-    if (interesse) {
+    if (interesse?.ativo) {
       setInteresse(index, interesse);
+    } else {
+      setInteresseNull(index, "inativa");
     }
   };
 
   const onRamoAtividadeSubViewClose = (index: number, ramo?: RamoAtividade) => {
-    if (ramo) {
+    if (ramo?.ativo) {
       setRamoAtividade(index, ramo);
+    } else {
+      setRamoAtividadeNull(index, "inativa");
     }
+  };
+
+  const [preenchido, setPreenchido] = useState<boolean>(false);
+
+  const handlePreenchidoChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value;
+    setPreenchido(value.length > 0); // Define como true se houver texto, caso contrário, false
   };
 
   const onSubmit = async (pData: Cliente) => {
     let toastId = toast.loading("Processando...");
+    let response: AxiosResponse<string> | undefined;
 
     try {
       if (action === "Cadastrar") {
         const payload = transformarParaPostCliente(pData);
-        await controller.create(payload, proposta_id);
-        toast.update(toastId, {
-          render: "Cliente cadastrado com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
+        response = await controller.create(payload);
       } else if (action === "Editar") {
         const payload = transformarParaPutCliente(pData);
-        await controller.update(payload);
-        toast.update(toastId, {
-          render: "Cliente atualizado com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
-      } else {
+        response = await controller.update(payload);
+      } else if (action === "Excluir") {
         const id = pData.id;
-        await controller.delete(id);
-        toast.update(toastId, {
-          render: "Cliente excluído com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
+        response = await controller.delete(id);
       }
-    } catch (error) {
       toast.update(toastId, {
-        render: "Ocorreu um erro. Tente novamente!",
+        render: response?.data,
+        type: "success",
+        isLoading: false,
+        draggable: true,
+        draggableDirection: "x",
+        autoClose: 1000,
+        onClose: onSuccess,
+      });
+    } catch (error) {
+      const errorMessage = (error as AxiosError).response?.data;
+      toast.update(toastId, {
+        render: String(errorMessage),
         type: "error",
         isLoading: false,
         draggable: true,
         draggableDirection: "x",
         autoClose: 3000,
       });
-      console.log(error);
     }
   };
 
@@ -205,10 +221,10 @@ export function ClienteDialog({
         ? data.contratos.map((contrato: any) => ({
             ...contrato,
             data_contrato: contrato.data_contrato
-              ? format(new Date(contrato.data_contrato), "dd/MM/yyyy HH:mm")
+              ? format(new Date(contrato.data_contrato), "dd/MM/yyyy")
               : "",
             data_vencimento: contrato.data_vencimento
-              ? format(new Date(contrato.data_vencimento), "dd/MM/yyyy HH:mm")
+              ? format(new Date(contrato.data_vencimento), "dd/MM/yyyy")
               : "",
           }))
         : [],
@@ -242,19 +258,13 @@ export function ClienteDialog({
         if (response.ativo) {
           setCidade(response);
         } else {
-          setCidadeNull();
+          setCidadeNull("inativa");
         }
       } catch (error) {
-        setCidadeNull();
-        toast("Cidade Inativa ou inexistente", {
-          type: "error",
-          isLoading: false,
-          autoClose: 3000,
-        });
-        console.log(error);
+        setCidadeNull("inexistente");
       }
     } else {
-      setCidadeNull();
+      setCidadeNull("inexistente");
     }
   };
 
@@ -265,11 +275,17 @@ export function ClienteDialog({
     setValue("pais", pCidade.pais);
   };
 
-  const setCidadeNull = () => {
+  const setCidadeNull = (str: string) => {
     setValue(`cidade_id`, 0);
     setValue(`cidade`, "");
     setValue("estado", "");
     setValue("pais", "");
+
+    toast(`Cidade ${str}!`, {
+      type: "error",
+      isLoading: false,
+      autoClose: 3000,
+    });
   };
 
   const getOrigem = async (pId: number) => {
@@ -279,19 +295,13 @@ export function ClienteDialog({
         if (response.ativo) {
           setOrigem(response);
         } else {
-          setOrigemNull();
+          setOrigemNull("inativo");
         }
       } catch (error) {
-        setOrigemNull();
-        toast("Origem Inativa ou inexistente", {
-          type: "error",
-          isLoading: false,
-          autoClose: 3000,
-        });
-        console.log(error);
+        setOrigemNull("inexistente");
       }
     } else {
-      setOrigemNull();
+      setOrigemNull("inexistente");
     }
   };
 
@@ -300,9 +310,15 @@ export function ClienteDialog({
     setValue(`origem`, pOrigem.origem);
   };
 
-  const setOrigemNull = () => {
+  const setOrigemNull = (str: string) => {
     setValue(`origem_id`, 0);
     setValue(`origem`, "");
+
+    toast(`Origem ${str}!`, {
+      type: "error",
+      isLoading: false,
+      autoClose: 3000,
+    });
   };
 
   const getInteresse = async (index: number, pId: number) => {
@@ -312,17 +328,13 @@ export function ClienteDialog({
         if (response.ativo) {
           setInteresse(index, response);
         } else {
-          setInteresseNull(index);
+          setInteresseNull(index, "inativo");
         }
       } catch (error) {
-        setInteresseNull(index);
-        toast("Interesse Inativo ou inexistente", {
-          type: "error",
-          isLoading: false,
-          autoClose: 3000,
-        });
-        console.log(error);
+        setInteresseNull(index, "inexistente");
       }
+    } else {
+      setInteresseNull(index, "inexistente");
     }
   };
 
@@ -331,9 +343,15 @@ export function ClienteDialog({
     setValue(`interesses.${index}.interesse`, pInteresse.interesse);
   };
 
-  const setInteresseNull = (index: number) => {
+  const setInteresseNull = (index: number, str: string) => {
     setValue(`interesses.${index}.interesse_id`, 0);
     setValue(`interesses.${index}.interesse`, "");
+
+    toast(`Interesse ${str}!`, {
+      type: "error",
+      isLoading: false,
+      autoClose: 3000,
+    });
   };
 
   const getRamoAtividade = async (index: number, pId: number) => {
@@ -344,17 +362,13 @@ export function ClienteDialog({
           if (response.ativo) {
             setRamoAtividade(index, response);
           } else {
-            setRamoAtividadeNull(index);
+            setRamoAtividadeNull(index, "inativo");
           }
         } catch (error) {
-          setRamoAtividadeNull(index);
-          toast("Ramo de Atividade Inativo ou inexistente", {
-            type: "error",
-            isLoading: false,
-            autoClose: 3000,
-          });
-          console.log(error);
+          setRamoAtividadeNull(index, "inexistente");
         }
+      } else {
+        setRamoAtividadeNull(index, "inexistente");
       }
     }
   };
@@ -364,9 +378,15 @@ export function ClienteDialog({
     setValue(`ramos.${index}.ramo`, pRamoAtividade.ramo);
   };
 
-  const setRamoAtividadeNull = (index: number) => {
+  const setRamoAtividadeNull = (index: number, str: string) => {
     setValue(`ramos.${index}.ramo_id`, 0);
     setValue(`ramos.${index}.ramo`, "");
+
+    toast(`Ramo de Atividade ${str}!`, {
+      type: "error",
+      isLoading: false,
+      autoClose: 3000,
+    });
   };
 
   const addNewInteresse = () => {
@@ -393,7 +413,7 @@ export function ClienteDialog({
 
   return (
     <Dialog.Content
-      maxWidth={"1000px"}
+      maxWidth={"900px"}
       onInteractOutside={(e) => {
         e.preventDefault();
       }}
@@ -402,9 +422,15 @@ export function ClienteDialog({
       }}
     >
       <div className="flex justify-between">
-        <Dialog.Title>Cadastrar Cliente</Dialog.Title>
+        <Dialog.Title>{action} Cliente</Dialog.Title>
 
-        <AlertCancelX />
+        {preenchido ? (
+          <AlertCancelX />
+        ) : (
+          <Dialog.Close>
+            <X />
+          </Dialog.Close>
+        )}
       </div>
       <FormProvider {...clientesForm}>
         <form
@@ -430,7 +456,7 @@ export function ClienteDialog({
               <Form.AtivoSelect
                 control={control}
                 name="ativo"
-                disabled={action != "Editar"}
+                disabled={action != "Editar" || isAtivoDisabled}
               />
               <Form.ErrorMessage field="ativo" />
             </Form.Field>
@@ -460,19 +486,21 @@ export function ClienteDialog({
                 defaultValue={data.cpf_cnpj}
                 disabled={action != "Cadastrar"}
                 maskType={pessoa === "Física" ? "cpf" : "cnpj"}
+                preenchidoChange={handlePreenchidoChange}
               />
               <Form.ErrorMessage field="cpf_cnpj" />
             </Form.Field>
 
-            <Form.Field>
+            <Form.Field className="flex-1">
               <Form.Label htmlFor="nome_razaoSocial">
                 {pessoa === "Física" ? "Nome *" : "Razão Social *"}
               </Form.Label>
               <Form.Input
                 name="nome_razaoSocial"
-                width={pessoa === "Física" ? 610 : 570}
+                max={50}
                 defaultValue={data.nome_razaoSocial}
-                disabled={action === "Excluir"}
+                disabled={action === "Excluir" || action === "Visualizar"}
+                preenchidoChange={handlePreenchidoChange}
               />
               <Form.ErrorMessage field="nome_razaoSocial" />
             </Form.Field>
@@ -488,7 +516,8 @@ export function ClienteDialog({
                 width={250}
                 max={50}
                 defaultValue={data.apelido_nomeFantasia}
-                disabled={action === "Excluir"}
+                disabled={action === "Excluir" || action === "Visualizar"}
+                preenchidoChange={handlePreenchidoChange}
               />
               <Form.ErrorMessage field="apelido_nomeFantasia" />
             </Form.Field>
@@ -502,7 +531,8 @@ export function ClienteDialog({
                 width={150}
                 max={pessoa === "Física" ? 9 : 14}
                 defaultValue={data.rg_inscricaoEstadual}
-                disabled={action === "Excluir"}
+                disabled={action === "Excluir" || action === "Visualizar"}
+                preenchidoChange={handlePreenchidoChange}
               />
               <Form.ErrorMessage field="rg_inscricaoEstadual" />
             </Form.Field>
@@ -513,7 +543,7 @@ export function ClienteDialog({
                 <Form.GeneroSelect
                   control={control}
                   name="genero"
-                  disabled={action === "Excluir"}
+                  disabled={action === "Excluir" || action === "Visualizar"}
                 />
                 <Form.ErrorMessage field="genero" />
               </Form.Field>
@@ -522,15 +552,15 @@ export function ClienteDialog({
 
           {/* Linha 3 */}
           <div className="flex gap-3 items-center">
-            <Form.Field>
+            <Form.Field className="flex-1">
               <Form.Label htmlFor="email">Email *</Form.Label>
               <Form.Input
                 name="email"
                 placeholder="exemplo@hotmail.com"
                 max={50}
-                width={300}
                 defaultValue={data.email}
-                disabled={action === "Excluir"}
+                disabled={action === "Excluir" || action === "Visualizar"}
+                preenchidoChange={handlePreenchidoChange}
               />
               <Form.ErrorMessage field="email" />
             </Form.Field>
@@ -544,37 +574,38 @@ export function ClienteDialog({
                 max={11}
                 width={130}
                 defaultValue={data.celular}
-                disabled={action === "Excluir"}
+                disabled={action === "Excluir" || action === "Visualizar"}
+                preenchidoChange={handlePreenchidoChange}
               />
               <Form.ErrorMessage field="celular" />
             </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="origem_id">Cód. *</Form.Label>
+              <Form.Label htmlFor="origem_id">Origem *</Form.Label>
               <Form.Input
                 name="origem_id"
                 placeholder="0"
-                max={5}
-                width={70}
+                max={4}
+                width={100}
                 defaultValue={data.origem_id}
                 onBlur={(e) => getOrigem(Number(e.target.value))}
-                disabled={action === "Excluir"}
+                disabled={action === "Excluir" || action === "Visualizar"}
+                preenchidoChange={handlePreenchidoChange}
               />
               <Form.ErrorMessage field="origem_id" />
             </Form.Field>
 
-            {origensController && (
-              <Form.Field>
-                <br />
-                <OrigensSubView
-                  onClose={onOrigemSubViewClose}
-                  controller={origensController}
-                />
-              </Form.Field>
-            )}
+            <Form.Field>
+              <br />
+              <OrigensSubView
+                onClose={onOrigemSubViewClose}
+                controller={origensController}
+                disabled={action === "Excluir" || action === "Visualizar"}
+              />
+            </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="origem">Origem</Form.Label>
+              <Form.Label htmlFor="origem"></Form.Label>
               <Form.Input
                 name="origem"
                 placeholder="Selecione o Origem"
@@ -593,35 +624,34 @@ export function ClienteDialog({
             <div className="flex-col space-y-3 border-2 p-4 rounded-lg">
               <div className="flex gap-3">
                 <Form.Field>
-                  <Form.Label htmlFor="cidade_id">Cód. *</Form.Label>
+                  <Form.Label htmlFor="cidade_id">Cidade *</Form.Label>
                   <Form.Input
                     name="cidade_id"
                     placeholder="0"
-                    max={5}
+                    max={4}
                     width={70}
                     defaultValue={data.cidade_id}
                     onBlur={(e) => getCidade(Number(e.target.value))}
-                    disabled={action === "Excluir"}
+                    disabled={action === "Excluir" || action === "Visualizar"}
+                    preenchidoChange={handlePreenchidoChange}
                   />
                   <Form.ErrorMessage field="cidade_id" />
                 </Form.Field>
 
-                {cidadesController && (
-                  <Form.Field>
-                    <br />
-                    <CidadesSubView
-                      onClose={onCidadeSubViewClose}
-                      controller={cidadesController}
-                    />
-                  </Form.Field>
-                )}
-
                 <Form.Field>
-                  <Form.Label htmlFor="cidade">Cidade</Form.Label>
+                  <br />
+                  <CidadesSubView
+                    onClose={onCidadeSubViewClose}
+                    controller={cidadesController}
+                    disabled={action === "Excluir" || action === "Visualizar"}
+                  />
+                </Form.Field>
+
+                <Form.Field className="flex-1">
+                  <Form.Label htmlFor="cidade"></Form.Label>
                   <Form.Input
                     name="cidade"
                     placeholder="Selecione a Cidade"
-                    width={250}
                     value={data.cidade}
                     disabled={true}
                   />
@@ -659,7 +689,8 @@ export function ClienteDialog({
                     max={8}
                     width={100}
                     defaultValue={data.cep}
-                    disabled={action === "Excluir"}
+                    disabled={action === "Excluir" || action === "Visualizar"}
+                    preenchidoChange={handlePreenchidoChange}
                   />
                   <Form.ErrorMessage field="cep" />
                 </Form.Field>
@@ -673,7 +704,8 @@ export function ClienteDialog({
                     max={80}
                     width={300}
                     defaultValue={data.logradouro}
-                    disabled={action === "Excluir"}
+                    disabled={action === "Excluir" || action === "Visualizar"}
+                    preenchidoChange={handlePreenchidoChange}
                   />
                   <Form.ErrorMessage field="logradouro" />
                 </Form.Field>
@@ -684,35 +716,36 @@ export function ClienteDialog({
                     name="numero"
                     placeholder=""
                     max={6}
-                    width={70}
+                    width={100}
                     defaultValue={data.numero}
-                    disabled={action === "Excluir"}
+                    disabled={action === "Excluir" || action === "Visualizar"}
+                    preenchidoChange={handlePreenchidoChange}
                   />
                   <Form.ErrorMessage field="numero" />
                 </Form.Field>
 
-                <Form.Field>
+                <Form.Field className="flex-1">
                   <Form.Label htmlFor="bairro">Bairro *</Form.Label>
                   <Form.Input
                     name="bairro"
                     placeholder=""
                     max={30}
-                    width={200}
                     defaultValue={data.bairro}
-                    disabled={action === "Excluir"}
+                    disabled={action === "Excluir" || action === "Visualizar"}
+                    preenchidoChange={handlePreenchidoChange}
                   />
                   <Form.ErrorMessage field="bairro" />
                 </Form.Field>
 
-                <Form.Field>
+                <Form.Field className="flex-1">
                   <Form.Label htmlFor="complemento">Complemento</Form.Label>
                   <Form.Input
                     name="complemento"
                     placeholder=""
                     max={80}
-                    width={300}
                     defaultValue={data.complemento}
-                    disabled={action === "Excluir"}
+                    disabled={action === "Excluir" || action === "Visualizar"}
+                    preenchidoChange={handlePreenchidoChange}
                   />
                   <Form.ErrorMessage field="complemento" />
                 </Form.Field>
@@ -732,7 +765,7 @@ export function ClienteDialog({
                   onClick={() => {
                     addNewInteresse();
                   }}
-                  disabled={action != "Cadastrar" && action != "Editar"}
+                  disabled={action === "Excluir" || action === "Visualizar"}
                 >
                   Adicionar Interesse
                 </Button>
@@ -752,9 +785,11 @@ export function ClienteDialog({
                   </Form.Label>
                   <Form.Input
                     name={`interesses.${index}.interesse_id` as const}
+                    max={4}
                     width={70}
                     onBlur={(e) => getInteresse(index, Number(e.target.value))}
                     disabled={action != "Cadastrar" && action != "Editar"}
+                    preenchidoChange={handlePreenchidoChange}
                   />
                   <Form.ErrorMessage
                     field={`interesses.${index}.interesse_id` as const}
@@ -768,6 +803,7 @@ export function ClienteDialog({
                       index={index}
                       onClose={onInteresseSubViewClose}
                       controller={interessesController}
+                      disabled={action === "Excluir" || action === "Visualizar"}
                     />
                   </Form.Field>
                 )}
@@ -794,6 +830,7 @@ export function ClienteDialog({
                   type="button"
                   color="red"
                   onClick={() => interessesRemove(index)}
+                  disabled={action === "Excluir" || action === "Visualizar"}
                 >
                   <Trash weight="bold" />
                 </Button>
@@ -813,7 +850,7 @@ export function ClienteDialog({
                   onClick={() => {
                     addNewRamo();
                   }}
-                  disabled={action != "Cadastrar" && action != "Editar"}
+                  disabled={action === "Excluir" || action === "Visualizar"}
                 >
                   Adicionar Ramo
                 </Button>
@@ -834,10 +871,12 @@ export function ClienteDialog({
                   <Form.Input
                     name={`ramos.${index}.ramo_id` as const}
                     width={70}
+                    max={4}
                     onBlur={(e) =>
                       getRamoAtividade(index, Number(e.target.value))
                     }
                     disabled={action != "Cadastrar" && action != "Editar"}
+                    preenchidoChange={handlePreenchidoChange}
                   />
                   <Form.ErrorMessage
                     field={`ramos.${index}.ramo_id` as const}
@@ -851,6 +890,7 @@ export function ClienteDialog({
                       index={index}
                       onClose={onRamoAtividadeSubViewClose}
                       controller={ramosAtividadeController}
+                      disabled={action === "Excluir" || action === "Visualizar"}
                     />
                   </Form.Field>
                 )}
@@ -873,6 +913,7 @@ export function ClienteDialog({
                   type="button"
                   color="red"
                   onClick={() => ramosRemove(index)}
+                  disabled={action === "Excluir" || action === "Visualizar"}
                 >
                   <Trash weight="bold" />
                 </Button>
@@ -902,9 +943,6 @@ export function ClienteDialog({
                       width={70}
                       disabled={true}
                     />
-                    <Form.ErrorMessage
-                      field={`contratos.${index}.contrato_id` as const}
-                    />
                   </Form.Field>
 
                   <Form.Field>
@@ -915,12 +953,9 @@ export function ClienteDialog({
                     </Form.Label>
                     <Form.Input
                       name={`contratos.${index}.data_contrato` as const}
-                      width={150}
+                      width={100}
                       defaultValue={`data.contratos.${index}.data_contrato`}
                       disabled={true}
-                    />
-                    <Form.ErrorMessage
-                      field={`contratos.${index}.data_contrato` as const}
                     />
                   </Form.Field>
 
@@ -932,13 +967,9 @@ export function ClienteDialog({
                     </Form.Label>
                     <Form.Input
                       name={`contratos.${index}.data_vencimento` as const}
-                      max={56}
-                      width={150}
+                      width={100}
                       defaultValue={`data.contratos.${index}.data_vencimento`}
                       disabled={true}
-                    />
-                    <Form.ErrorMessage
-                      field={`contratos.${index}.data_vencimento` as const}
                     />
                   </Form.Field>
 
@@ -954,9 +985,6 @@ export function ClienteDialog({
                       width={150}
                       defaultValue={`data.contratos.${index}.situacao`}
                       disabled={true}
-                    />
-                    <Form.ErrorMessage
-                      field={`contratos.${index}.situacao` as const}
                     />
                   </Form.Field>
                 </div>
@@ -992,23 +1020,20 @@ export function ClienteDialog({
           </div>
 
           <div className="flex w-full justify-end gap-3">
-            <Dialog.Close>
-              <Button type="button" variant="outline">
-                Cancelar
-              </Button>
-            </Dialog.Close>
-            {action === "Excluir" && (
-              <Button type="submit" color="red">
-                {action}
-              </Button>
+            {preenchido ? (
+              <AlertCancel />
+            ) : (
+              <Dialog.Close>
+                <Button variant="outline">Voltar</Button>
+              </Dialog.Close>
             )}
-            {action != "Excluir" && (
-              <Button
-                type="submit"
-                onClick={() => console.log(clientesForm.getValues())}
-              >
-                {action}
-              </Button>
+
+            {action != "Visualizar" && (
+              <AlertSubmit
+                title={action as string}
+                type="Cliente"
+                onSubmit={onSubmit}
+              />
             )}
           </div>
         </form>

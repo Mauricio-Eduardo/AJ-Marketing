@@ -21,6 +21,7 @@ export function Input({
   textColor,
   preenchidoChange,
   onChange,
+  className,
   ...rest
 }: InputProps) {
   const { register } = useFormContext();
@@ -62,10 +63,15 @@ export function Input({
       id={name}
       maxLength={max}
       className={`${
-        disabled
-          ? `bg-gray-200 text-gray-500 cursor-not-allowed ${textColor}`
-          : ""
-      } h-8 pl-2 pr-2 w-full uppercase rounded border border-zinc-300 hover:border-violet-600 focus:ring-2 focus:outline-violet-700 shadow-sm ${textColor}`}
+        disabled ? "bg-gray-200 text-gray-500 cursor-not-allowed" : ""
+      } h-8 pl-2 pr-2 w-full rounded border border-zinc-300 hover:border-violet-600 focus:ring-2 focus:outline-violet-700 shadow-sm ${textColor} ${
+        className || ""
+      }`}
+      // className={`${
+      //   disabled
+      //     ? `bg-gray-200 text-gray-500 cursor-not-allowed ${textColor}`
+      //     : ""
+      // } h-8 pl-2 pr-2 w-full rounded border border-zinc-300 hover:border-violet-600 focus:ring-2 focus:outline-violet-700 shadow-sm ${textColor}`}
       style={style}
       disabled={disabled}
       {...register(name)}

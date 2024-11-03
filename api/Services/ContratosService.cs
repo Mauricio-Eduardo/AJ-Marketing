@@ -416,6 +416,19 @@ namespace api.Services
 
                     ordensCmd.ExecuteNonQuery();
 
+                    // Trocar a situacao da proposta para "Cancelada"
+                    string propostasQuery = @"UPDATE propostas
+                        SET situacao = @situacao
+                        FROM propostas P
+                        JOIN contratos c ON c.proposta_id = p.id
+                        WHERE c.id = @id";
+
+                    SqlCommand propostasCmd = new SqlCommand(propostasQuery, Connection, transaction);
+                    propostasCmd.Parameters.AddWithValue("@id", id);
+                    propostasCmd.Parameters.AddWithValue("@situacao", "Cancelada");
+
+                    propostasCmd.ExecuteNonQuery();
+
                     transaction.Commit();
                     return "Cancelado com sucesso!";
                 }

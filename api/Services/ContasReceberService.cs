@@ -168,6 +168,48 @@ namespace api.Services
             }
         }
 
+        //public string PostConta([FromBody] ContaReceberPostModel contaInserida)
+        //{
+        //    using (Connection)
+        //    {
+
+        //        try
+        //        {
+        //            Connection.Open();
+
+        //            string query = @"
+        //                INSERT INTO contasReceber
+        //                (cliente_id, percentdata_vencimento = @data_vencimento, jurosRecebido = @jurosRecebido, multaRecebida = @multaRecebida, 
+        //                descontoConcedido = @descontoConcedido, totalRecebido = @totalRecebido, data_recebimento = @data_recebimento, 
+        //                situacao = @situacao
+        //                WHERE id = @id;";
+
+        //            SqlCommand postCmd = new SqlCommand(query, Connection);
+        //            postCmd.Parameters.AddWithValue("@id", contaRecebida.Id);
+        //            postCmd.Parameters.AddWithValue("@data_vencimento", contaRecebida.Data_recebimento);
+        //            postCmd.Parameters.AddWithValue("@jurosRecebido", contaRecebida.JurosRecebido);
+        //            postCmd.Parameters.AddWithValue("@multaRecebida", contaRecebida.MultaRecebida);
+        //            postCmd.Parameters.AddWithValue("@descontoConcedido", contaRecebida.DescontoConcedido);
+        //            postCmd.Parameters.AddWithValue("@totalRecebido", contaRecebida.TotalRecebido);
+        //            postCmd.Parameters.AddWithValue("@data_recebimento", contaRecebida.Data_recebimento);
+        //            postCmd.Parameters.AddWithValue("@situacao", "Recebida");
+
+        //            postCmd.ExecuteNonQuery();
+
+        //            return "Recebida com Sucesso!";
+        //        }
+        //        catch (SqlException ex)
+        //        {
+
+        //            throw new Exception(ex.Message);
+        //        }
+        //        finally
+        //        {
+        //            Connection.Close();
+        //        }
+        //    }
+        //}
+
         public string ReceberConta([FromBody] ContaReceberPutModel contaRecebida)
         {
             using (Connection)

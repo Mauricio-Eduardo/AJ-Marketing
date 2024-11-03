@@ -18,7 +18,11 @@ import {
 import { DialogProps } from "../DialogProps";
 import { ServicosSubView } from "../../../views/servicos/subView";
 import { Datepick } from "../../form/Datepicker";
-import { formatCpfCnpj, formatCurrency } from "../../form/Formats";
+import {
+  formatCpfCnpj,
+  formatCurrency,
+  formatToDecimal,
+} from "../../form/Formats";
 import { ServicosController } from "../../../controllers/servicos-controller";
 import { ClientesSubView } from "../../../views/clientes/subView";
 import { ClientesController } from "../../../controllers/clientes-controller";
@@ -78,20 +82,26 @@ export function PropostaDialog({
         descricao: "",
         dias: 0,
       });
+
+      setPreenchido(true);
     }
   };
 
   const onClienteSubViewClose = (cliente?: Cliente) => {
-    if (cliente) {
+    if (cliente?.ativo) {
       setCliente(cliente);
       setPreenchido(true);
+    } else {
+      setClienteNull("inativo");
     }
   };
 
   const onCondicaoSubViewClose = (condicao?: CondicaoPagamento) => {
-    if (condicao) {
+    if (condicao?.ativo) {
       setCondicaoPagamento(condicao);
       setPreenchido(true);
+    } else {
+      setCondicaoPagamentoNull("inativa");
     }
   };
 
@@ -99,16 +109,20 @@ export function PropostaDialog({
     index: number,
     peridiocidade?: Peridiocidade
   ) => {
-    if (peridiocidade) {
+    if (peridiocidade?.ativo) {
       setPeridiocidade(index, peridiocidade);
       setPreenchido(true);
+    } else {
+      setPeridiocidadeNull(index, "inativa");
     }
   };
 
   const onServicoSubViewClose = (index: number, servico?: ServicoProposta) => {
-    if (servico) {
+    if (servico?.ativo) {
       setServico(index, servico);
       setPreenchido(true);
+    } else {
+      setServicoNull(index, "inativo");
     }
   };
 
@@ -184,7 +198,7 @@ export function PropostaDialog({
       tipo_pessoa: "",
       cpf_cnpj: "",
       nome_razaoSocial: "",
-      prazo_final: formatISO(addDays(new Date(), 30)),
+      prazo_final: formatISO(addDays(new Date(), 7)),
       data_aprovacao: "",
       data_inicio: "",
       total: "0,00",
@@ -239,18 +253,20 @@ export function PropostaDialog({
     const quantidade = watch(`servicos.${index}.quantidade`) || 0;
     const valorUnitario = parseFloat(
       (watch(`servicos.${index}.valor_unitario`) || "0")
-        .toString()
         .replace(/\./g, "")
         .replace(",", ".")
     );
     const desconto = parseFloat(
       (watch(`servicos.${index}.desconto`) || "0")
-        .toString()
         .replace(/\./g, "")
         .replace(",", ".")
     );
 
     const valorServico = quantidade * valorUnitario - desconto;
+
+    console.log(valorServico);
+    console.log(formatCurrency(valorServico));
+    console.log(formatToDecimal(formatCurrency(valorServico)));
 
     setValue(`servicos.${index}.valor_total`, formatCurrency(valorServico));
     calculaTotal();
@@ -279,6 +295,7 @@ export function PropostaDialog({
   const removeServico = (index: number) => {
     remove(index);
     calculaTotal();
+    setPreenchido(true);
   };
 
   const getServico = async (index: number, pId: number) => {
@@ -289,14 +306,16 @@ export function PropostaDialog({
           if (response.ativo) {
             setServico(index, response);
           } else {
-            setServicoNull(index);
+            setServicoNull(index, "inativo");
           }
         } catch (error) {
-          setServicoNull(index);
-          console.log(error);
+          setServicoNull(index, "inexistente");
         }
       }
+    } else {
+      setServicoNull(index, "inexistente");
     }
+    handleServicoChange(index);
   };
 
   const setServico = (index: number, pServico: Servico) => {
@@ -308,10 +327,16 @@ export function PropostaDialog({
     );
   };
 
-  const setServicoNull = (index: number) => {
+  const setServicoNull = (index: number, str: string) => {
     setValue(`servicos.${index}.servico_id`, 0);
     setValue(`servicos.${index}.servico`, "");
     setValue(`servicos.${index}.valor_unitario`, "0,00");
+
+    toast(`Serviço ${str}!`, {
+      type: "error",
+      isLoading: false,
+      autoClose: 3000,
+    });
   };
 
   const getPeridiocidade = async (index: number, pId: number) => {
@@ -322,13 +347,14 @@ export function PropostaDialog({
           if (response.ativo) {
             setPeridiocidade(index, response);
           } else {
-            setPeridiocidadeNull(index);
+            setPeridiocidadeNull(index, "inativa");
           }
         } catch (error) {
-          setPeridiocidadeNull(index);
-          console.log(error);
+          setPeridiocidadeNull(index, "inexistente");
         }
       }
+    } else {
+      setPeridiocidadeNull(index, "inexistente");
     }
   };
 
@@ -338,10 +364,16 @@ export function PropostaDialog({
     setValue(`servicos.${index}.dias`, pPeridiocidade.dias);
   };
 
-  const setPeridiocidadeNull = (index: number) => {
+  const setPeridiocidadeNull = (index: number, str: string) => {
     setValue(`servicos.${index}.peridiocidade_id`, 0);
     setValue(`servicos.${index}.descricao`, "");
     setValue(`servicos.${index}.dias`, 0);
+
+    toast(`Peridiocidade ${str}!`, {
+      type: "error",
+      isLoading: false,
+      autoClose: 3000,
+    });
   };
 
   const getCondicao = async (pId: number) => {
@@ -352,20 +384,14 @@ export function PropostaDialog({
           if (response.ativo) {
             setCondicaoPagamento(response);
           } else {
-            setCondicaoPagamentoNull();
+            setCondicaoPagamentoNull("inativa");
           }
         } catch (error) {
-          setCondicaoPagamentoNull();
-          toast("Condiçãoo Pagamento Inativa ou inexistente", {
-            type: "error",
-            isLoading: false,
-            autoClose: 3000,
-          });
-          console.log(error);
+          setCondicaoPagamentoNull("inexistente");
         }
       }
     } else {
-      setCondicaoPagamentoNull();
+      setCondicaoPagamentoNull("inexistente");
     }
   };
 
@@ -374,33 +400,35 @@ export function PropostaDialog({
     setValue(`condicaoPagamento`, pCondicaoPagamento.condicaoPagamento);
   };
 
-  const setCondicaoPagamentoNull = () => {
+  const setCondicaoPagamentoNull = (str: string) => {
     setValue("condPag_id", 0);
     setValue("condicaoPagamento", "");
+
+    toast(`Condição de Pagamento ${str}!`, {
+      type: "error",
+      isLoading: false,
+      autoClose: 3000,
+    });
   };
 
   const getCliente = async (pId: number) => {
-    if (pId != 0) {
+    if (pId > 0) {
       if (clientesController) {
         try {
           const response = await clientesController.getOne(pId);
           if (response.ativo) {
             setCliente(response);
           } else {
-            setClienteNull();
+            setClienteNull("inativo");
           }
         } catch (error) {
-          setClienteNull();
-          toast("Cliente Inativo ou inexistente", {
-            type: "error",
-            isLoading: false,
-            autoClose: 3000,
-          });
+          setClienteNull("inexistente");
+
           console.log(error);
         }
       }
     } else {
-      setClienteNull();
+      setClienteNull("inexistente");
     }
   };
 
@@ -421,12 +449,18 @@ export function PropostaDialog({
     setValue(`nome_razaoSocial`, pCliente.nome_razaoSocial);
   };
 
-  const setClienteNull = () => {
+  const setClienteNull = (str: string) => {
     setValue(`cliente_id`, 0);
-    setValue(`tipo_pessoa`, "Física");
-    setPessoa("Física");
+    setValue(`tipo_pessoa`, "");
+    setPessoa("");
     setValue(`cpf_cnpj`, "");
     setValue(`nome_razaoSocial`, "");
+
+    toast(`Cliente ${str}!`, {
+      type: "error",
+      isLoading: false,
+      autoClose: 3000,
+    });
   };
 
   return (
@@ -464,6 +498,7 @@ export function PropostaDialog({
               <Form.Input
                 name="id"
                 placeholder="0"
+                max={4}
                 defaultValue={data.id}
                 width={70}
                 disabled={true}
@@ -495,12 +530,12 @@ export function PropostaDialog({
           {/* Linha 2 */}
           <div className="flex gap-3">
             <Form.Field>
-              <Form.Label htmlFor="cliente_id">Cód. Cliente *</Form.Label>
+              <Form.Label htmlFor="cliente_id">Cliente *</Form.Label>
               <Form.Input
                 name="cliente_id"
                 placeholder="0"
-                max={5}
-                width={80}
+                max={4}
+                width={100}
                 defaultValue={data.cliente_id}
                 onBlur={(e) => getCliente(Number(e.target.value))}
                 disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
@@ -526,7 +561,7 @@ export function PropostaDialog({
 
             <Form.Field>
               <Form.Label htmlFor="cpf_cnpj">
-                {pessoa === "Física" ? "CPF" : "CNPJ"}
+                {pessoa === "Jurídica" ? "CNPJ" : "CPF"}
               </Form.Label>
               <Form.Input
                 name="cpf_cnpj"
@@ -540,13 +575,12 @@ export function PropostaDialog({
               <Form.ErrorMessage field="cpf_cnpj" />
             </Form.Field>
 
-            <Form.Field>
+            <Form.Field className="flex-1">
               <Form.Label htmlFor="nome_razaoSocial">
-                {pessoa === "Física" ? "Nome *" : "Razão Social *"}
+                {pessoa === "Jurídica" ? "Razão Social" : "Nome"}
               </Form.Label>
               <Form.Input
                 name="nome_razaoSocial"
-                width={pessoa === "Física" ? 475 : 435}
                 defaultValue={data.nome_razaoSocial}
                 disabled={true}
                 preenchidoChange={handlePreenchidoChange}
@@ -557,12 +591,12 @@ export function PropostaDialog({
 
           <div className="flex gap-3">
             <Form.Field>
-              <Form.Label htmlFor="condPag_id">Cód. *</Form.Label>
+              <Form.Label htmlFor="condPag_id">Condição Pag. *</Form.Label>
               <Form.Input
                 name="condPag_id"
                 placeholder="0"
-                max={5}
-                width={70}
+                max={4}
+                width={100}
                 defaultValue={data.condPag_id}
                 onBlur={(e) => getCondicao(Number(e.target.value))}
                 disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
@@ -582,11 +616,10 @@ export function PropostaDialog({
 
             <Form.Field>
               <Form.Label htmlFor="condicaoPagamento">
-                Condição de Pagamento
+                {/* Condição de Pagamento */}
               </Form.Label>
               <Form.Input
                 name="condicaoPagamento"
-                placeholder="..."
                 max={56}
                 width={250}
                 value={data.condicaoPagamento}
@@ -596,10 +629,10 @@ export function PropostaDialog({
             </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="prazo_final">Prazo Final</Form.Label>
+              <Form.Label htmlFor="prazo_final">Prazo Aprovação *</Form.Label>
               <Datepick
                 name="prazo_final"
-                days={30}
+                days={0}
                 disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
               />
               <Form.ErrorMessage field="prazo_final" />
@@ -614,17 +647,17 @@ export function PropostaDialog({
             </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="data_inicio">Data de Início</Form.Label>
+              <Form.Label htmlFor="data_inicio">Data de Início *</Form.Label>
               <Datepick
                 name="data_inicio"
-                days={30}
+                days={0}
                 disabled={action != "Aprovar"}
               />
               <Form.ErrorMessage field="data_inicio" />
             </Form.Field>
           </div>
 
-          {/* SERVICOS */}
+          {/* SERVIÇOS */}
           <div className="flex flex-col gap-1 border-t-2 pt-4 border-gray-200">
             <div className="flex gap-3 justify-between">
               <span className="text-sm font-medium">Serviços</span>
@@ -657,226 +690,252 @@ export function PropostaDialog({
                 <Form.ErrorMessage field="servicos" />
               </Form.Field>
             </div>
+
             {fields.map((field: any, index: any) => (
               <div
                 key={field.id}
-                className="flex gap-3 flex-wrap items-end border-2 border-gray-200 rounded p-2 justify-start"
+                className="flex flex-wrap items-end border-2 border-gray-200 rounded p-2 justify-start"
               >
-                <Form.Field>
-                  <Form.Label
-                    htmlFor={`servicos.${index}.servico_id` as const}
-                    className="flex flex-col"
-                  >
-                    Cód. *
-                  </Form.Label>
-                  <Form.Input
-                    name={`servicos.${index}.servico_id` as const}
-                    width={70}
-                    onBlur={(e) => getServico(index, Number(e.target.value))}
-                    disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
-                  />
-                  <Form.ErrorMessage
-                    field={`servicos.${index}.servico_id` as const}
-                  />
-                </Form.Field>
+                <div className="flex flex-col gap-2 w-full">
+                  {/* Primeira linha: até valor_total */}
+                  <div className="flex gap-3">
+                    <Form.Field>
+                      <Form.Label
+                        htmlFor={`servicos.${index}.servico_id` as const}
+                        className="flex flex-col"
+                      >
+                        Serviço *
+                      </Form.Label>
+                      <Form.Input
+                        name={`servicos.${index}.servico_id` as const}
+                        width={70}
+                        max={4}
+                        onBlur={(e) =>
+                          getServico(index, Number(e.target.value))
+                        }
+                        disabled={
+                          !["Cadastrar", "Editar"].includes(action ?? "")
+                        }
+                      />
+                      <Form.ErrorMessage
+                        field={`servicos.${index}.servico_id` as const}
+                      />
+                    </Form.Field>
 
-                {servicosController && (
-                  <Form.Field>
-                    <br />
-                    <ServicosSubView
-                      index={index}
-                      onClose={onServicoSubViewClose}
-                      controller={servicosController}
-                      disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
-                    />
-                  </Form.Field>
-                )}
+                    {servicosController && (
+                      <Form.Field>
+                        <br />
+                        <ServicosSubView
+                          index={index}
+                          onClose={onServicoSubViewClose}
+                          controller={servicosController}
+                          disabled={
+                            !["Cadastrar", "Editar"].includes(action ?? "")
+                          }
+                        />
+                      </Form.Field>
+                    )}
 
-                <Form.Field>
-                  <Form.Label htmlFor={`servicos.${index}.servico` as const}>
-                    Serviço *
-                  </Form.Label>
-                  <Form.Input
-                    name={`servicos.${index}.servico` as const}
-                    placeholder="Selecione o Serviço"
-                    width={350}
-                    defaultValue={`data.servicos.${index}.servico`}
-                    disabled={true}
-                  />
+                    <Form.Field className="flex-1">
+                      <Form.Label
+                        htmlFor={`servicos.${index}.servico` as const}
+                      ></Form.Label>
+                      <Form.Input
+                        name={`servicos.${index}.servico` as const}
+                        defaultValue={`data.servicos.${index}.servico`}
+                        disabled={true}
+                      />
+                      <Form.ErrorMessage
+                        field={`servicos.${index}.servico` as const}
+                      />
+                    </Form.Field>
 
-                  <Form.ErrorMessage
-                    field={`servicos.${index}.servico` as const}
-                  />
-                </Form.Field>
+                    <Form.Field>
+                      <Form.Label
+                        htmlFor={`servicos.${index}.quantidade` as const}
+                        className="flex flex-col"
+                      >
+                        Qtd. *
+                      </Form.Label>
+                      <Form.Input
+                        name={`servicos.${index}.quantidade` as const}
+                        width={50}
+                        max={2}
+                        disabled={
+                          !["Cadastrar", "Editar"].includes(action ?? "")
+                        }
+                        onChange={(e) => {
+                          register(
+                            `servicos.${index}.quantidade` as const
+                          ).onChange(e);
+                        }}
+                        onBlur={() => handleServicoChange(index)}
+                      />
+                      <Form.ErrorMessage
+                        field={`servicos.${index}.quantidade` as const}
+                      />
+                    </Form.Field>
 
-                <Form.Field>
-                  <Form.Label
-                    htmlFor={`servicos.${index}.quantidade` as const}
-                    className="flex flex-col"
-                  >
-                    Qtd. *
-                  </Form.Label>
-                  <Form.Input
-                    name={`servicos.${index}.quantidade` as const}
-                    width={50}
-                    max={2}
-                    disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
-                    onChange={(e) => {
-                      register(
-                        `servicos.${index}.quantidade` as const
-                      ).onChange(e);
-                    }}
-                    onBlur={() => handleServicoChange(index)}
-                  />
-                  <Form.ErrorMessage
-                    field={`servicos.${index}.quantidade` as const}
-                  />
-                </Form.Field>
+                    <Form.Field>
+                      <Form.Label
+                        htmlFor={`servicos.${index}.valor_unitario` as const}
+                        className="flex flex-col"
+                      >
+                        Valor Unitário *
+                      </Form.Label>
+                      <Form.Input
+                        name={`servicos.${index}.valor_unitario` as const}
+                        width={100}
+                        max={9}
+                        maskType="money"
+                        disabled={
+                          !["Cadastrar", "Editar"].includes(action ?? "")
+                        }
+                        onChange={(e) => {
+                          register(
+                            `servicos.${index}.quantidade` as const
+                          ).onChange(e);
+                        }}
+                        onBlur={() => handleServicoChange(index)}
+                      />
+                      <Form.ErrorMessage
+                        field={`servicos.${index}.valor_unitario` as const}
+                      />
+                    </Form.Field>
 
-                <Form.Field>
-                  <Form.Label
-                    htmlFor={`servicos.${index}.valor_unitario` as const}
-                    className="flex flex-col"
-                  >
-                    Valor Unitário *
-                  </Form.Label>
-                  <Form.Input
-                    name={`servicos.${index}.valor_unitario` as const}
-                    width={100}
-                    max={9}
-                    maskType="money"
-                    disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
-                    onChange={(e) => {
-                      register(
-                        `servicos.${index}.quantidade` as const
-                      ).onChange(e);
-                    }}
-                    onBlur={() => handleServicoChange(index)}
-                  />
-                  <Form.ErrorMessage
-                    field={`servicos.${index}.valor_unitario` as const}
-                  />
-                </Form.Field>
+                    <Form.Field>
+                      <Form.Label
+                        htmlFor={`servicos.${index}.desconto` as const}
+                        className="flex flex-col"
+                      >
+                        Desconto
+                      </Form.Label>
+                      <Form.Input
+                        name={`servicos.${index}.desconto` as const}
+                        width={100}
+                        max={9}
+                        maskType="money"
+                        disabled={
+                          !["Cadastrar", "Editar"].includes(action ?? "")
+                        }
+                        onChange={(e) => {
+                          register(
+                            `servicos.${index}.quantidade` as const
+                          ).onChange(e);
+                        }}
+                        onBlur={() => handleServicoChange(index)}
+                      />
+                      <Form.ErrorMessage
+                        field={`servicos.${index}.desconto` as const}
+                      />
+                    </Form.Field>
 
-                <Form.Field>
-                  <Form.Label
-                    htmlFor={`servicos.${index}.desconto` as const}
-                    className="flex flex-col"
-                  >
-                    Desconto
-                  </Form.Label>
-                  <Form.Input
-                    name={`servicos.${index}.desconto` as const}
-                    width={100}
-                    max={9}
-                    maskType="money"
-                    disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
-                    onChange={(e) => {
-                      register(
-                        `servicos.${index}.quantidade` as const
-                      ).onChange(e);
-                    }}
-                    onBlur={() => handleServicoChange(index)}
-                  />
-                  <Form.ErrorMessage
-                    field={`servicos.${index}.desconto` as const}
-                  />
-                </Form.Field>
+                    <Form.Field>
+                      <Form.Label
+                        htmlFor={`servicos.${index}.valor_total` as const}
+                        className="flex flex-col"
+                      >
+                        Valor Total
+                      </Form.Label>
+                      <Form.Input
+                        name={`servicos.${index}.valor_total` as const}
+                        width={150}
+                        disabled={true}
+                      />
+                      <Form.ErrorMessage
+                        field={`servicos.${index}.valor_total` as const}
+                      />
+                    </Form.Field>
+                  </div>
 
-                <Form.Field>
-                  <Form.Label
-                    htmlFor={`servicos.${index}.valor_total` as const}
-                    className="flex flex-col"
-                  >
-                    Valor Total
-                  </Form.Label>
-                  <Form.Input
-                    name={`servicos.${index}.valor_total` as const}
-                    width={150}
-                    disabled={true}
-                  />
-                  <Form.ErrorMessage
-                    field={`servicos.${index}.valor_total` as const}
-                  />
-                </Form.Field>
+                  {/* Segunda linha: peridiocidade_id até botão de excluir */}
+                  <div className="flex gap-3 relative">
+                    <Form.Field>
+                      <Form.Label
+                        htmlFor={`servicos.${index}.peridiocidade_id` as const}
+                        className="flex flex-col"
+                      >
+                        Peridiocidade *
+                      </Form.Label>
+                      <Form.Input
+                        name={`servicos.${index}.peridiocidade_id` as const}
+                        width={100}
+                        max={4}
+                        onBlur={(e) =>
+                          getPeridiocidade(index, Number(e.target.value))
+                        }
+                        disabled={
+                          !["Cadastrar", "Editar"].includes(action ?? "")
+                        }
+                      />
+                      <Form.ErrorMessage
+                        field={`servicos.${index}.peridiocidade_id` as const}
+                      />
+                    </Form.Field>
 
-                <Form.Field>
-                  <Form.Label
-                    htmlFor={`servicos.${index}.peridiocidade_id` as const}
-                    className="flex flex-col"
-                  >
-                    Cód. *
-                  </Form.Label>
-                  <Form.Input
-                    name={`servicos.${index}.peridiocidade_id` as const}
-                    width={70}
-                    onBlur={(e) =>
-                      getPeridiocidade(index, Number(e.target.value))
-                    }
-                    disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
-                  />
-                  <Form.ErrorMessage
-                    field={`servicos.${index}.peridiocidade_id` as const}
-                  />
-                </Form.Field>
+                    {peridiocidadesController && (
+                      <Form.Field>
+                        <br />
+                        <PeridiocidadesSubView
+                          index={index}
+                          onClose={onPeridiocidadeSubViewClose}
+                          controller={peridiocidadesController}
+                          disabled={
+                            !["Cadastrar", "Editar"].includes(action ?? "")
+                          }
+                        />
+                      </Form.Field>
+                    )}
 
-                {peridiocidadesController && (
-                  <Form.Field>
-                    <br />
-                    <PeridiocidadesSubView
-                      index={index}
-                      onClose={onPeridiocidadeSubViewClose}
-                      controller={peridiocidadesController}
-                      disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
-                    />
-                  </Form.Field>
-                )}
+                    <Form.Field>
+                      <Form.Label
+                        htmlFor={`servicos.${index}.descricao` as const}
+                      />
+                      <Form.Input
+                        name={`servicos.${index}.descricao` as const}
+                        max={56}
+                        width={300}
+                        defaultValue={`data.servicos.${index}.descricao`}
+                        disabled={true}
+                      />
+                      <Form.ErrorMessage
+                        field={`servicos.${index}.descricao` as const}
+                      />
+                    </Form.Field>
 
-                <Form.Field>
-                  <Form.Label htmlFor={`servicos.${index}.descricao` as const}>
-                    Peridiocidade *
-                  </Form.Label>
-                  <Form.Input
-                    name={`servicos.${index}.descricao` as const}
-                    placeholder="Selecione a Peridiocidade"
-                    max={56}
-                    width={300}
-                    defaultValue={`data.servicos.${index}.descricao`}
-                    disabled={true}
-                  />
+                    <Form.Field>
+                      <Form.Label
+                        htmlFor={`servicos.${index}.quantidade` as const}
+                        className="flex flex-col"
+                      >
+                        Dias
+                      </Form.Label>
+                      <Form.Input
+                        name={`servicos.${index}.dias` as const}
+                        width={50}
+                        max={2}
+                        disabled={true}
+                      />
+                      <Form.ErrorMessage
+                        field={`servicos.${index}.dias` as const}
+                      />
+                    </Form.Field>
 
-                  <Form.ErrorMessage
-                    field={`servicos.${index}.descricao` as const}
-                  />
-                </Form.Field>
-
-                <Form.Field>
-                  <Form.Label
-                    htmlFor={`servicos.${index}.quantidade` as const}
-                    className="flex flex-col"
-                  >
-                    Dias
-                  </Form.Label>
-                  <Form.Input
-                    name={`servicos.${index}.dias` as const}
-                    width={50}
-                    max={2}
-                    disabled={true}
-                  />
-                  <Form.ErrorMessage
-                    field={`servicos.${index}.dias` as const}
-                  />
-                </Form.Field>
-
-                <Button
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                  type="button"
-                  color="red"
-                  disabled={!["Cadastrar", "Editar"].includes(action ?? "")}
-                  onClick={() => removeServico(index)}
-                >
-                  <Trash weight="bold" />
-                </Button>
+                    <div className="flex  items-end">
+                      {/* <br /> */}
+                      <Button
+                        type="button"
+                        color="red"
+                        disabled={
+                          !["Cadastrar", "Editar"].includes(action ?? "")
+                        }
+                        onClick={() => removeServico(index)}
+                      >
+                        <Trash weight="bold" /> Excluir Serviço
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -913,7 +972,7 @@ export function PropostaDialog({
               <AlertCancel />
             ) : (
               <Dialog.Close>
-                <Button variant="outline">Cancelar</Button>
+                <Button variant="outline">Voltar</Button>
               </Dialog.Close>
             )}
 

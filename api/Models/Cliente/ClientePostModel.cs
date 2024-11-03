@@ -1,7 +1,6 @@
 ﻿
 using api.Models.Clientes_interesses;
 using api.Models.Clientes_ramos;
-using api.Models.Clientes_usuarios;
 
 namespace api.Models.Cliente
 {
@@ -24,7 +23,6 @@ namespace api.Models.Cliente
         private string _cep;
         private int _origem_id;
 
-        private List<ClienteUsuarioModel> _usuarios;
         private List<ClienteInteresseModel> _interesses;
         private List<ClienteRamoModel> _ramos;
 
@@ -119,12 +117,6 @@ namespace api.Models.Cliente
             set { _origem_id = value; }
         }
 
-        public List<ClienteUsuarioModel> Usuarios
-        {
-            get { return _usuarios; }
-            set { _usuarios = value; }
-        }
-
         public List<ClienteInteresseModel> Interesses
         {
             get { return _interesses; }
@@ -158,7 +150,6 @@ namespace api.Models.Cliente
             string cep,
             int origem_ID,
 
-            List<ClienteUsuarioModel> usuarios,
             List<ClienteInteresseModel> interesses,
             List<ClienteRamoModel> ramos
             )
@@ -179,7 +170,6 @@ namespace api.Models.Cliente
             _cep = cep;
             _origem_id = origem_ID;
             _interesses = interesses;
-            _usuarios = usuarios;
             _interesses = interesses;
             _ramos = ramos;
         }

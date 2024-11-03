@@ -1,3 +1,4 @@
+import { AxiosResponse } from "axios";
 import { api } from "../config/api";
 import { CreateClienteDto } from "../models/cliente/dto/createCliente.dto";
 import { UpdateClienteDto } from "../models/cliente/dto/updateCliente.dto";
@@ -14,33 +15,25 @@ export class ClientesService {
   }
 
   async create(
-    createClienteDto: CreateClienteDto,
-    proposta_id: number | null | undefined
-  ) {
-    let response;
-
-    if (proposta_id) {
-      response = await api.post(
-        `/PostCliente?proposta_id=${proposta_id}`,
-        createClienteDto
-      );
-    } else {
-      response = await api.post(`/PostCliente`, createClienteDto);
-    }
-    return String(response.data);
+    createClienteDto: CreateClienteDto
+  ): Promise<AxiosResponse<string>> {
+    const response = await api.post<string>(`/PostCliente`, createClienteDto);
+    return response;
   }
 
-  async update(updateClienteDto: UpdateClienteDto) {
+  async update(
+    updateClienteDto: UpdateClienteDto
+  ): Promise<AxiosResponse<string>> {
     const response = await api.put("PutCliente", updateClienteDto);
-    return String(response.data);
+    return response;
   }
 
-  async delete(id: number) {
+  async delete(id: number): Promise<AxiosResponse<string>> {
     const response = await api.delete("DeleteCliente", {
       params: {
         id: id,
       },
     });
-    return String(response.data);
+    return response;
   }
 }

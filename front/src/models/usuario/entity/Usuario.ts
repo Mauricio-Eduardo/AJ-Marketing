@@ -4,6 +4,7 @@ export class Usuario extends ModelPai {
   nome: string;
   email: string;
   senha: string;
+  novoUsuario_id: number | null;
 
   constructor(
     pId: number,
@@ -12,11 +13,13 @@ export class Usuario extends ModelPai {
     pDataUltAlt: string,
     pNome: string,
     pEmail: string,
-    pSenha: string
+    pSenha: string,
+    pNovoUsuario_id: number | null
   ) {
     super(pId, pAtivo, pDataCadastro, pDataUltAlt);
     this.nome = pNome;
     this.email = pEmail;
     this.senha = pSenha;
+    this.novoUsuario_id = pNovoUsuario_id;
   }
 }

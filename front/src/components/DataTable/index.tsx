@@ -17,6 +17,7 @@ interface TableConfig {
   controller: any;
   onRowSelectionChange: (selectedRow: any) => void;
   refreshKey: number;
+  disableFilters?: boolean;
 }
 
 export const DataTable = ({
@@ -25,6 +26,7 @@ export const DataTable = ({
   controller,
   onRowSelectionChange,
   refreshKey,
+  disableFilters,
 }: TableConfig) => {
   const [data, setData] = useState<any[]>([]);
   const [pagination, setPagination] = useState({
@@ -33,6 +35,8 @@ export const DataTable = ({
   });
 
   const getColumnFilters = (): ColumnFiltersState => {
+    if (disableFilters) return [];
+
     switch (type) {
       case "contratos":
         return [
@@ -187,7 +191,7 @@ export const DataTable = ({
               </tr>
             ))}
           </thead>
-          <tbody className="uppercase">
+          <tbody>
             {table.getRowModel().rows.map((row, index) => {
               const rowClass =
                 row.id === selectedRowId

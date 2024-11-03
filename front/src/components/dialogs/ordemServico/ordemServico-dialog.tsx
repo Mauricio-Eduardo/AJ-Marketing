@@ -38,9 +38,11 @@ export function OrdemServicoDialog({
   const { register, handleSubmit, reset, setValue } = ordensServicoForm;
 
   const onUsuarioSubViewClose = (usuario?: Usuario) => {
-    if (usuario) {
+    if (usuario?.ativo) {
       setUsuario(usuario);
       setPreenchido(true);
+    } else {
+      setUsuarioNull("inativo");
     }
   };
 
@@ -165,25 +167,14 @@ export function OrdemServicoDialog({
           if (response.ativo) {
             setUsuario(response);
           } else {
-            setUsuarioNull();
-            toast("Usuário inativo!", {
-              type: "error",
-              isLoading: false,
-              autoClose: 3000,
-            });
+            setUsuarioNull("inativo");
           }
         } catch (error) {
-          setUsuarioNull();
-          toast("Usuário inexistente!", {
-            type: "error",
-            isLoading: false,
-            autoClose: 3000,
-          });
-          console.log(error);
+          setUsuarioNull("inexistente");
         }
       }
     } else {
-      setUsuarioNull();
+      setUsuarioNull("inexistente");
     }
   };
 
@@ -201,9 +192,15 @@ export function OrdemServicoDialog({
     setValue(`nome`, pUsuario.nome);
   };
 
-  const setUsuarioNull = () => {
+  const setUsuarioNull = (str: string) => {
     setValue(`usuario_id`, 0);
     setValue(`nome`, "Física");
+
+    toast(`Usuário ${str}!`, {
+      type: "error",
+      isLoading: false,
+      autoClose: 3000,
+    });
   };
 
   return (
@@ -215,7 +212,6 @@ export function OrdemServicoDialog({
       onEscapeKeyDown={(e) => {
         e.preventDefault();
       }}
-      autoFocus={false}
     >
       <div className="flex justify-between">
         <Dialog.Title>{action} Ordem de Serviço</Dialog.Title>
@@ -411,8 +407,9 @@ export function OrdemServicoDialog({
               <Form.Label htmlFor="observacoes">Observações</Form.Label>
               <TextArea
                 {...register("observacoes")}
+                maxLength={255}
                 placeholder="Adicione aqui as observações"
-                className="uppercase min-h-24 max-h-24"
+                className="min-h-24 max-h-24"
                 disabled={action === "Visualizar"}
               />
               <Form.ErrorMessage field="observacoes" />
@@ -451,7 +448,7 @@ export function OrdemServicoDialog({
               <AlertCancel />
             ) : (
               <Dialog.Close>
-                <Button variant="outline">Cancelar</Button>
+                <Button variant="outline">Voltar</Button>
               </Dialog.Close>
             )}
 

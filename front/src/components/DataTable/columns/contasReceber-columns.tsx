@@ -103,10 +103,9 @@ export const ContasReceberColumns: ColumnDef<ContaReceber>[] = [
           className="pl-2 text-sm font-normal rounded"
         >
           <option value="">Todas</option>
-          <option value={["Pendente", "Parcial"]}>Pendente</option>
+          <option value="Pendente">Pendente</option>
           <option value="Recebida">Recebida</option>
-          <option value="Parcial">Parcial</option>
-          <option value="Paga">Cancelada</option>
+          <option value="Cancelada">Cancelada</option>
         </select>
       </div>
     ),

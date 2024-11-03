@@ -1,4 +1,4 @@
-import { MagnifyingGlass, Pencil, Plus, Trash, X } from "@phosphor-icons/react";
+import { Eye, MagnifyingGlass, Pencil, Plus } from "@phosphor-icons/react";
 import { Button, Dialog, Flex } from "@radix-ui/themes";
 import { useState } from "react";
 import { DataTable } from "../../../components/datatable";
@@ -25,7 +25,7 @@ export const ClientesSubView = ({
 
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [dialogAction, setDialogAction] = useState<
-    "Cadastrar" | "Editar" | "Excluir" | null
+    "Cadastrar" | "Editar" | "Visualizar" | null
   >(null);
 
   const [refreshKey, setRefreshKey] = useState(0);
@@ -41,7 +41,9 @@ export const ClientesSubView = ({
     handleOpenDialog();
   };
 
-  const handleActionChange = (action: "Cadastrar" | "Editar" | "Excluir") => {
+  const handleActionChange = (
+    action: "Cadastrar" | "Editar" | "Visualizar"
+  ) => {
     setDialogAction(action);
   };
 
@@ -69,85 +71,69 @@ export const ClientesSubView = ({
         >
           <Dialog.Root open={isDialogOpen} onOpenChange={handleOpenDialog}>
             <Flex
-              justify={"start"}
+              justify={"between"}
               direction={"row"}
               gap={"3"}
               className="pb-2 border-b-2 border-b-gray-200"
             >
-              <Dialog.Trigger>
-                <Button
-                  onClick={() => {
-                    handleActionChange("Cadastrar");
-                  }}
-                >
-                  <Plus />
-                  Cadastrar
-                </Button>
-              </Dialog.Trigger>
+              <div className="space-x-3">
+                <Dialog.Trigger>
+                  <Button
+                    onClick={() => {
+                      handleActionChange("Cadastrar");
+                    }}
+                  >
+                    <Plus />
+                    Cadastrar
+                  </Button>
+                </Dialog.Trigger>
 
-              {/* Editar */}
-              <Dialog.Trigger>
-                <Button
-                  onClick={() => {
-                    handleActionChange("Editar");
-                  }}
-                  disabled={!selectedRowData.id}
-                >
-                  <Pencil />
-                  Editar
-                </Button>
-              </Dialog.Trigger>
+                <Dialog.Trigger>
+                  <Button
+                    onClick={() => {
+                      handleActionChange("Editar");
+                    }}
+                    disabled={!selectedRowData?.id}
+                  >
+                    <Pencil />
+                    Editar
+                  </Button>
+                </Dialog.Trigger>
 
-              {/* Excluir */}
-              <Dialog.Trigger>
-                <Button
-                  onClick={() => {
-                    handleActionChange("Excluir");
-                  }}
-                  disabled={!selectedRowData.id}
-                  color="red"
-                >
-                  <Trash />
-                  Excluir
-                </Button>
-              </Dialog.Trigger>
+                <Dialog.Trigger>
+                  <Button
+                    onClick={() => {
+                      handleActionChange("Visualizar");
+                    }}
+                    disabled={!selectedRowData?.id}
+                    variant="outline"
+                  >
+                    <Eye />
+                    Visualizar
+                  </Button>
+                </Dialog.Trigger>
+              </div>
 
               {isDialogOpen && (
-                <Dialog.Content
-                  maxWidth={"1000px"}
-                  onInteractOutside={(e) => {
-                    e.preventDefault();
-                  }}
-                  onEscapeKeyDown={(e) => {
-                    e.preventDefault();
-                  }}
-                >
-                  <div className="flex justify-between">
-                    <Dialog.Title>{dialogAction} Cliente</Dialog.Title>
-
-                    <Dialog.Close>
-                      <X />
-                    </Dialog.Close>
-                  </div>
-                  <ClienteDialog
-                    key={selectedRowData?.id}
-                    proposta_id={null}
-                    data={selectedRowData as Cliente}
-                    action={dialogAction}
-                    controller={controller}
-                    origensController={origensController}
-                    cidadesController={cidadesController}
-                    usuariosController={usuariosController}
-                    interessesController={interessesController}
-                    ramosAtividadeController={ramosAtividadeController}
-                    isOpenModal={isDialogOpen}
-                    onSuccess={handleSuccess}
-                  />
-                </Dialog.Content>
+                <ClienteDialog
+                  key={selectedRowData?.id}
+                  proposta_id={null}
+                  data={selectedRowData as Cliente}
+                  action={dialogAction}
+                  controller={controller}
+                  origensController={origensController}
+                  cidadesController={cidadesController}
+                  usuariosController={usuariosController}
+                  interessesController={interessesController}
+                  ramosAtividadeController={ramosAtividadeController}
+                  isOpenModal={isDialogOpen}
+                  onSuccess={handleSuccess}
+                />
               )}
             </Flex>
 
             <DataTable
+              type="sub"
               columns={ClientesColumns}
               onRowSelectionChange={handleRowSelectionChange}
               controller={controller}

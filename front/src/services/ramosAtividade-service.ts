@@ -1,3 +1,4 @@
+import { AxiosResponse } from "axios";
 import { api } from "../config/api";
 import { CreateRamoAtividadeDto } from "../models/ramoAtividade/dto/createRamoAtividade.dto";
 import { UpdateRamoAtividadeDto } from "../models/ramoAtividade/dto/updateRamoAtividade.dto";
@@ -13,23 +14,27 @@ export class RamosAtividadeService {
     return response.data;
   }
 
-  async create(createRamoAtividadeDto: CreateRamoAtividadeDto) {
-    const response = await api.post(
+  async create(
+    createRamoAtividadeDto: CreateRamoAtividadeDto
+  ): Promise<AxiosResponse<string>> {
+    const response = await api.post<string>(
       "PostRamoAtividade",
       createRamoAtividadeDto
     );
-    return String(response.data);
+    return response;
   }
 
-  async update(updateRamoAtividadeDto: UpdateRamoAtividadeDto) {
+  async update(
+    updateRamoAtividadeDto: UpdateRamoAtividadeDto
+  ): Promise<AxiosResponse<string>> {
     const response = await api.put("PutRamoAtividade", updateRamoAtividadeDto);
-    return String(response.data);
+    return response;
   }
 
-  async delete(id: number) {
+  async delete(id: number): Promise<AxiosResponse<string>> {
     const response = await api.delete("DeleteRamoAtividade", {
       params: { id: id },
     });
-    return String(response.data);
+    return response;
   }
 }

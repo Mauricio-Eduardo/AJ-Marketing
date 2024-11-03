@@ -1,4 +1,4 @@
-import { MagnifyingGlass, Pencil, Plus, Trash } from "@phosphor-icons/react";
+import { Eye, MagnifyingGlass, Pencil, Plus } from "@phosphor-icons/react";
 import { Button, Dialog, Flex } from "@radix-ui/themes";
 import { useState } from "react";
 import { Pais } from "../../../models/pais/entity/Pais";
@@ -14,7 +14,7 @@ export const PaisesSubView = ({
 }: SubDialogProps) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [dialogAction, setDialogAction] = useState<
-    "Cadastrar" | "Editar" | "Excluir" | null
+    "Cadastrar" | "Editar" | "Visualizar" | null
   >(null);
 
   const [refreshKey, setRefreshKey] = useState(0);
@@ -30,7 +30,9 @@ export const PaisesSubView = ({
     handleOpenDialog();
   };
 
-  const handleActionChange = (action: "Cadastrar" | "Editar" | "Excluir") => {
+  const handleActionChange = (
+    action: "Cadastrar" | "Editar" | "Visualizar"
+  ) => {
     setDialogAction(action);
   };
 
@@ -89,13 +91,13 @@ export const PaisesSubView = ({
               <Dialog.Trigger>
                 <Button
                   onClick={() => {
-                    handleActionChange("Excluir");
+                    handleActionChange("Visualizar");
                   }}
-                  disabled={!selectedRowData.id}
-                  color="red"
+                  disabled={!selectedRowData?.id}
+                  variant="outline"
                 >
-                  <Trash />
-                  Excluir
+                  <Eye />
+                  Visualizar
                 </Button>
               </Dialog.Trigger>
 

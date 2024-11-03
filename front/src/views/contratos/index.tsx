@@ -84,7 +84,7 @@ export const ContratosView = () => {
                   handleActionChange("Cancelar");
                 }}
                 disabled={
-                  !selectedRowData?.id &&
+                  !selectedRowData?.id ||
                   selectedRowData?.situacao === "Cancelado"
                 }
                 color="red"

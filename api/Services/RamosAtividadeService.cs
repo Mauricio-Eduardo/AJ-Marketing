@@ -121,12 +121,12 @@ namespace api.Services
                     postCmd.Parameters.Add("@ramo", SqlDbType.VarChar).Value = ramoInserido.Ramo;
 
                     postCmd.ExecuteNonQuery();
-                    return "Inserido com Sucesso!";
+                    return "Ramo de Atividade inserido com Sucesso!";
 
                 }
                 catch (SqlException ex)
                 {
-                    throw new Exception(ex.Message);
+                    throw;
                 }
                 finally
                 {
@@ -154,12 +154,12 @@ namespace api.Services
                     putCmd.Parameters.Add("@data_ult_alt", SqlDbType.DateTime).Value = new SqlDateTime(DateTime.Now).ToString();
 
                     putCmd.ExecuteNonQuery();
-                    return "Alterado com Sucesso!";
+                    return "Ramo de Atividade alterado com Sucesso!";
 
                 }
                 catch (SqlException ex)
                 {
-                    throw new Exception(ex.Message);
+                    throw;
                 }
                 finally
                 {
@@ -183,12 +183,12 @@ namespace api.Services
                     deleteCmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
 
                     deleteCmd.ExecuteNonQuery();
-                    return "Deletado com Sucesso!";
+                    return "Ramo de Atividade deletado com Sucesso!";
 
                 }
                 catch (SqlException ex)
                 {
-                    throw new Exception(ex.Message);
+                    throw;
                 }
                 finally
                 {

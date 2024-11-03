@@ -37,6 +37,17 @@ namespace api.Controllers
                 return BadRequest();
         }
 
+        //[HttpPut]
+        //[Route("/PostConta")]
+        //public IActionResult PostConta([FromBody] ContaReceberPostModel contaInserida)
+        //{
+        //    string result = contasReceberService.PostConta(contaInserida);
+        //    if (result != null)
+        //        return Ok(result);
+        //    else
+        //        return BadRequest();
+        //}
+
         [HttpPut]
         [Route("/ReceberConta")]
         public IActionResult ReceberConta([FromBody] ContaReceberPutModel contaRecebida)

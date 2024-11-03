@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Dialog } from "@radix-ui/themes";
 import { FormProvider, useForm } from "react-hook-form";
@@ -13,6 +13,8 @@ import { PaisesSubView } from "../../../views/paises/subView";
 import { X } from "@phosphor-icons/react";
 import { DialogProps } from "../DialogProps";
 import { toast } from "react-toastify";
+import { AlertCancel, AlertCancelX, AlertSubmit } from "../../form/Alerts";
+import { AxiosError, AxiosResponse } from "axios";
 
 export function EstadoDialog({
   data,
@@ -30,63 +32,57 @@ export function EstadoDialog({
   const { control, handleSubmit, setValue, reset } = estadoForm;
 
   const onSubViewClose = (pais?: Pais) => {
-    if (pais) {
+    if (pais?.ativo) {
       setPais(pais);
+    } else {
+      setPaisNull("inativo");
     }
   };
 
   const onSubmit = async (pData: Estado) => {
     let toastId = toast.loading("Processando...");
+    let response: AxiosResponse<string> | undefined;
 
     try {
       if (action === "Cadastrar") {
         const payload = transformarParaPostEstado(pData);
-        await controller.create(payload);
-        toast.update(toastId, {
-          render: "Estado cadastrado com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
+        response = await controller.create(payload);
       } else if (action === "Editar") {
         const payload = transformarParaPutEstado(pData);
-        await controller.update(payload);
-        toast.update(toastId, {
-          render: "Estado atualizado com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
+        response = await controller.update(payload);
       } else if (action === "Excluir") {
         const id = pData.id;
-        await controller.delete(id);
-        toast.update(toastId, {
-          render: "Estado excluído com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
+        response = await controller.delete(id);
       }
-    } catch (error) {
       toast.update(toastId, {
-        render: "Ocorreu um erro. Tente novamente!",
+        render: response?.data,
+        type: "success",
+        isLoading: false,
+        draggable: true,
+        draggableDirection: "x",
+        autoClose: 1000, // Não auto fecha
+        onClose: onSuccess,
+      });
+    } catch (error) {
+      const errorMessage = (error as AxiosError).response?.data;
+      toast.update(toastId, {
+        render: String(errorMessage),
         type: "error",
         isLoading: false,
         draggable: true,
         draggableDirection: "x",
         autoClose: 3000,
       });
-      console.log(error);
     }
+  };
+
+  const [preenchido, setPreenchido] = useState<boolean>(false);
+
+  const handlePreenchidoChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value;
+    setPreenchido(value.length > 0); // Define como true se houver texto, caso contrário, false
   };
 
   const cleanData = () => {
@@ -132,13 +128,14 @@ export function EstadoDialog({
           if (response.ativo) {
             setPais(response);
           } else {
-            setPaisNull();
+            setPaisNull("inativo");
           }
         } catch (error) {
-          setPaisNull();
-          console.log(error);
+          setPaisNull("inexistente");
         }
       }
+    } else {
+      setPaisNull("inexistente");
     }
   };
 
@@ -147,9 +144,15 @@ export function EstadoDialog({
     setValue("pais", pPais.pais);
   };
 
-  const setPaisNull = () => {
+  const setPaisNull = (str: string) => {
     setValue("pais_id", 0);
     setValue("pais", "");
+
+    toast(`País ${str}!`, {
+      type: "error",
+      isLoading: false,
+      autoClose: 3000,
+    });
   };
 
   return (
@@ -165,9 +168,13 @@ export function EstadoDialog({
         <div className="flex justify-between">
           <Dialog.Title>{action} Estado</Dialog.Title>
 
-          <Dialog.Close>
-            <X />
-          </Dialog.Close>
+          {preenchido ? (
+            <AlertCancelX />
+          ) : (
+            <Dialog.Close>
+              <X />
+            </Dialog.Close>
+          )}
         </div>
 
         <FormProvider {...estadoForm}>
@@ -202,15 +209,15 @@ export function EstadoDialog({
 
             {/* Linha 2 */}
             <div className="flex gap-3">
-              <Form.Field>
+              <Form.Field className="flex-1">
                 <Form.Label htmlFor="estado">Estado *</Form.Label>
                 <Form.Input
                   name="estado"
                   placeholder="Insira o Estado"
                   max={56}
-                  width={250}
                   defaultValue={data.estado}
-                  disabled={action === "Excluir"}
+                  disabled={action === "Excluir" || action === "Visualizar"}
+                  preenchidoChange={handlePreenchidoChange}
                 />
                 <Form.ErrorMessage field="estado" />
               </Form.Field>
@@ -223,7 +230,9 @@ export function EstadoDialog({
                   max={2}
                   width={70}
                   defaultValue={data.uf}
-                  disabled={action === "Excluir"}
+                  disabled={action === "Excluir" || action === "Visualizar"}
+                  className="uppercase"
+                  preenchidoChange={handlePreenchidoChange}
                 />
                 <Form.ErrorMessage field="uf" />
               </Form.Field>
@@ -232,7 +241,7 @@ export function EstadoDialog({
             {/* Linha 3 */}
             <div className="flex gap-3 items-center">
               <Form.Field>
-                <Form.Label htmlFor="pais_id">Cód. *</Form.Label>
+                <Form.Label htmlFor="pais_id">País *</Form.Label>
                 <Form.Input
                   name="pais_id"
                   placeholder="0"
@@ -240,7 +249,8 @@ export function EstadoDialog({
                   width={70}
                   defaultValue={data.pais_id}
                   onBlur={(e) => getPais(Number(e.target.value))}
-                  disabled={action === "Excluir"}
+                  disabled={action === "Excluir" || action === "Visualizar"}
+                  preenchidoChange={handlePreenchidoChange}
                 />
                 <Form.ErrorMessage field="pais_id" />
               </Form.Field>
@@ -251,17 +261,16 @@ export function EstadoDialog({
                   <PaisesSubView
                     onClose={onSubViewClose}
                     controller={subController}
+                    disabled={action === "Excluir" || action === "Visualizar"}
                   />
                 </Form.Field>
               )}
 
-              <Form.Field>
-                <Form.Label htmlFor="pais">País</Form.Label>
+              <Form.Field className="flex-1">
+                <Form.Label htmlFor="pais"></Form.Label>
                 <Form.Input
                   name="pais"
                   placeholder="Selecione o País"
-                  max={56}
-                  width={250}
                   defaultValue={data.pais}
                   disabled={true}
                 />
@@ -297,15 +306,21 @@ export function EstadoDialog({
             </div>
 
             <div className="flex w-full justify-end gap-3">
-              <Dialog.Close>
-                <Button variant="outline">Cancelar</Button>
-              </Dialog.Close>
-              {action === "Excluir" && (
-                <Button type="submit" color="red">
-                  {action}
-                </Button>
+              {preenchido ? (
+                <AlertCancel />
+              ) : (
+                <Dialog.Close>
+                  <Button variant="outline">Voltar</Button>
+                </Dialog.Close>
               )}
-              {action != "Excluir" && <Button type="submit">{action}</Button>}
+
+              {action != "Visualizar" && (
+                <AlertSubmit
+                  title={action as string}
+                  type="Origem"
+                  onSubmit={onSubmit}
+                />
+              )}
             </div>
           </form>
         </FormProvider>

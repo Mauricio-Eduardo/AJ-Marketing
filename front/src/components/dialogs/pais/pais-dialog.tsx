@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Dialog } from "@radix-ui/themes";
 import { FormProvider, useForm } from "react-hook-form";
@@ -12,6 +12,8 @@ import { X } from "@phosphor-icons/react";
 import { DialogProps } from "../DialogProps";
 import "react-toastify/dist/ReactToastify.css";
 import { toast, ToastContainer } from "react-toastify";
+import { AxiosError, AxiosResponse } from "axios";
+import { AlertCancel, AlertCancelX, AlertSubmit } from "../../form/Alerts";
 
 export function PaisDialog({
   data,
@@ -29,56 +31,48 @@ export function PaisDialog({
 
   const onSubmit = async (pData: Pais) => {
     let toastId = toast.loading("Processando...");
+    let response: AxiosResponse<string> | undefined;
 
     try {
       if (action === "Cadastrar") {
         const payload = transformarParaPostPais(pData);
-        await controller.create(payload);
-        toast.update(toastId, {
-          render: "País cadastrado com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
+        response = await controller.create(payload);
       } else if (action === "Editar") {
         const payload = transformarParaPutPais(pData);
-        await controller.update(payload);
-        toast.update(toastId, {
-          render: "País atualizado com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
+        response = await controller.update(payload);
       } else if (action === "Excluir") {
         const id = pData.id;
-        await controller.delete(id);
-        toast.update(toastId, {
-          render: "País excluído com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
+        response = await controller.delete(id);
       }
-    } catch (error) {
       toast.update(toastId, {
-        render: "Ocorreu um erro. Tente novamente!",
+        render: response?.data,
+        type: "success",
+        isLoading: false,
+        draggable: true,
+        draggableDirection: "x",
+        autoClose: 1000,
+        onClose: onSuccess,
+      });
+    } catch (error) {
+      const errorMessage = (error as AxiosError).response?.data;
+      toast.update(toastId, {
+        render: String(errorMessage),
         type: "error",
         isLoading: false,
         draggable: true,
         draggableDirection: "x",
         autoClose: 3000,
       });
-      console.log(error);
     }
+  };
+
+  const [preenchido, setPreenchido] = useState<boolean>(false);
+
+  const handlePreenchidoChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value;
+    setPreenchido(value.length > 0); // Define como true se houver texto, caso contrário, false
   };
 
   const cleanData = () => {
@@ -129,9 +123,13 @@ export function PaisDialog({
 
         <ToastContainer />
 
-        <Dialog.Close>
-          <X />
-        </Dialog.Close>
+        {preenchido ? (
+          <AlertCancelX />
+        ) : (
+          <Dialog.Close>
+            <X />
+          </Dialog.Close>
+        )}
       </div>
 
       <FormProvider {...paisForm}>
@@ -166,15 +164,15 @@ export function PaisDialog({
 
           {/* Linha 2 */}
           <div className="flex gap-3">
-            <Form.Field>
+            <Form.Field className="flex-1">
               <Form.Label htmlFor="pais">País *</Form.Label>
               <Form.Input
                 name="pais"
                 placeholder="Insira o País"
                 max={56}
-                width={250}
                 defaultValue={data.pais}
-                disabled={action === "Excluir"}
+                disabled={action === "Excluir" || action === "Visualizar"}
+                preenchidoChange={handlePreenchidoChange}
               />
               <Form.ErrorMessage field="pais" />
             </Form.Field>
@@ -187,7 +185,9 @@ export function PaisDialog({
                 max={2}
                 width={70}
                 defaultValue={data.sigla}
-                disabled={action === "Excluir"}
+                className="uppercase"
+                disabled={action === "Excluir" || action === "Visualizar"}
+                preenchidoChange={handlePreenchidoChange}
               />
               <Form.ErrorMessage field="sigla" />
             </Form.Field>
@@ -200,7 +200,8 @@ export function PaisDialog({
                 max={3}
                 width={70}
                 defaultValue={data.ddi}
-                disabled={action === "Excluir"}
+                disabled={action === "Excluir" || action === "Visualizar"}
+                preenchidoChange={handlePreenchidoChange}
               />
               <Form.ErrorMessage field="ddi" />
             </Form.Field>
@@ -235,17 +236,21 @@ export function PaisDialog({
 
           {/* Submit Buttons */}
           <div className="flex w-full justify-end gap-3">
-            <Dialog.Close>
-              <Button type="button" variant="outline">
-                Cancelar
-              </Button>
-            </Dialog.Close>
-            {action === "Excluir" && (
-              <Button type="submit" color="red">
-                {action}
-              </Button>
+            {preenchido ? (
+              <AlertCancel />
+            ) : (
+              <Dialog.Close>
+                <Button variant="outline">Voltar</Button>
+              </Dialog.Close>
             )}
-            {action != "Excluir" && <Button type="submit">{action}</Button>}
+
+            {action != "Visualizar" && (
+              <AlertSubmit
+                title={action as string}
+                type="País"
+                onSubmit={onSubmit}
+              />
+            )}
           </div>
         </form>
       </FormProvider>

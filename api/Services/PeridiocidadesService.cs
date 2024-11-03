@@ -62,56 +62,6 @@ namespace api.Services
             }
         }
 
-        public IEnumerable<PeridiocidadeModel> GetAllPeridiocidadesAtivas()
-        {
-            List<PeridiocidadeModel> listaPeridiocidades = new List<PeridiocidadeModel>();
-
-            using (Connection)
-            {
-                try
-                {
-                    Connection.Open();
-
-                    SqlCommand getAllCmd = new SqlCommand(String.Format(
-                        "SELECT * FROM peridiocidades WHERE ativo = @ativo;"), Connection);
-
-                    getAllCmd.Parameters.Clear();
-                    getAllCmd.Parameters.Add("@ativo", SqlDbType.Bit).Value = 1;
-
-                    SqlDataReader reader = getAllCmd.ExecuteReader();
-
-                    while (reader.Read())
-                    {
-                        // Para cada registro encontrado, cria um objeto e adiciona à lista
-                        listaPeridiocidades.Add(
-                            new PeridiocidadeModel
-                            {
-                                Id = reader.GetInt32("id"),
-                                Descricao = reader.GetString("descricao"),
-                                Dias = reader.GetInt32("dias"),
-                                Ativo = reader.GetBoolean("ativo"),
-                                Data_cadastro = reader.GetDateTime("data_cadastro"),
-                                Data_ult_alt = reader.IsDBNull(reader.GetOrdinal("data_ult_alt"))
-                                    ? (DateTime?)null
-                                    : reader.GetDateTime(reader.GetOrdinal("data_ult_alt"))
-                            }
-                        );
-                    }
-                    return listaPeridiocidades;
-
-                }
-                catch (SqlException ex)
-                {
-                    throw new Exception(ex.Message);
-                }
-                finally
-                {
-                    Connection.Close();
-                }
-
-            }
-        }
-
         public PeridiocidadeModel GetPeridiocidade(int id)
         {
             using (Connection)
@@ -174,12 +124,12 @@ namespace api.Services
                     postCmd.Parameters.Add("@dias", SqlDbType.Int).Value = peridiocidadeInserida.Dias;
 
                     postCmd.ExecuteNonQuery();
-                    return "Inserida com Sucesso!";
+                    return "Peridiocidade inserida com Sucesso!";
 
                 }
                 catch (SqlException ex)
                 {
-                    throw new Exception(ex.Message);
+                    throw;
                 }
                 finally
                 {
@@ -208,12 +158,12 @@ namespace api.Services
                     putCmd.Parameters.Add("@data_ult_alt", SqlDbType.DateTime).Value = new SqlDateTime(DateTime.Now).ToString();
 
                     putCmd.ExecuteNonQuery();
-                    return "Alterada com Sucesso!";
+                    return "Peridiocidade alterada com Sucesso!";
 
                 }
                 catch (SqlException ex)
                 {
-                    throw new Exception(ex.Message);
+                    throw;
                 }
                 finally
                 {
@@ -237,12 +187,12 @@ namespace api.Services
                     deleteCmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
 
                     deleteCmd.ExecuteNonQuery();
-                    return "Deletada com Sucesso!";
+                    return "Peridiocidade deletada com Sucesso!";
 
                 }
                 catch (SqlException ex)
                 {
-                    throw new Exception(ex.Message);
+                    throw;
                 }
                 finally
                 {

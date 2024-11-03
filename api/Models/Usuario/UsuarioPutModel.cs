@@ -9,6 +9,8 @@
         private string _email;
         private string _senha;
 
+        private int? _novoUsuario_id;
+
         private bool _ativo;
 
         // Propriedades públicas para acessar as variáveis
@@ -36,6 +38,18 @@
             set { _senha = value; }
         }
 
+        public int? NovoUsuario_id
+        {
+            get { return _novoUsuario_id; }
+            set { _novoUsuario_id = value; }
+        }
+
+        //public string SenhaAtual
+        //{
+        //    get { return _senhaAtual; }
+        //    set { _senhaAtual = value; }
+        //}
+
         public bool Ativo
         {
             get { return _ativo; }
@@ -46,12 +60,13 @@
         public UsuarioPutModel() { }
 
         // Construtor com parâmetros
-        public UsuarioPutModel(int id, string nome, string email, string senha, bool ativo)
+        public UsuarioPutModel(int id, string nome, string email, string senha, int novoUsuario_id, bool ativo)
         {
             _id = id;
             _nome = nome;
             _email = email;
             _senha = senha;
+            _novoUsuario_id = novoUsuario_id;
             _ativo = ativo;
         }
     }

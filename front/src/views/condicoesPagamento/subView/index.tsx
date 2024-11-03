@@ -1,11 +1,12 @@
-import { MagnifyingGlass, Pencil, Plus, Trash } from "@phosphor-icons/react";
+import { Eye, MagnifyingGlass, Pencil, Plus } from "@phosphor-icons/react";
 import { Button, Dialog, Flex } from "@radix-ui/themes";
 import { useState } from "react";
 import { DataTable } from "../../../components/datatable";
-import { EstadoDialog } from "../../../components/dialogs/estado/estado-dialog";
 import { SubDialogProps } from "../../../components/dialogs/DialogProps";
 import { CondicaoPagamento } from "../../../models/condicaoPagamento/entity/CondicaoPagamento";
 import { CondicoesPagamentoColumns } from "../../../components/datatable/columns/condicoesPagamento-columns";
+import { CondicaoPagamentoDialog } from "../../../components/dialogs/condicaoPagamento/condicaoPagamento-dialog";
+import { FormasPagamentoController } from "../../../controllers/formasPagamento-controller";
 
 export const CondicoesPagamentoSubView = ({
   onClose,
@@ -14,8 +15,9 @@ export const CondicoesPagamentoSubView = ({
 }: SubDialogProps) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [dialogAction, setDialogAction] = useState<
-    "Cadastrar" | "Editar" | "Excluir" | null
+    "Cadastrar" | "Editar" | "Visualizar" | null
   >(null);
+  const formasPagamentoController = new FormasPagamentoController();
 
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -30,7 +32,9 @@ export const CondicoesPagamentoSubView = ({
     handleOpenDialog();
   };
 
-  const handleActionChange = (action: "Cadastrar" | "Editar" | "Excluir") => {
+  const handleActionChange = (
+    action: "Cadastrar" | "Editar" | "Visualizar"
+  ) => {
     setDialogAction(action);
   };
 
@@ -87,31 +91,30 @@ export const CondicoesPagamentoSubView = ({
                 </Button>
               </Dialog.Trigger>
 
-              {/* Excluir */}
               <Dialog.Trigger>
                 <Button
                   onClick={() => {
-                    handleActionChange("Excluir");
+                    handleActionChange("Visualizar");
                   }}
-                  disabled={!selectedRowData.id}
-                  color="red"
+                  disabled={!selectedRowData?.id}
+                  variant="outline"
                 >
-                  <Trash />
-                  Excluir
+                  <Eye />
+                  Visualizar
                 </Button>
               </Dialog.Trigger>
 
-              <EstadoDialog
+              <CondicaoPagamentoDialog
                 data={selectedRowData as CondicaoPagamento}
                 action={dialogAction}
                 controller={controller}
+                subController={formasPagamentoController}
                 isOpenModal={isDialogOpen}
                 onSuccess={handleSuccess}
               />
             </Flex>
 
             <DataTable
-              type=""
               columns={CondicoesPagamentoColumns}
               onRowSelectionChange={handleRowSelectionChange}
               controller={controller}

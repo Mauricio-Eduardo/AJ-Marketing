@@ -15,60 +15,6 @@ namespace api.Services
             this.Connection = pSqlConnection;
         }
 
-        public IEnumerable<EstadoModel> GetAllEstadosAtivos() 
-        {
-            List<EstadoModel> listaEstados = new List<EstadoModel>();
-
-            using (Connection)
-            {
-                try
-                {
-                    Connection.Open();
-
-                    SqlCommand getAllCmd = new SqlCommand(String.Format(
-                       "SELECT e.id, e.estado, e.uf, e.pais_id, p.pais, e.ativo, e.data_cadastro, e.data_ult_alt " +
-                       "FROM estados e INNER JOIN paises p ON e.pais_id = p.id WHERE e.ativo = @ativo"), Connection);
-
-                    getAllCmd.Parameters.Clear();
-                    getAllCmd.Parameters.Add("@ativo", SqlDbType.Bit).Value = 1;
-
-
-                    SqlDataReader reader = getAllCmd.ExecuteReader();
-
-                    while (reader.Read())
-                    {
-                        // Para cada registro encontrado, cria um objeto e adiciona à lista
-                        listaEstados.Add(
-                            new EstadoModel
-                            {
-                                Id = reader.GetInt32("id"),
-                                Estado = reader.GetString("estado"),
-                                Uf = reader.GetString("uf"),
-                                Pais_id = reader.GetInt32("pais_id"),
-                                Pais = reader.GetString("pais"),
-                                Ativo = reader.GetBoolean("ativo"),
-                                Data_cadastro = reader.GetDateTime("data_cadastro"),
-                                Data_ult_alt = reader.IsDBNull(reader.GetOrdinal("data_ult_alt"))
-                                    ? (DateTime?)null
-                                    : reader.GetDateTime(reader.GetOrdinal("data_ult_alt"))
-                            }
-                        );
-                    }
-                    return listaEstados;
-
-                }
-                catch (SqlException ex)
-                {
-                    throw new Exception(ex.Message);
-                }
-                finally
-                {
-                    Connection.Close();
-                }
-
-            }
-        }
-
         public IEnumerable<EstadoModel> GetAllEstados()
         {
             List<EstadoModel> listaEstados = new List<EstadoModel>();
@@ -115,7 +61,6 @@ namespace api.Services
                 {
                     Connection.Close();
                 }
-
             }
         }
 
@@ -186,12 +131,12 @@ namespace api.Services
                     postCmd.Parameters.Add("@pais_id", SqlDbType.Int).Value = estadoInserido.Pais_id;
 
                     postCmd.ExecuteNonQuery();
-                    return "Inserido com Sucesso!";
+                    return "Estado inserido com Sucesso!";
 
                 }
                 catch (SqlException ex)
                 {
-                    throw new Exception(ex.Message);
+                    throw;
                 }
                 finally
                 {
@@ -221,12 +166,12 @@ namespace api.Services
                     putCmd.Parameters.Add("@data_ult_alt", SqlDbType.DateTime).Value = new SqlDateTime(DateTime.Now).ToString();
 
                     putCmd.ExecuteNonQuery();
-                    return "Alterado com Sucesso!";
+                    return "Estado alterado com Sucesso!";
 
                 }
                 catch (SqlException ex)
                 {
-                    throw new Exception(ex.Message);
+                    throw;
                 }
                 finally
                 {
@@ -250,12 +195,12 @@ namespace api.Services
                     deleteCmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
 
                     deleteCmd.ExecuteNonQuery();
-                    return "Deletado com Sucesso!";
+                    return "Estado deletado com Sucesso!";
 
                 }
                 catch (SqlException ex)
                 {
-                    throw new Exception(ex.Message);
+                    throw;
                 }
                 finally
                 {

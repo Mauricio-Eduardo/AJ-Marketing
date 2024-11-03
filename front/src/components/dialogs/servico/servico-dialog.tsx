@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Dialog, TextArea } from "@radix-ui/themes";
 import { FormProvider, useForm } from "react-hook-form";
@@ -11,6 +11,8 @@ import { Servico } from "../../../models/servico/entity/Servico";
 import { transformarParaPostServico } from "../../../models/servico/dto/createServico.dto";
 import { transformarParaPutServico } from "../../../models/servico/dto/updateServico.dto";
 import { toast } from "react-toastify";
+import { AlertCancel, AlertCancelX, AlertSubmit } from "../../form/Alerts";
+import { AxiosError, AxiosResponse } from "axios";
 
 export function ServicoDialog({
   data,
@@ -29,58 +31,49 @@ export function ServicoDialog({
 
   const onSubmit = async (pData: Servico) => {
     let toastId = toast.loading("Processando...");
+    let response: AxiosResponse<string> | undefined;
 
     try {
       pData.valor = unmaskMoney(pData.valor);
       if (action === "Cadastrar") {
         const payload = transformarParaPostServico(pData);
-        await controller.create(payload);
-        toast.update(toastId, {
-          render: "Serviço cadastrado com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
-        reset();
+        response = await controller.create(payload);
       } else if (action === "Editar") {
         const payload = transformarParaPutServico(pData);
-        await controller.update(payload);
-        toast.update(toastId, {
-          render: "Serviço atualizado com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
+        response = await controller.update(payload);
       } else if (action === "Excluir") {
         const id = pData.id;
-        await controller.delete(id);
-        toast.update(toastId, {
-          render: "Serviço excluído com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
+        response = await controller.delete(id);
       }
-    } catch (error) {
       toast.update(toastId, {
-        render: "Ocorreu um erro. Tente novamente!",
+        render: response?.data,
+        type: "success",
+        isLoading: false,
+        draggable: true,
+        draggableDirection: "x",
+        autoClose: 1000,
+        onClose: onSuccess,
+      });
+    } catch (error) {
+      const errorMessage = (error as AxiosError).response?.data;
+      toast.update(toastId, {
+        render: String(errorMessage),
         type: "error",
         isLoading: false,
         draggable: true,
         draggableDirection: "x",
         autoClose: 3000,
       });
-      console.log(error);
     }
+  };
+
+  const [preenchido, setPreenchido] = useState<boolean>(false);
+
+  const handlePreenchidoChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value;
+    setPreenchido(value.length > 0); // Define como true se houver texto, caso contrário, false
   };
 
   const cleanData = () => {
@@ -141,9 +134,13 @@ export function ServicoDialog({
         <div className="flex justify-between">
           <Dialog.Title>{action} Serviço</Dialog.Title>
 
-          <Dialog.Close>
-            <X />
-          </Dialog.Close>
+          {preenchido ? (
+            <AlertCancelX />
+          ) : (
+            <Dialog.Close>
+              <X />
+            </Dialog.Close>
+          )}
         </div>
 
         <FormProvider {...servicoForm}>
@@ -178,15 +175,15 @@ export function ServicoDialog({
 
             {/* Linha 2 */}
             <div className="flex gap-3">
-              <Form.Field>
+              <Form.Field className="flex-1">
                 <Form.Label htmlFor="servico">Serviço *</Form.Label>
                 <Form.Input
                   name="servico"
-                  placeholder="Insira a Serviço"
+                  placeholder="Insira o Serviço"
                   max={30}
-                  width={250}
                   defaultValue={data.servico}
                   disabled={action === "Excluir"}
+                  preenchidoChange={handlePreenchidoChange}
                 />
                 <Form.ErrorMessage field="servico" />
               </Form.Field>
@@ -200,6 +197,7 @@ export function ServicoDialog({
                   defaultValue={data.valor}
                   disabled={action === "Excluir"}
                   maskType="money"
+                  preenchidoChange={handlePreenchidoChange}
                 />
                 <Form.ErrorMessage field="valor" />
               </Form.Field>
@@ -207,14 +205,17 @@ export function ServicoDialog({
 
             {/* Linha 3 */}
             <div className="flex flex-col gap-3">
-              <Form.Label htmlFor="descricao">Descrição</Form.Label>
-              <TextArea
-                className="flex-1"
-                maxLength={255}
-                placeholder="Insira a descricao do serviço..."
-                {...register("descricao")}
-              />
-              <Form.ErrorMessage field="descricao" />
+              <Form.Field className="h-32">
+                <Form.Label htmlFor="descricao">Descrição</Form.Label>
+                <TextArea
+                  {...register("descricao")}
+                  maxLength={255}
+                  placeholder="Insira a descricao do serviço..."
+                  className="h-full"
+                  disabled={action === "Visualizar"}
+                />
+                <Form.ErrorMessage field="descricao" />
+              </Form.Field>
             </div>
 
             {/* Linha 4 */}
@@ -246,21 +247,21 @@ export function ServicoDialog({
 
             {/* Submit Buttons */}
             <div className="flex w-full justify-end gap-3">
-              <Dialog.Close>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => cleanData()}
-                >
-                  Cancelar
-                </Button>
-              </Dialog.Close>
-              {action === "Excluir" && (
-                <Button type="submit" color="red">
-                  {action}
-                </Button>
+              {preenchido ? (
+                <AlertCancel />
+              ) : (
+                <Dialog.Close>
+                  <Button variant="outline">Voltar</Button>
+                </Dialog.Close>
               )}
-              {action != "Excluir" && <Button type="submit">{action}</Button>}
+
+              {action != "Visualizar" && (
+                <AlertSubmit
+                  title={action as string}
+                  type="Origem"
+                  onSubmit={onSubmit}
+                />
+              )}
             </div>
           </form>
         </FormProvider>

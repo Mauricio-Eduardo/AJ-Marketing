@@ -1,6 +1,8 @@
 ﻿using api.Interfaces;
 using api.Models.Cliente;
+using api.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Data.SqlClient;
 
 
 namespace api.Controllers
@@ -40,43 +42,59 @@ namespace api.Controllers
 
         [HttpPost]
         [Route("/PostCliente")]
-        public IActionResult PostCliente([FromBody] ClientePostModel clienteInserido, int? proposta_id)
+        public IActionResult PostCliente([FromBody] ClientePostModel clienteInserido)
         {
-            string result;
-            if (proposta_id == null)
+            try
             {
-                result = clientesService.PostCliente(clienteInserido, null);
+                string result = clientesService.PostCliente(clienteInserido);
+                return StatusCode(200, result);
             }
-            else
+            catch (SqlException ex) when (ex.Number == 2627)
             {
-            result = clientesService.PostCliente(clienteInserido, proposta_id);
+                return Conflict("O cliente já está cadastrado."); // 409 Conflict
             }
-            if (result != null)
-                return Ok(result);
-            else
-                return BadRequest();
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocorreu um erro inesperado: " + ex.Message);
+            }
         }
 
         [HttpPut]
         [Route("/PutCliente")]
         public IActionResult PutUsuario([FromBody] ClientePutModel clienteAlterado)
         {
-            string result = clientesService.PutCliente(clienteAlterado);
-            if (result != null)
-                return Ok(result);
-            else
-                return BadRequest();
+            try
+            {
+                string result = clientesService.PutCliente(clienteAlterado);
+                return StatusCode(200, result);
+            }
+            catch (SqlException ex) when (ex.Number == 2627)
+            {
+                return Conflict("O cliente já está cadastrado."); // 409 Conflict
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocorreu um erro inesperado: " + ex.Message);
+            }
         }
 
         [HttpDelete]
         [Route("/DeleteCliente")]
         public IActionResult DeleteCliente(int id)
         {
-            string result = clientesService.DeleteCliente(id);
-            if (result != null)
-                return Ok(result);
-            else
-                return BadRequest();
+            try
+            {
+                string result = clientesService.DeleteCliente(id);
+                return StatusCode(200, result);
+            }
+            catch (SqlException ex) when (ex.Number == 547)
+            {
+                return Conflict("Não é possível excluir o cliente pois ele tem relações com outros registros.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocorreu um erro inesperado: " + ex.Message);
+            }
         }
     }
 }

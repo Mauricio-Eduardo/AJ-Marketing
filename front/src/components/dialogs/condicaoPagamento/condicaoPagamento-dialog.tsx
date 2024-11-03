@@ -18,6 +18,7 @@ import { FormasPagamentoSubView } from "../../../views/formasPagamento/subView";
 import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
 import { formatCurrency } from "../../form/Formats";
+import { AlertCancel, AlertCancelX, AlertSubmit } from "../../form/Alerts";
 
 export function CondicaoPagamentoDialog({
   data,
@@ -182,6 +183,15 @@ export function CondicaoPagamentoDialog({
     }
   };
 
+  const [preenchido, setPreenchido] = useState<boolean>(false);
+
+  const handlePreenchidoChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value;
+    setPreenchido(value.length > 0); // Define como true se houver texto, caso contrário, false
+  };
+
   const cleanData = () => {
     reset({
       id: 0,
@@ -278,14 +288,17 @@ export function CondicaoPagamentoDialog({
       onEscapeKeyDown={(e) => {
         e.preventDefault();
       }}
-      className="absolute z-10"
     >
       <div className="flex justify-between">
         <Dialog.Title>{action} Condição de Pagamento</Dialog.Title>
 
-        <Dialog.Close>
-          <X />
-        </Dialog.Close>
+        {preenchido ? (
+          <AlertCancelX />
+        ) : (
+          <Dialog.Close>
+            <X />
+          </Dialog.Close>
+        )}
       </div>
       <FormProvider {...condicoesPagamentoForm}>
         <form
@@ -319,7 +332,7 @@ export function CondicaoPagamentoDialog({
 
           {/* Linha 2 */}
           <div className="flex gap-3">
-            <Form.Field>
+            <Form.Field className="flex-1">
               <Form.Label htmlFor="condicaoPagamento">
                 Condição de Pagamento *
               </Form.Label>
@@ -328,9 +341,9 @@ export function CondicaoPagamentoDialog({
                 name="condicaoPagamento"
                 placeholder="Insira a Condição de Pagamento"
                 max={50}
-                width={250}
                 defaultValue={data.condicaoPagamento}
-                disabled={action === "Excluir"}
+                disabled={action === "Excluir" || action == "Visualizar"}
+                preenchidoChange={handlePreenchidoChange}
               />
               <Form.ErrorMessage field="condicaoPagamento" />
             </Form.Field>
@@ -342,8 +355,9 @@ export function CondicaoPagamentoDialog({
                 width={100}
                 placeholder="0,00"
                 defaultValue={data.juros}
-                disabled={action === "Excluir"}
+                disabled={action === "Excluir" || action == "Visualizar"}
                 maskType="percentage"
+                preenchidoChange={handlePreenchidoChange}
               />
               <Form.ErrorMessage field="juros" />
             </Form.Field>
@@ -355,8 +369,9 @@ export function CondicaoPagamentoDialog({
                 width={100}
                 placeholder="0,00"
                 defaultValue={data.multa}
-                disabled={action === "Excluir"}
+                disabled={action === "Excluir" || action == "Visualizar"}
                 maskType="percentage"
+                preenchidoChange={handlePreenchidoChange}
               />
               <Form.ErrorMessage field="multa" />
             </Form.Field>
@@ -368,8 +383,9 @@ export function CondicaoPagamentoDialog({
                 width={100}
                 placeholder="0,00"
                 defaultValue={data.desconto}
-                disabled={action === "Excluir"}
+                disabled={action === "Excluir" || action == "Visualizar"}
                 maskType="percentage"
+                preenchidoChange={handlePreenchidoChange}
               />
               <Form.ErrorMessage field="desconto" />
             </Form.Field>
@@ -393,11 +409,13 @@ export function CondicaoPagamentoDialog({
                 </Form.Label>
                 <Form.Input
                   name="quantidadeParcelas"
+                  type="number"
                   width={70}
                   max={2}
                   placeholder="0"
                   defaultValue={data.quantidadeParcelas}
-                  disabled={action === "Excluir"}
+                  disabled={action === "Excluir" || action == "Visualizar"}
+                  preenchidoChange={handlePreenchidoChange}
                 />
                 <Form.ErrorMessage field="quantidadeParcelas" />
               </Form.Field>
@@ -409,7 +427,7 @@ export function CondicaoPagamentoDialog({
                   onClick={() => {
                     addNewParcela();
                   }}
-                  disabled={action === "Excluir"}
+                  disabled={action === "Excluir" || action == "Visualizar"}
                 >
                   Adicionar Parcelas
                 </Button>
@@ -450,7 +468,8 @@ export function CondicaoPagamentoDialog({
                     name={`parcelas.${index}.dias` as const}
                     width={70}
                     max={3}
-                    disabled={action === "Excluir"}
+                    disabled={action === "Excluir" || action == "Visualizar"}
+                    preenchidoChange={handlePreenchidoChange}
                   />
                   <Form.ErrorMessage
                     field={`parcelas.${index}.dias` as const}
@@ -468,10 +487,12 @@ export function CondicaoPagamentoDialog({
                     name={`parcelas.${index}.porcentagem` as const}
                     width={70}
                     maskType="percentage"
-                    disabled={action === "Excluir"}
+                    placeholder="0,00"
+                    disabled={action === "Excluir" || action == "Visualizar"}
                     onBlur={(e) =>
                       handlePorcentagemChange(index, e.target.value)
                     }
+                    preenchidoChange={handlePreenchidoChange}
                   />
                   <Form.ErrorMessage
                     field={`parcelas.${index}.porcentagem` as const}
@@ -483,15 +504,17 @@ export function CondicaoPagamentoDialog({
                     htmlFor={`parcelas.${index}.formaPag_id` as const}
                     className="flex flex-col"
                   >
-                    Cód.
+                    Forma de Pag.
                   </Form.Label>
                   <Form.Input
                     name={`parcelas.${index}.formaPag_id` as const}
-                    width={70}
+                    max={4}
+                    width={100}
                     onBlur={(e) =>
                       getFormaPagamento(index, Number(e.target.value))
                     }
-                    disabled={action === "Excluir"}
+                    disabled={action === "Excluir" || action == "Visualizar"}
+                    preenchidoChange={handlePreenchidoChange}
                   />
                   <Form.ErrorMessage
                     field={`parcelas.${index}.formaPag_id` as const}
@@ -505,21 +528,18 @@ export function CondicaoPagamentoDialog({
                       index={index}
                       onClose={onSubViewClose}
                       controller={subController}
+                      disabled={action === "Excluir" || action == "Visualizar"}
                     />
                   </Form.Field>
                 )}
 
-                <Form.Field>
+                <Form.Field className="flex-1">
                   <Form.Label
                     htmlFor={`parcelas.${index}.formaPagamento` as const}
-                  >
-                    Forma de Pagamento
-                  </Form.Label>
+                  ></Form.Label>
                   <Form.Input
                     name={`parcelas.${index}.formaPagamento` as const}
                     placeholder="Selecione a Forma de Pagamento"
-                    max={56}
-                    width={250}
                     defaultValue={`data.parcelas.${index}.formaPagamento`}
                     disabled={true}
                   />
@@ -531,6 +551,7 @@ export function CondicaoPagamentoDialog({
                   type="button"
                   color="red"
                   onClick={() => removeParcela(index)}
+                  disabled={action === "Excluir" || action == "Visualizar"}
                 >
                   <Trash weight="bold" />
                 </Button>
@@ -566,17 +587,21 @@ export function CondicaoPagamentoDialog({
           </div>
 
           <div className="flex w-full justify-end gap-3">
-            <Dialog.Close>
-              <Button type="button" variant="outline">
-                Cancelar
-              </Button>
-            </Dialog.Close>
-            {action === "Excluir" && (
-              <Button type="submit" color="red">
-                {action}
-              </Button>
+            {preenchido ? (
+              <AlertCancel />
+            ) : (
+              <Dialog.Close>
+                <Button variant="outline">Voltar</Button>
+              </Dialog.Close>
             )}
-            {action != "Excluir" && <Button type="submit">{action}</Button>}
+
+            {action != "Visualizar" && (
+              <AlertSubmit
+                title={action as string}
+                type="Condição de Pagamento"
+                onSubmit={onSubmit}
+              />
+            )}
           </div>
         </form>
       </FormProvider>

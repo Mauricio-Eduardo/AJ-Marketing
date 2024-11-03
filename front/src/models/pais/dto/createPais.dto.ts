@@ -9,7 +9,7 @@ export interface CreatePaisDto {
 export function transformarParaPostPais(data: Pais): CreatePaisDto {
   return {
     pais: data.pais,
-    sigla: data.sigla,
+    sigla: data.sigla.toUpperCase(),
     ddi: data.ddi,
   };
 }

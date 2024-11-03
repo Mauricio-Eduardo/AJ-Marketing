@@ -15,7 +15,7 @@ CREATE TABLE paises (
 CREATE TABLE estados (
   id int NOT NULL PRIMARY KEY IDENTITY,
  
-  estado VARCHAR(56) COLLATE Latin1_General_CI_AI NOT NULL UNIQUE,
+  estado VARCHAR(56) COLLATE Latin1_General_CI_AI NOT NULL,
   uf VARCHAR(2) NOT NULL,
 
   pais_id int NOT NULL, -- Foreign Key
@@ -24,12 +24,15 @@ CREATE TABLE estados (
   ativo BIT NOT NULL DEFAULT 1,
   data_cadastro DATETIME NOT NULL DEFAULT GETDATE(),
   data_ult_alt DATETIME DEFAULT NULL
+
+  CONSTRAINT estado_pais UNIQUE (estado, pais_id)
 )
 
 CREATE TABLE cidades (
   id int NOT NULL PRIMARY KEY IDENTITY,
   
-  cidade VARCHAR(100) COLLATE Latin1_General_CI_AI NOT NULL UNIQUE,
+  cidade VARCHAR(100) COLLATE Latin1_General_CI_AI NOT NULL,
+  --cidade VARCHAR(100) COLLATE Latin1_General_CI_AI NOT NULL UNIQUE,
   ddd VARCHAR(2),
 
   estado_id int NOT NULL, -- Foreign Key
@@ -38,6 +41,8 @@ CREATE TABLE cidades (
   ativo BIT NOT NULL DEFAULT 1,
   data_cadastro DATETIME NOT NULL DEFAULT GETDATE(),
   data_ult_alt DATETIME DEFAULT NULL
+
+  CONSTRAINT cidade_estado UNIQUE (cidade, estado_id)
 );
 
 CREATE TABLE peridiocidades (

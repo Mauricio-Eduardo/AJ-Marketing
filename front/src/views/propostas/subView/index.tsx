@@ -88,22 +88,6 @@ export const PropostasSubView = ({
                 </Dialog.Trigger>
               </div>
 
-              <div className="flex gap-3">
-                <Dialog.Trigger>
-                  <Button
-                    onClick={() => {
-                      handleActionChange("Cancelar");
-                    }}
-                    disabled={!selectedRowData?.id}
-                    color="orange"
-                    variant="outline"
-                  >
-                    <X />
-                    Cancelar Proposta
-                  </Button>
-                </Dialog.Trigger>
-              </div>
-
               {isDialogOpen && (
                 <PropostaDialog
                   key={selectedRowData?.id}

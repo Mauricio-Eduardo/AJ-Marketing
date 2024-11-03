@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Dialog } from "@radix-ui/themes";
 import { FormProvider, useForm } from "react-hook-form";
@@ -13,6 +13,8 @@ import { X } from "@phosphor-icons/react";
 import { DialogProps } from "../DialogProps";
 import { EstadosSubView } from "../../../views/estados/subView";
 import { toast } from "react-toastify";
+import { AlertCancel, AlertCancelX, AlertSubmit } from "../../form/Alerts";
+import { AxiosError, AxiosResponse } from "axios";
 
 export function CidadeDialog({
   data,
@@ -30,63 +32,58 @@ export function CidadeDialog({
   const { control, handleSubmit, setValue, reset } = cidadeForm;
 
   const onSubViewClose = (estado?: Estado) => {
-    if (estado) {
+    if (estado?.ativo) {
       setEstado(estado);
+    } else {
+      setEstadoNull("inativo");
     }
   };
 
   const onSubmit = async (pData: Cidade) => {
     let toastId = toast.loading("Processando...");
+    let response: AxiosResponse<string> | undefined;
 
     try {
       if (action === "Cadastrar") {
         const payload = transformarParaPostCidade(pData);
-        await controller.create(payload);
-        toast.update(toastId, {
-          render: "Cidade cadastrada com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
+        response = await controller.create(payload);
       } else if (action === "Editar") {
         const payload = transformarParaPutCidade(pData);
-        await controller.update(payload);
-        toast.update(toastId, {
-          render: "Cidade atualizada com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
+        response = await controller.update(payload);
       } else if (action === "Excluir") {
         const id = pData.id;
-        await controller.delete(id);
-        toast.update(toastId, {
-          render: "Cidade excluída com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
+        response = await controller.delete(id);
       }
-    } catch (error) {
       toast.update(toastId, {
-        render: "Ocorreu um erro. Tente novamente!",
-        type: "error",
+        render: response?.data,
+        type: "success",
         isLoading: false,
         draggable: true,
         draggableDirection: "x",
+        autoClose: 1000,
+        onClose: onSuccess,
+      });
+    } catch (error) {
+      const errorMessage = (error as AxiosError).response?.data;
+      toast.update(toastId, {
+        render: String(errorMessage),
+        type: "error",
+        isLoading: false,
+        draggable: true,
+        pauseOnHover: true,
+        draggableDirection: "x",
         autoClose: 3000,
       });
-      console.log(error);
     }
+  };
+
+  const [preenchido, setPreenchido] = useState<boolean>(false);
+
+  const handlePreenchidoChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value;
+    setPreenchido(value.length > 0); // Define como true se houver texto, caso contrário, false
   };
 
   const cleanData = () => {
@@ -96,6 +93,7 @@ export function CidadeDialog({
       ddd: "",
       estado_id: 0,
       estado: "",
+      pais: "",
       ativo: true,
       data_cadastro: "",
       data_ult_alt: "",
@@ -132,24 +130,33 @@ export function CidadeDialog({
           if (response.ativo) {
             setEstado(response);
           } else {
-            setEstadoNull();
+            setEstadoNull("inativa");
           }
         } catch (error) {
-          setEstadoNull();
-          console.log(error);
+          setEstadoNull("inexistente");
         }
       }
+    } else {
+      setEstadoNull("inexistente");
     }
   };
 
   const setEstado = (pEstado: Estado) => {
     setValue("estado_id", pEstado.id);
     setValue("estado", pEstado.estado);
+    setValue("pais", pEstado.pais);
   };
 
-  const setEstadoNull = () => {
+  const setEstadoNull = (str: string) => {
     setValue("estado_id", 0);
     setValue("estado", "");
+    setValue("pais", "");
+
+    toast(`Estado ${str}!`, {
+      type: "error",
+      isLoading: false,
+      autoClose: 3000,
+    });
   };
 
   return (
@@ -165,11 +172,13 @@ export function CidadeDialog({
         <div className="flex justify-between">
           <Dialog.Title>{action} Cidade</Dialog.Title>
 
-          {/* <ToastContainer /> */}
-
-          <Dialog.Close>
-            <X />
-          </Dialog.Close>
+          {preenchido ? (
+            <AlertCancelX />
+          ) : (
+            <Dialog.Close>
+              <X />
+            </Dialog.Close>
+          )}
         </div>
 
         <FormProvider {...cidadeForm}>
@@ -201,18 +210,17 @@ export function CidadeDialog({
                 <Form.ErrorMessage field="ativo" />
               </Form.Field>
             </div>
-
             {/* Linha 2 */}
             <div className="flex gap-3">
-              <Form.Field>
+              <Form.Field className="flex-1">
                 <Form.Label htmlFor="cidade">Cidade *</Form.Label>
                 <Form.Input
                   name="cidade"
                   placeholder="Insira a Cidade"
                   max={100}
-                  width={250}
                   defaultValue={data.cidade}
                   disabled={action === "Excluir"}
+                  preenchidoChange={handlePreenchidoChange}
                 />
                 <Form.ErrorMessage field="cidade" />
               </Form.Field>
@@ -225,16 +233,16 @@ export function CidadeDialog({
                   max={2}
                   width={70}
                   defaultValue={data.ddd}
-                  disabled={action === "Excluir"}
+                  disabled={action === "Excluir" || action === "Visualizar"}
+                  preenchidoChange={handlePreenchidoChange}
                 />
                 <Form.ErrorMessage field="ddd" />
               </Form.Field>
             </div>
-
             {/* Linha 3 */}
             <div className="flex gap-3 items-center">
               <Form.Field>
-                <Form.Label htmlFor="estado_id">Cód. *</Form.Label>
+                <Form.Label htmlFor="estado_id">Estado *</Form.Label>
                 <Form.Input
                   name="estado_id"
                   placeholder="0"
@@ -242,7 +250,7 @@ export function CidadeDialog({
                   width={70}
                   defaultValue={data.estado_id}
                   onBlur={(e) => getEstado(Number(e.target.value))}
-                  disabled={action === "Excluir"}
+                  disabled={action === "Excluir" || action === "Visualizar"}
                 />
                 <Form.ErrorMessage field="estado_id" />
               </Form.Field>
@@ -253,24 +261,34 @@ export function CidadeDialog({
                   <EstadosSubView
                     onClose={onSubViewClose}
                     controller={subController}
+                    disabled={action === "Excluir" || action === "Visualizar"}
                   />
                 </Form.Field>
               )}
 
-              <Form.Field>
-                <Form.Label htmlFor="estado">Estado</Form.Label>
+              <Form.Field className="flex-1">
+                <Form.Label htmlFor="estado"></Form.Label>
                 <Form.Input
                   name="estado"
                   placeholder="Selecione o Estado"
                   max={56}
-                  width={250}
                   value={data.estado}
                   disabled={true}
                 />
                 <Form.ErrorMessage field="estado" />
               </Form.Field>
-            </div>
 
+              <Form.Field className="flex-1">
+                <Form.Label htmlFor="pais"></Form.Label>
+                <Form.Input
+                  name="pais"
+                  max={56}
+                  value={data.pais}
+                  disabled={true}
+                />
+                <Form.ErrorMessage field="pais" />
+              </Form.Field>
+            </div>
             {/* Linha 4 */}
             <div className="flex gap-3">
               <Form.Field>
@@ -299,15 +317,21 @@ export function CidadeDialog({
             </div>
 
             <div className="flex w-full justify-end gap-3">
-              <Dialog.Close>
-                <Button variant="outline">Cancelar</Button>
-              </Dialog.Close>
-              {action === "Excluir" && (
-                <Button type="submit" color="red">
-                  {action}
-                </Button>
+              {preenchido ? (
+                <AlertCancel />
+              ) : (
+                <Dialog.Close>
+                  <Button variant="outline">Voltar</Button>
+                </Dialog.Close>
               )}
-              {action != "Excluir" && <Button type="submit">{action}</Button>}
+
+              {action != "Visualizar" && (
+                <AlertSubmit
+                  title={action as string}
+                  type="Origem"
+                  onSubmit={onSubmit}
+                />
+              )}
             </div>
           </form>
         </FormProvider>

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Dialog } from "@radix-ui/themes";
 import { FormProvider, useForm } from "react-hook-form";
@@ -11,6 +11,8 @@ import { toast } from "react-toastify";
 import { RamoAtividade } from "../../../models/ramoAtividade/entity/RamoAtividade";
 import { transformarParaPostRamoAtividade } from "../../../models/ramoAtividade/dto/createRamoAtividade.dto";
 import { transformarParaPutRamoAtividade } from "../../../models/ramoAtividade/dto/updateRamoAtividade.dto";
+import { AlertCancel, AlertCancelX, AlertSubmit } from "../../form/Alerts";
+import { AxiosError, AxiosResponse } from "axios";
 
 export function RamoAtividadeDialog({
   data,
@@ -29,56 +31,48 @@ export function RamoAtividadeDialog({
 
   const onSubmit = async (pData: RamoAtividade) => {
     let toastId = toast.loading("Processando...");
+    let response: AxiosResponse<string> | undefined;
 
     try {
       if (action === "Cadastrar") {
         const payload = transformarParaPostRamoAtividade(pData);
-        await controller.create(payload);
-        toast.update(toastId, {
-          render: "Ramo de Atividade cadastrado com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
+        response = await controller.create(payload);
       } else if (action === "Editar") {
         const payload = transformarParaPutRamoAtividade(pData);
-        await controller.update(payload);
-        toast.update(toastId, {
-          render: "Ramo de Atividade atualizado com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
+        response = await controller.update(payload);
       } else if (action === "Excluir") {
         const id = pData.id;
-        await controller.delete(id);
-        toast.update(toastId, {
-          render: "Ramo de Atividade excluído com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
+        response = await controller.delete(id);
       }
-    } catch (error) {
       toast.update(toastId, {
-        render: "Ocorreu um erro. Tente novamente!",
+        render: response?.data,
+        type: "success",
+        isLoading: false,
+        draggable: true,
+        draggableDirection: "x",
+        autoClose: 1000,
+        onClose: onSuccess,
+      });
+    } catch (error) {
+      const errorMessage = (error as AxiosError).response?.data;
+      toast.update(toastId, {
+        render: String(errorMessage),
         type: "error",
         isLoading: false,
         draggable: true,
         draggableDirection: "x",
         autoClose: 3000,
       });
-      console.log(error);
     }
+  };
+
+  const [preenchido, setPreenchido] = useState<boolean>(false);
+
+  const handlePreenchidoChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value;
+    setPreenchido(value.length > 0); // Define como true se houver texto, caso contrário, false
   };
 
   const cleanData = () => {
@@ -124,11 +118,15 @@ export function RamoAtividadeDialog({
         }}
       >
         <div className="flex justify-between">
-          <Dialog.Title>{action} Serviço</Dialog.Title>
+          <Dialog.Title>{action} Ramo de Atividade</Dialog.Title>
 
-          <Dialog.Close>
-            <X />
-          </Dialog.Close>
+          {preenchido ? (
+            <AlertCancelX />
+          ) : (
+            <Dialog.Close>
+              <X />
+            </Dialog.Close>
+          )}
         </div>
 
         <FormProvider {...ramoAtividadeForm}>
@@ -168,10 +166,11 @@ export function RamoAtividadeDialog({
                 <Form.Input
                   name="ramo"
                   placeholder="Insira o Ramo de Atividade"
-                  max={30}
-                  width={250}
+                  max={60}
+                  width={350}
                   defaultValue={data.ramo}
-                  disabled={action === "Excluir"}
+                  disabled={action === "Excluir" || action === "Visualizar"}
+                  preenchidoChange={handlePreenchidoChange}
                 />
                 <Form.ErrorMessage field="ramo" />
               </Form.Field>
@@ -206,13 +205,21 @@ export function RamoAtividadeDialog({
 
             {/* Submit Buttons */}
             <div className="flex w-full justify-end gap-3">
-              <Dialog.Close>
-                <Button type="button" variant="outline">
-                  Cancelar
-                </Button>
-              </Dialog.Close>
-              {action === "Excluir" && <Button color="red">{action}</Button>}
-              {action != "Excluir" && <Button>{action}</Button>}
+              {preenchido ? (
+                <AlertCancel />
+              ) : (
+                <Dialog.Close>
+                  <Button variant="outline">Voltar</Button>
+                </Dialog.Close>
+              )}
+
+              {action != "Visualizar" && (
+                <AlertSubmit
+                  title={action as string}
+                  type="Ramo de Atividade"
+                  onSubmit={onSubmit}
+                />
+              )}
             </div>
           </form>
         </FormProvider>

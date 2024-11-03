@@ -1,3 +1,4 @@
+import { AxiosResponse } from "axios";
 import { api } from "../config/api";
 import { CreateFormaPagamentoDto } from "../models/formaPagamento/dto/createFormaPagamento.dto";
 import { UpdateFormaPagamentoDto } from "../models/formaPagamento/dto/updateFormaPagamento.dto";
@@ -15,26 +16,30 @@ export class FormasPagamentoService {
     return response.data;
   }
 
-  async create(createFormaPagamentoDto: CreateFormaPagamentoDto) {
-    const response = await api.post(
+  async create(
+    createFormaPagamentoDto: CreateFormaPagamentoDto
+  ): Promise<AxiosResponse<string>> {
+    const response = await api.post<string>(
       "PostFormaPagamento",
       createFormaPagamentoDto
     );
-    return String(response.data);
+    return response;
   }
 
-  async update(updateFormaPagamentoDto: UpdateFormaPagamentoDto) {
+  async update(
+    updateFormaPagamentoDto: UpdateFormaPagamentoDto
+  ): Promise<AxiosResponse<string>> {
     const response = await api.put(
       "PutFormaPagamento",
       updateFormaPagamentoDto
     );
-    return String(response.data);
+    return response;
   }
 
-  async delete(id: number) {
+  async delete(id: number): Promise<AxiosResponse<string>> {
     const response = await api.delete("DeleteFormaPagamento", {
       params: { id: id },
     });
-    return String(response.data);
+    return response;
   }
 }

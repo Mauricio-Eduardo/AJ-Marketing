@@ -3,12 +3,16 @@
   "WorkspaceRootPath": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|d:\\faculdade\\pr\u00E1tica profissional\\projeto\\api\\services\\contasreceberservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|solutionrelative:services\\contasreceberservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|d:\\faculdade\\pr\u00E1tica profissional\\projeto\\api\\services\\usuariosservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|solutionrelative:services\\usuariosservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|d:\\faculdade\\pr\u00E1tica profissional\\projeto\\api\\services\\propostasservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|solutionrelative:services\\propostasservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|d:\\faculdade\\pr\u00E1tica profissional\\projeto\\api\\controllers\\usuarioscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|solutionrelative:controllers\\usuarioscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|d:\\faculdade\\pr\u00E1tica profissional\\projeto\\api\\interfaces\\iusuariosservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{496D8079-7C05-4AAF-A9AD-6AD03D16562F}|api.csproj|solutionrelative:interfaces\\iusuariosservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,32 +22,45 @@
       "DocumentGroups": [
         {
           "DockedWidth": 367,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "ContasReceberService.cs",
-              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Services\\ContasReceberService.cs",
-              "RelativeDocumentMoniker": "Services\\ContasReceberService.cs",
-              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Services\\ContasReceberService.cs",
-              "RelativeToolTip": "Services\\ContasReceberService.cs",
-              "ViewState": "AQIAAN4AAAAAAAAAAAAAAO8AAAAqAAAA",
+              "DocumentIndex": 1,
+              "Title": "UsuariosController.cs",
+              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Controllers\\UsuariosController.cs",
+              "RelativeDocumentMoniker": "Controllers\\UsuariosController.cs",
+              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Controllers\\UsuariosController.cs",
+              "RelativeToolTip": "Controllers\\UsuariosController.cs",
+              "ViewState": "AQIAAEsAAAAAAAAAAAAAAGAAAAAnAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-29T23:52:58.898Z",
+              "WhenOpened": "2024-11-03T23:09:01.079Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "PropostasService.cs",
-              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Services\\PropostasService.cs",
-              "RelativeDocumentMoniker": "Services\\PropostasService.cs",
-              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Services\\PropostasService.cs",
-              "RelativeToolTip": "Services\\PropostasService.cs",
-              "ViewState": "AQIAAAkAAAAAAAAAAAAAAMgAAAAAAAAA",
+              "DocumentIndex": 2,
+              "Title": "IUsuariosService.cs",
+              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Interfaces\\IUsuariosService.cs",
+              "RelativeDocumentMoniker": "Interfaces\\IUsuariosService.cs",
+              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Interfaces\\IUsuariosService.cs",
+              "RelativeToolTip": "Interfaces\\IUsuariosService.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAAA3AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-29T02:25:43.598Z",
+              "WhenOpened": "2024-11-03T23:08:43.033Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "UsuariosService.cs",
+              "DocumentMoniker": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Services\\UsuariosService.cs",
+              "RelativeDocumentMoniker": "Services\\UsuariosService.cs",
+              "ToolTip": "D:\\Faculdade\\Pr\u00E1tica Profissional\\Projeto\\api\\Services\\UsuariosService.cs",
+              "RelativeToolTip": "Services\\UsuariosService.cs",
+              "ViewState": "AQIAANoAAAAAAAAAAAAAAOkAAAB5AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-03T23:02:09.236Z",
               "EditorCaption": ""
             }
           ]

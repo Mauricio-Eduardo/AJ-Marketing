@@ -1,4 +1,4 @@
-import { MagnifyingGlass, Pencil, Plus, Trash } from "@phosphor-icons/react";
+import { Eye, MagnifyingGlass, Pencil, Plus } from "@phosphor-icons/react";
 import { Button, Dialog, Flex } from "@radix-ui/themes";
 import { useState } from "react";
 import { DataTable } from "../../../components/datatable";
@@ -14,7 +14,7 @@ export const OrigensSubView = ({
 }: SubDialogProps) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [dialogAction, setDialogAction] = useState<
-    "Cadastrar" | "Editar" | "Excluir" | null
+    "Cadastrar" | "Editar" | "Visualizar" | null
   >(null);
 
   const [refreshKey, setRefreshKey] = useState(0);
@@ -30,7 +30,9 @@ export const OrigensSubView = ({
     handleOpenDialog();
   };
 
-  const handleActionChange = (action: "Cadastrar" | "Editar" | "Excluir") => {
+  const handleActionChange = (
+    action: "Cadastrar" | "Editar" | "Visualizar"
+  ) => {
     setDialogAction(action);
   };
 
@@ -87,17 +89,16 @@ export const OrigensSubView = ({
                 </Button>
               </Dialog.Trigger>
 
-              {/* Excluir */}
               <Dialog.Trigger>
                 <Button
                   onClick={() => {
-                    handleActionChange("Excluir");
+                    handleActionChange("Visualizar");
                   }}
-                  disabled={!selectedRowData.id}
-                  color="red"
+                  disabled={!selectedRowData?.id}
+                  variant="outline"
                 >
-                  <Trash />
-                  Excluir
+                  <Eye />
+                  Visualizar
                 </Button>
               </Dialog.Trigger>
 
@@ -120,10 +121,12 @@ export const OrigensSubView = ({
 
           <div className="flex w-full justify-end gap-3">
             <Dialog.Close>
-              <Button variant="outline">Cancelar</Button>
+              <Button type="button" variant="outline">
+                Cancelar
+              </Button>
             </Dialog.Close>
             <Dialog.Close>
-              <Button onClick={() => onClose(selectedRowData)}>
+              <Button type="button" onClick={() => onClose(selectedRowData)}>
                 Selecionar
               </Button>
             </Dialog.Close>

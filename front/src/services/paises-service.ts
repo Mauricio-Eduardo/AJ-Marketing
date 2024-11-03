@@ -1,3 +1,4 @@
+import { AxiosResponse } from "axios";
 import { api } from "../config/api";
 import { CreatePaisDto } from "../models/pais/dto/createPais.dto";
 import { UpdatePaisDto } from "../models/pais/dto/updatePais.dto";
@@ -13,20 +14,20 @@ export class PaisesService {
     return response.data;
   }
 
-  async create(createPaisDto: CreatePaisDto) {
-    const response = await api.post("PostPais", createPaisDto);
-    return String(response.data);
+  async create(createPaisDto: CreatePaisDto): Promise<AxiosResponse<string>> {
+    const response = await api.post<string>("PostPais", createPaisDto);
+    return response;
   }
 
-  async update(updatePaisDto: UpdatePaisDto) {
+  async update(updatePaisDto: UpdatePaisDto): Promise<AxiosResponse<string>> {
     const response = await api.put("PutPais", updatePaisDto);
-    return String(response.data);
+    return response;
   }
 
-  async delete(id: number) {
+  async delete(id: number): Promise<AxiosResponse<string>> {
     const response = await api.delete("DeletePais", {
       params: { id: id },
     });
-    return String(response.data);
+    return response;
   }
 }

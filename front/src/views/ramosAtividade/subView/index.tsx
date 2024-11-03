@@ -1,11 +1,11 @@
-import { MagnifyingGlass, Pencil, Plus, Trash } from "@phosphor-icons/react";
+import { Eye, MagnifyingGlass, Pencil, Plus } from "@phosphor-icons/react";
 import { Button, Dialog, Flex } from "@radix-ui/themes";
 import { useState } from "react";
 import { DataTable } from "../../../components/datatable";
 import { SubArrayDialogProps } from "../../../components/dialogs/DialogProps";
-import { InteressesColumns } from "../../../components/datatable/columns/interesses-columns";
 import { RamoAtividadeDialog } from "../../../components/dialogs/ramoAtividade/ramoAtividade-dialog";
 import { RamoAtividade } from "../../../models/ramoAtividade/entity/RamoAtividade";
+import { RamosAtividadeColumns } from "../../../components/datatable/columns/ramosAtividade-columns";
 
 export const RamosAtividadeSubView = ({
   index,
@@ -15,7 +15,7 @@ export const RamosAtividadeSubView = ({
 }: SubArrayDialogProps) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [dialogAction, setDialogAction] = useState<
-    "Cadastrar" | "Editar" | "Excluir" | null
+    "Cadastrar" | "Editar" | "Visualizar" | null
   >(null);
 
   const [refreshKey, setRefreshKey] = useState(0);
@@ -31,7 +31,9 @@ export const RamosAtividadeSubView = ({
     handleOpenDialog();
   };
 
-  const handleActionChange = (action: "Cadastrar" | "Editar" | "Excluir") => {
+  const handleActionChange = (
+    action: "Cadastrar" | "Editar" | "Visualizar"
+  ) => {
     setDialogAction(action);
   };
 
@@ -92,13 +94,13 @@ export const RamosAtividadeSubView = ({
               <Dialog.Trigger>
                 <Button
                   onClick={() => {
-                    handleActionChange("Excluir");
+                    handleActionChange("Visualizar");
                   }}
-                  disabled={!selectedRowData.id}
-                  color="red"
+                  disabled={!selectedRowData?.id}
+                  variant="outline"
                 >
-                  <Trash />
-                  Excluir
+                  <Eye />
+                  Visualizar
                 </Button>
               </Dialog.Trigger>
 
@@ -112,7 +114,7 @@ export const RamosAtividadeSubView = ({
             </Flex>
 
             <DataTable
-              columns={InteressesColumns}
+              columns={RamosAtividadeColumns}
               onRowSelectionChange={handleRowSelectionChange}
               controller={controller}
               refreshKey={refreshKey}
@@ -121,10 +123,15 @@ export const RamosAtividadeSubView = ({
 
           <div className="flex w-full justify-end gap-3">
             <Dialog.Close>
-              <Button variant="outline">Cancelar</Button>
+              <Button type="button" variant="outline">
+                Cancelar
+              </Button>
             </Dialog.Close>
             <Dialog.Close>
-              <Button onClick={() => onClose(index, selectedRowData)}>
+              <Button
+                type="submit"
+                onClick={() => onClose(index, selectedRowData)}
+              >
                 Selecionar
               </Button>
             </Dialog.Close>

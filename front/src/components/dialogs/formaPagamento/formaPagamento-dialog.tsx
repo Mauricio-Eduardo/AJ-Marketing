@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Dialog } from "@radix-ui/themes";
 import { FormProvider, useForm } from "react-hook-form";
@@ -11,6 +11,8 @@ import { format } from "date-fns";
 import { Form } from "../../form";
 import { X } from "@phosphor-icons/react";
 import { toast } from "react-toastify";
+import { AlertCancel, AlertCancelX, AlertSubmit } from "../../form/Alerts";
+import { AxiosError, AxiosResponse } from "axios";
 
 export function FormaPagamentoDialog({
   data,
@@ -29,56 +31,48 @@ export function FormaPagamentoDialog({
 
   const onSubmit = async (pData: FormaPagamento) => {
     let toastId = toast.loading("Processando...");
+    let response: AxiosResponse<string> | undefined;
 
     try {
       if (action === "Cadastrar") {
         const payload = transformarParaPostFormaPagamento(pData);
-        await controller.create(payload);
-        toast.update(toastId, {
-          render: "Forma de Pagamento cadastrada com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
+        response = await controller.create(payload);
       } else if (action === "Editar") {
         const payload = transformarParaPutFormaPagamento(pData);
-        await controller.update(payload);
-        toast.update(toastId, {
-          render: "Forma de Pagamento atualizada com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
+        response = await controller.update(payload);
       } else if (action === "Excluir") {
         const id = pData.id;
-        await controller.delete(id);
-        toast.update(toastId, {
-          render: "Forma de Pagamento excluída com sucesso!",
-          type: "success",
-          isLoading: false,
-          draggable: true,
-          draggableDirection: "x",
-          autoClose: 3000,
-        });
-        onSuccess();
+        response = await controller.delete(id);
       }
-    } catch (error) {
       toast.update(toastId, {
-        render: "Ocorreu um erro. Tente novamente!",
+        render: response?.data,
+        type: "success",
+        isLoading: false,
+        draggable: true,
+        draggableDirection: "x",
+        autoClose: 1000,
+        onClose: onSuccess,
+      });
+    } catch (error) {
+      const errorMessage = (error as AxiosError).response?.data;
+      toast.update(toastId, {
+        render: String(errorMessage),
         type: "error",
         isLoading: false,
         draggable: true,
         draggableDirection: "x",
         autoClose: 3000,
       });
-      console.log(error);
     }
+  };
+
+  const [preenchido, setPreenchido] = useState<boolean>(false);
+
+  const handlePreenchidoChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value;
+    setPreenchido(value.length > 0); // Define como true se houver texto, caso contrário, false
   };
 
   const cleanData = () => {
@@ -126,9 +120,13 @@ export function FormaPagamentoDialog({
         <div className="flex justify-between">
           <Dialog.Title>{action} Forma de Pagamento</Dialog.Title>
 
-          <Dialog.Close>
-            <X />
-          </Dialog.Close>
+          {preenchido ? (
+            <AlertCancelX />
+          ) : (
+            <Dialog.Close>
+              <X />
+            </Dialog.Close>
+          )}
         </div>
         <FormProvider {...formasPagamentoForm}>
           <form
@@ -170,9 +168,10 @@ export function FormaPagamentoDialog({
                   name="formaPagamento"
                   placeholder="Insira a Forma de Pagamento"
                   max={50}
-                  width={250}
+                  width={300}
                   defaultValue={data.formaPagamento}
-                  disabled={action === "Excluir"}
+                  disabled={action === "Excluir" || action === "Visualizar"}
+                  preenchidoChange={handlePreenchidoChange}
                 />
                 <Form.ErrorMessage field="formaPagamento" />
               </Form.Field>
@@ -206,13 +205,21 @@ export function FormaPagamentoDialog({
             </div>
 
             <div className="flex w-full justify-end gap-3">
-              <Dialog.Close>
-                <Button type="button" variant="outline">
-                  Cancelar
-                </Button>
-              </Dialog.Close>
-              {action === "Excluir" && <Button color="red">{action}</Button>}
-              {action != "Excluir" && <Button>{action}</Button>}
+              {preenchido ? (
+                <AlertCancel />
+              ) : (
+                <Dialog.Close>
+                  <Button variant="outline">Voltar</Button>
+                </Dialog.Close>
+              )}
+
+              {action != "Visualizar" && (
+                <AlertSubmit
+                  title={action as string}
+                  type="Forma de Pagamento"
+                  onSubmit={onSubmit}
+                />
+              )}
             </div>
           </form>
         </FormProvider>
