@@ -40,25 +40,21 @@ VALUES
 (10, 'Fortaleza', '85');
 
 INSERT INTO servicos (servico, valor, descricao)
-VALUES 
-('Campanha', 1000.00, ''),
+VALUES
 ('Post Instagram', 100.00, ''),
 ('Reels Instagram', 150.00, ''),
 ('Tráfego Pago', 2000.00, ''),
-('Video Youtube', 200.00, '');
+('Vídeo Youtube', 200.00, '');
 
 INSERT INTO formasPagamento (formaPagamento) 
 VALUES
-('Cartão de Crédito'),
-('Boleto'),
-('Transferência Bancária'),
-('PIX'),
 ('Dinheiro'),
-('Cheque'),
+('Cartão de Crédito'),
 ('Cartão de Débito'),
-('PayPal'),
-('Crédito Consignado'),
-('Vale Alimentação');
+('Boleto'),
+('PIX'),
+('Transferência Bancária'),
+('Cheque');
 
 INSERT INTO condicoesPagamento (condicaoPagamento, quantidadeParcelas, desconto, juros, multa) 
 VALUES
@@ -92,7 +88,6 @@ VALUES
 ('Instagram'),
 ('Facebook'),
 ('WhatsApp'),
-('Google Ads'),
 ('YouTube'),
 ('Site');
 

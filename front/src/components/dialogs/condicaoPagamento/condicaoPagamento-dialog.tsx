@@ -46,17 +46,20 @@ export function CondicaoPagamentoDialog({
   const parcelas = watch("parcelas", []) || [];
   const [totalPorcentagem, setTotalPorcentagem] = useState<number>(100.0);
 
-  // Atualiza o total de porcentagem toda vez que uma porcentagem é modificada
   const updateTotalPorcentagem = () => {
     if (parcelas && parcelas.length > 0) {
-      const total = parcelas.reduce((acc: any, parcela: any) => {
+      const total = parcelas.reduce((acc: number, parcela: any) => {
         const porcentagem = parcela?.porcentagem
           ? String(parcela.porcentagem).replace(",", ".")
           : "0";
         return acc + (parseFloat(porcentagem) || 0);
       }, 0);
 
-      setTotalPorcentagem(total);
+      // Arredonda o total para 2 casas decimais
+      const totalArredondado = Math.round(total * 100) / 100;
+
+      setTotalPorcentagem(totalArredondado);
+      console.log(totalArredondado);
     } else {
       setTotalPorcentagem(100);
     }

@@ -362,7 +362,7 @@ export function OrdemServicoDialog({
               <Form.Label htmlFor="data_prazo">Prazo *</Form.Label>
               <Datepick
                 name="data_prazo"
-                days={30}
+                days={0}
                 disabled={action === "Visualizar"}
               />
               <Form.ErrorMessage field="data_prazo" />
